@@ -1,0 +1,23 @@
+{
+  "name": "slaughter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "./build.sh",
+    "watch": "./node_modules/.bin/nodemon ---watch ./src ./build.sh"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "browserify": "^13.1.1",
+    "nodemon": "^1.11.0",
+    "tsify": "^2.0.3",
+    "typescript": "^2.0.10",
+    "typings": "^2.0.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.2",
+    "underscore": "^1.8.3"
+  }
+}
