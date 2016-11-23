@@ -2,6 +2,7 @@
 import { Hex, Tenant, Board, TEAM_WATER, Game } from './models'
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
+    size -= 2; //boarder
     var angle_deg = 60 * i;
     var angle_rad = Math.PI / 180 * angle_deg;
     return new THREE.Vector2(center.x + size * Math.cos(angle_rad),
@@ -9,6 +10,9 @@ function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
 }
 
 export class HexView extends Backbone.View<Hex> {
+    events(){ return {
+        "click":this._onHexClick
+    } as Backbone.EventsHash }
     initialize(options:Backbone.ViewOptions<Hex>){
         var size = 60;  // In pixels
         var width = size * 2;
@@ -39,6 +43,9 @@ export class HexView extends Backbone.View<Hex> {
             .addClass('hex')
             .addClass('team-'+this.model.team)
         return this;
+    }
+    _onHexClick(){
+        window['hex'] = this.model;
     }
 }
 

@@ -14,14 +14,16 @@ body, html {
   stroke: #000;
   stroke-width: 1;
   fill: #ffff00;
-  transition: stroke, stroke-width;
-  transition-duration: 1s;
+  transition: stroke, stroke-width, opacity;
+  transition-duration: 0.5s;
 }
 
 .hex:hover {
   stroke: #ff0000;
-  stroke-width: 5;
+  stroke-width: 2;
   z-index: 10;
+  opacity: 0.7;
+  filter:url(#dropshadow);
 }
 
 .hex.team--1 {
