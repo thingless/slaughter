@@ -14,7 +14,7 @@ export class HexView extends Backbone.View<Hex> {
         "click":this._onHexClick
     } as Backbone.EventsHash }
     initialize(options:Backbone.ViewOptions<Hex>){
-        var size = 16;  // In pixels
+        var size = 22;  // In pixels
         var width = size * 2;
         var height = Math.sqrt(3)/2 * width;
 
