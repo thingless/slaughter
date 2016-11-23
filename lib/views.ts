@@ -10,7 +10,7 @@ function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
 
 export class HexView extends Backbone.View<Hex> {
     initialize(options:Backbone.ViewOptions<Hex>){
-        var size = 60;  // In pixels
+        var size = 16;  // In pixels
         var width = size * 2;
         var height = Math.sqrt(3)/2 * width;
 
@@ -19,7 +19,7 @@ export class HexView extends Backbone.View<Hex> {
         var row = this.model.loc.z + (this.model.loc.x - (this.model.loc.x & 1)) / 2;
 
         // Find the center (TODO)
-        var center = new THREE.Vector2(col * width * 3/4 + width, row * height + (col % 2 === 1 && height / 2 || 0) + height);
+        var center = new THREE.Vector2((col + 0.5) * width * 3/4, (row + 0.5) * height + (col % 2 === 1 && height / 2 || 0));
 
         var polyLines = [];
         for (var i = 0; i < 6; i++) {
