@@ -7,5 +7,12 @@ win['_'] = require('underscore');
 win['Backbone'] = require('backbone');
 win['THREE'] = require('three');
 
-import * as j from './fun'
-j.log();
+import {Game} from './models'
+import {GameView} from './views'
+
+function main() {
+    var game = new Game()
+
+}
+
+$(document).ready(main)
