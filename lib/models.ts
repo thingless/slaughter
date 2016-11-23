@@ -66,7 +66,39 @@ export class BaseColletion<T extends Backbone.Model> extends Backbone.Collection
     }
 }
 
+export enum Tenant {
+    Water,
+
+    House,
+    Tower,
+
+    Grave,
+    TreePalm,
+    TreePine,
+
+    Peasant,
+    Spearman,
+    Knight,
+    Paladan,
+}
+export const TEAM_WATER:number = 0;
+
 export class Hex extends BaseModel {
+    //x:number   starting at 0,0,0 at top left
+    //y:number
+    //z:number
+    //tenant:Tenant
+    //team:number
+    defaults(){ return {
+        team:TEAM_WATER,
+        tenant:Tenant.Water,
+    }}
+    get team():number { return this.get('team') }
+    set team(val:number) { this.set('team', val) }
+    get tenant():Tenant { return this.get('tenant') }
+    set tenant(val:Tenant) { this.set('tenant', val) }
+
+
     /* Some example code to make backbone easier
     defaults(){ return {
         commStation:false,
