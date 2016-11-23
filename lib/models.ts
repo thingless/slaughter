@@ -67,9 +67,6 @@ export class BaseColletion<T extends Backbone.Model> extends Backbone.Collection
 }
 
 export class Hex extends BaseModel {
-    initialize(){
-
-    }
     /* Some example code to make backbone easier
     defaults(){ return {
         commStation:false,
