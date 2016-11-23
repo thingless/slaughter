@@ -84,19 +84,20 @@ export enum Tenant {
 export const TEAM_WATER:number = 0;
 
 export class Hex extends BaseModel {
-    //x:number   starting at 0,0,0 at top left
-    //y:number
-    //z:number
     //tenant:Tenant
     //team:number
+    //loc:THREE.Vector3
     defaults(){ return {
         team:TEAM_WATER,
         tenant:Tenant.Water,
+        loc:new THREE.Vector3(0,0,0),
     }}
     get team():number { return this.get('team') }
     set team(val:number) { this.set('team', val) }
     get tenant():Tenant { return this.get('tenant') }
     set tenant(val:Tenant) { this.set('tenant', val) }
+    get loc():THREE.Vector3 { return this.get('loc') }
+    set loc(val:THREE.Vector3) { this.set('loc', val) }
 
 
     /* Some example code to make backbone easier
