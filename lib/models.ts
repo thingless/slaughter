@@ -67,12 +67,25 @@ export class BaseColletion<T extends Backbone.Model> extends Backbone.Collection
 }
 
 export class Hex extends BaseModel {
-    //x:int
-    //y:int
-    //z:int
     initialize(){
 
     }
+    /* Some example code to make backbone easier
+    defaults(){ return {
+        commStation:false,
+        team:-1,
+    }}
+    initialize(){
+        this.loc && this.set('id', this.loc.x+','+this.loc.y)
+        this.on('fleet:enter', this._fleetEnter, this)
+        this.on('fleet:leave', this._fleetLeave, this)
+        this.on('comm:enter', this._commEnter, this)
+        this.listenTo(this, 'change:loc', (m,val)=>this.set('id', val.x+','+val.y))
+    }
+    //Use properties for type checking
+    get time():number { return this.get('time') }
+    set time(locations:number) { this.set('time', locations) }
+    */
 }
 
 export class Board extends BaseColletion<Hex> {
