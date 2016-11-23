@@ -9,10 +9,14 @@ win['THREE'] = require('three');
 
 import {Game} from './models'
 import {GameView} from './views'
+import * as hexops from './hexops'
 
 function main() {
     var game = new Game()
-
+    game.board = hexops.dumbGen(10);
+    var gameView = new GameView({model:game})
+    window['game'] = game
+    window['gameView'] = gameView;
 }
 
 $(document).ready(main)

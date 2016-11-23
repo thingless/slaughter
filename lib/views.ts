@@ -18,8 +18,8 @@ export class HexView extends Backbone.View<Hex> {
 }
 
 export class GameView extends Backbone.View<Game> {
-    tagName = "svg"
     initialize(options:Backbone.ViewOptions<Game>){
+        this.setElement($('#svg-slaughter'))
         this.model.board.forEach(this._onHexAdded.bind(this))
         this.listenTo(this.model.board, 'add', this._onHexAdded)
     }
