@@ -2,12 +2,12 @@
 import {Board, Hex} from './models';
 
 export const DIRS = {
-    SE: THREE.Vector3(+1, -1, +0),
-    NE: THREE.Vector3(+1, +0, -1),
-    N:  THREE.Vector3(+0, +1, -1),
-    NW: THREE.Vector3(-1, +1, +0),
-    SW: THREE.Vector3(-1, +0, +1),
-    S:  THREE.Vector3(+0, -1, +1),
+    SE: new THREE.Vector3(+1, -1, +0),
+    NE: new THREE.Vector3(+1, +0, -1),
+    N:  new THREE.Vector3(+0, +1, -1),
+    NW: new THREE.Vector3(-1, +1, +0),
+    SW: new THREE.Vector3(-1, +0, +1),
+    S:  new THREE.Vector3(+0, -1, +1),
 };
 type Direction = THREE.Vector3;
 
@@ -16,7 +16,7 @@ export function hexNeighbor(board:Board, hex:Hex, direction:Direction):Hex {
     return board.get(newLoc.x + ',' + newLoc.y + ',' + newLoc.z);
 }
 
-export function teamFloodFill(board:Board, hex:Hex, territory:Number):Array<Hex> {
+export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex> {
     let output:Array<Hex> = []
 
     // Set the "territory" property of this hex and all connected hexes.
@@ -56,9 +56,11 @@ export function teamFloodFill(board:Board, hex:Hex, territory:Number):Array<Hex>
     return output;
 }
 
-export function annotateTerritories(board:Board):Array<Hex> {
-    let territories:Array<Hex> = [];
-    let currentTerritory:Number = 1;
+export function annotateTerritories(board:Board):Array<Array<Hex>> {
+    // Assign the "territory" prop on each hex to the same thing for each connected component
+    // Additionally, return a list of territories (which are each just a list of Hexes)
+    let territories:Array<Array<Hex>> = [];
+    let currentTerritory:number = 1;
 
     board.map((hex)=>{
         let ter = teamFloodFill(board, hex, currentTerritory);
@@ -67,4 +69,15 @@ export function annotateTerritories(board:Board):Array<Hex> {
     });
 
     return territories;
+}
+
+export function dumbGen(size:number):Board {
+    var board:Board = new Board();
+    for(var i = 0; i < size; i++) {
+        for(var j = 0; j < size; j++) {
+            var k = -(i+j);
+            board.add(i + ',' + j + ',' + k, new Hex());
+        }
+    }
+    return board;
 }

@@ -8,4 +8,5 @@ win['Backbone'] = require('backbone');
 win['THREE'] = require('three');
 
 import * as j from './fun'
+import * as ho from './hexops'
 j.log();
