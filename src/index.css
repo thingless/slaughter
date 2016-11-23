@@ -7,3 +7,17 @@ body, html {
     width: 100%;
     height: 100%;
 }
+
+.hex {
+  cursor: pointer;
+  stroke: #000;
+  stroke-width: 1;
+  fill: #ffff00;
+  transition: stroke, stroke-width;
+  transition-duration: 1s;
+}
+
+.hex:hover {
+  stroke: #ff0000;
+  stroke-width: 5;
+}
