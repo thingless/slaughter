@@ -13,7 +13,7 @@ import * as hexops from './hexops'
 
 function main() {
     var game = new Game()
-    game.board = hexops.dumbGen(10);
+    game.board = hexops.dumbGen(30);
     var gameView = new GameView({model:game})
     window['game'] = game
     window['gameView'] = gameView;
