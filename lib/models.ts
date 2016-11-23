@@ -130,6 +130,8 @@ export class Game extends BaseModel {
     defaults(){return {
     }}
     initialize(attributes, options){
-        this.set('game', new Game(null, {parent:this}))
+        this.set('board', new Board(null, {parent:this}))
     }
+    get board():Board { return this.get('board') }
+    set board(val:Board) { this.set('board', val) }
 }
