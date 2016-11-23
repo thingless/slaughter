@@ -81,7 +81,7 @@ export enum Tenant {
     Knight,
     Paladan,
 }
-export const TEAM_WATER:number = 0;
+export const TEAM_WATER:number = -1;
 
 export class Hex extends BaseModel {
     //tenant:Tenant
