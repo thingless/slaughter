@@ -73,12 +73,15 @@ export function annotateTerritories(board:Board):Array<Array<Hex>> {
 
 export function dumbGen(size:number):Board {
     var board:Board = new Board();
-    for(var i = 0; i < size; i++) {
-        for(var j = 0; j < size; j++) {
-            var k = -(i+j);
 
-            board.add(new Hex({loc:new THREE.Vector3(i,j,k)}));
+    for (var row = 0; row < size; row++) {
+        for (var col = 0; col < size; col++) {
+            var x = col;
+            var z = row - (col - (col&1)) / 2;
+            var y = -x-z;
+            board.add(new Hex({loc: new THREE.Vector3(x,y,z)}));
         }
     }
+
     return board;
 }

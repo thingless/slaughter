@@ -1,9 +1,34 @@
 /// <reference path="../typings/index.d.ts" />
 import { Hex, Tenant, Board, TEAM_WATER, Game } from './models'
 
+function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
+    var angle_deg = 60 * i;
+    var angle_rad = Math.PI / 180 * angle_deg;
+    return new THREE.Vector2(center.x + size * Math.cos(angle_rad),
+                             center.y + size * Math.sin(angle_rad));
+}
+
 export class HexView extends Backbone.View<Hex> {
     initialize(options:Backbone.ViewOptions<Hex>){
-        var ele = Snap("#svg-slaughter").polygon([300,150, 225,280, 75,280, 0,150, 75,20, 225,20])
+        var size = 60;  // In pixels
+        var width = size * 2;
+        var height = Math.sqrt(3)/2 * width;
+
+        // Convert to odd-q offset coords
+        var col = this.model.loc.x;
+        var row = this.model.loc.z + (this.model.loc.x - (this.model.loc.x & 1)) / 2;
+
+        // Find the center (TODO)
+        var center = new THREE.Vector2(col * width * 3/4 + width, row * height + (col % 2 === 1 && height / 2 || 0) + height);
+
+        var polyLines = [];
+        for (var i = 0; i < 6; i++) {
+            var corn = hexCorner(center, size, i);
+            polyLines.push(corn.x);
+            polyLines.push(corn.y);
+        }
+
+        var ele = Snap("#svg-slaughter").polygon(polyLines)
         this.setElement(ele.node);
         this.listenTo(this.model, 'change:team', this.render)
         this.listenTo(this.model, 'change:tenant', this.render)
