@@ -1,5 +1,5 @@
 //import * as models from './models'
-import {Board, Hex} from './models';
+import {Board, Hex, Tenant} from './models';
 
 export const DIRS = {
     SE: new THREE.Vector3(+1, -1, +0),
@@ -71,15 +71,36 @@ export function annotateTerritories(board:Board):Array<Array<Hex>> {
     return territories;
 }
 
+export function offsetCoordsToCubic(row:number, col:number):THREE.Vector3 {
+    var x = col;
+    var z = row - (col - (col&1)) / 2;
+    var y = -x-z;
+    return new THREE.Vector3(x, y, z);
+}
+
 export function dumbGen(size:number):Board {
     var board:Board = new Board();
 
     for (var row = 0; row < size; row++) {
         for (var col = 0; col < size; col++) {
-            var x = col;
-            var z = row - (col - (col&1)) / 2;
-            var y = -x-z;
-            board.add(new Hex({loc: new THREE.Vector3(x,y,z)}));
+            let hex:Hex = new Hex({loc: offsetCoordsToCubic(row, col)});
+            if (row > 4 && row < 9) {
+                if (col >= 2 && col < 7) {
+                    hex.team = 1;
+                } else if (col >= 7 && col <= 12) {
+                    hex.team = 2;
+                }
+            }
+            if (row == 6 && (col == 4 || col == 9)) {
+                hex.money = 100;
+                hex.tenant = Tenant.House;
+            }
+
+            if (row == 5 && (col == 4 || col == 9)) {
+                hex.tenant = Tenant.Peasant;
+            }
+
+            board.add(hex);
         }
     }
 
