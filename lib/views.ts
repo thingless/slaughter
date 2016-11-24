@@ -1,5 +1,5 @@
 /// <reference path="../typings/index.d.ts" />
-import { Hex, Tenant, Board, TEAM_WATER, Game, Dictionary } from './models'
+import { Hex, Tenant, Board, TEAM_WATER, Game, Dictionary, Move } from './models'
 import {debugLogHex} from './hexops';
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
@@ -14,7 +14,9 @@ export const HEX_RADIUS = 22;
 export class HexView extends Backbone.View<Hex> {
     private _center:THREE.Vector2;
     events(){ return {
-        "click":this._onHexClick
+        "click":this._onHexClick,
+        "dragend":this.render, //who knows where our sprite is? rerender
+        "ondrop":this._onDrop,
     } as Backbone.EventsHash }
     initialize(options:Backbone.ViewOptions<Hex>){
         var size = HEX_RADIUS;  // In pixels
@@ -50,7 +52,9 @@ export class HexView extends Backbone.View<Hex> {
         Snap(this.el)
             .attr({class:''})
             .addClass('hex')
+            .addClass('dropzone')
             .addClass('team-'+this.model.team)
+            .attr({id:'hex-'+this.model.id.replace(/,/g,'_')})
         //update money
         let moneyEl = Snap(this.el).select('.money')
         if(moneyEl && this.model.money === 0){
@@ -74,27 +78,33 @@ export class HexView extends Backbone.View<Hex> {
             //render new tenant
             if(tenantSvg){
                 Snap.load(tenantSvg, (tenant:Snap.Element)=>{
-                    tenant = tenant.select('g')
-                    tenant.attr({
+                    let sprite = tenant.select('g')
+                    sprite.attr({
                         'transform-origin':`${this._center.x} ${this._center.y}`,
                         'transform':`translate(${this._center.x} ${this._center.y}) scale(0.25 0.25)`,
                     })
-                    Snap(this.el).add(tenant)
+                    //make a group to wrap sprite to isolate transforms
+                    let group:Snap.Element = Snap(1,1).g(sprite)
+                    group.addClass('sprite').addClass('draggable')
+                    //add it to doc
+                    Snap(this.el).add(group)
                 }, this)
             }
         }
         return this;
     }
-    _onHexClick(e){
+    private _onHexClick(e){
         debugLogHex(this.model);
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
         if (e.button === 1) { // middle mouse, insert a peasant
             window['sim'].makeMove(new window['Move'](window['hex'].team, window['hex'], null, window['Tenant'].Peasant));
         }
-        else if (e.shiftKey) { // shift-click, make a move from lastHex to hex
-            window['sim'].makeMove(new window['Move'](window['lastHex'].team, window['hex'], window['lastHex'], null));
-        }
+    }
+    private _onDrop(event){
+        let fromHexId:string = event.detail.from.id.split("hex-")[1].replace(/_/g, ",")
+        let fromHex:Hex = window['sim'].board.get(fromHexId)
+        window['sim'].makeMove(new Move(fromHex.team, this.model, fromHex, null))
     }
 }
 
@@ -113,3 +123,73 @@ export class GameView extends Backbone.View<Game> {
     //}
 }
 
+//we use interact.js to do drag and drop. This function reg/configs interact.js
+export function setupDraggable(){
+  interact('.draggable').draggable({
+    inertia: false, //enable inertial throwing
+    // keep the element within the area of it's parent
+    restrict: {
+      restriction: "parent",
+      endOnly: true,
+      elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+    },
+    autoScroll: true, // enable autoScroll
+    onstart: function name(event:Interact.InteractEvent) {
+        //SVG does not support ZIndex so we hack it in by reordering nodes
+        var hex = $(event.target).closest('.hex')[0];
+        $(hex).parent().append(hex);
+    },
+    // call this function on every dragmove event
+    onmove: function (event:Interact.InteractEvent) {
+        var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        // translate the element
+        target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        // update the posiion attributes
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+    },
+    // call this function on every dragend event
+    onend: function (event:Interact.InteractEvent) {
+        event.target.dispatchEvent(new CustomEvent('dragend',{ bubbles:true }))
+    }
+  });
+
+  interact('.dropzone').dropzone({
+    //accept: '#yes-drop',
+    overlap: 0.75, // Require a 75% element overlap for a drop to be possible
+    // listen for drop related events:
+    ondropactivate: function (event) {
+        // add active dropzone feedback
+        event.target.classList.add('drop-active');
+    },
+    ondragenter: function (event) {
+        var draggableElement = event.relatedTarget,
+            dropzoneElement = event.target;
+        // feedback the possibility of a drop
+        dropzoneElement.classList.add('drop-target');
+        draggableElement.classList.add('can-drop');
+    },
+    ondragleave: function (event) {
+        // remove the drop feedback style
+        event.target.classList.remove('drop-target');
+        event.relatedTarget.classList.remove('can-drop');
+    },
+    ondrop: function (event) {
+        event.target.dispatchEvent(new CustomEvent('ondrop',{
+            bubbles:true,
+            detail:{
+                to:$(event.target).closest('.hex')[0],
+                from:$(event.relatedTarget).closest('.hex')[0],
+            }
+        }))
+    },
+    ondropdeactivate: function (event) {
+        // remove active dropzone feedback
+        event.target.classList.remove('drop-active');
+        event.target.classList.remove('drop-target');
+    }
+  });
+}

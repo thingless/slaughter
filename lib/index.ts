@@ -6,13 +6,15 @@ win['$'] = require('jquery');
 win['_'] = require('underscore');
 win['Backbone'] = require('backbone');
 win['THREE'] = require('three');
+win['interact'] = require('interact.js');
 
 import {Game, Move, Tenant} from './models'
-import {GameView} from './views'
+import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
 
 function main() {
+    setupDraggable();
     var game = new Game()
     game.board = hexops.dumbGen(30);
     hexops.annotateTerritories(game.board);
