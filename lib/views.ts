@@ -1,6 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 import { Hex, Tenant, Board, TEAM_WATER, Game, Dictionary, Move } from './models'
 import {debugLogHex} from './hexops';
+import {Simulator} from './simulator'
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
     size -= 2; //boarder
@@ -85,7 +86,10 @@ export class HexView extends Backbone.View<Hex> {
                     })
                     //make a group to wrap sprite to isolate transforms
                     let group:Snap.Element = Snap(1,1).g(sprite)
-                    group.addClass('sprite').addClass('draggable')
+                    group.addClass('sprite')
+                    if(Simulator.isMobileUnit(this.model.tenant)){
+                        group.addClass('draggable')
+                    }
                     //add it to doc
                     Snap(this.el).add(group)
                 }, this)

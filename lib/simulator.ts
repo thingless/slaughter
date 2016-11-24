@@ -78,12 +78,15 @@ export class Simulator {
         return this.board.filter((hex)=>hex.territory === territory && hex.tenant === Tenant.House)[0];
     }
 
-    private isMobileUnit(tenant:Tenant):boolean {
+    public static isMobileUnit(tenant:Tenant):boolean {
         // Check if it's even a mobile unit
         return (tenant === Tenant.Peasant ||
                 tenant === Tenant.Spearman ||
                 tenant === Tenant.Knight ||
                 tenant === Tenant.Paladan);
+    }
+    private isMobileUnit(tenant:Tenant):boolean {
+        return Simulator.isMobileUnit(tenant);
     }
 
     private canMove(hex:Hex):boolean {
