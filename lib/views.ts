@@ -9,13 +9,14 @@ function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
                              center.y + size * Math.sin(angle_rad));
 }
 
+export const HEX_RADIUS = 22;
 export class HexView extends Backbone.View<Hex> {
     private _center:THREE.Vector2;
     events(){ return {
         "click":this._onHexClick
     } as Backbone.EventsHash }
     initialize(options:Backbone.ViewOptions<Hex>){
-        var size = 22;  // In pixels
+        var size = HEX_RADIUS;  // In pixels
         var width = size * 2;
         var height = Math.sqrt(3)/2 * width;
 
@@ -48,9 +49,8 @@ export class HexView extends Backbone.View<Hex> {
             .addClass('hex')
             .addClass('team-'+this.model.team)
         //cleanup old tenant if it exsits
-        //Snap(this.el).filter('use').remove()
+        Snap(this.el).filter('g').remove()
         if(this.model.tenant){
-            debugger
             //get graphics for new tenant
             let svgTable:Dictionary<string> = {}
             svgTable[Tenant.Grave.toString()] = '/img/grave.svg'
@@ -63,10 +63,13 @@ export class HexView extends Backbone.View<Hex> {
             var tenantSvg:string = svgTable[this.model.tenant] || null
             //render new tenant
             if(tenantSvg){
-                var tenant:Snap.Element = Snap(this.el)
-                    .use() as Snap.Element
-                tenant.attr({"xlink:href":tenantSvg})
-                    .transform(`translate(${this._center.x},${this._center.y})`)
+                Snap.load(tenantSvg, (tenant:Snap.Element)=>{
+                    tenant = tenant.select('g')
+                    tenant.attr({
+                        'transform':`translate(${this._center.x},${this._center.y})`
+                    })
+                    Snap(this.el).add(tenant)
+                }, this)
             }
         }
         return this;
