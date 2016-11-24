@@ -66,7 +66,8 @@ export class HexView extends Backbone.View<Hex> {
                 Snap.load(tenantSvg, (tenant:Snap.Element)=>{
                     tenant = tenant.select('g')
                     tenant.attr({
-                        'transform':`translate(${this._center.x},${this._center.y})`
+                        'transform-origin':`${this._center.x} ${this._center.y}`,
+                        'transform':`translate(${this._center.x} ${this._center.y}) scale(0.25 0.25)`,
                     })
                     Snap(this.el).add(tenant)
                 }, this)
