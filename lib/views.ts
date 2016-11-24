@@ -49,7 +49,7 @@ export class HexView extends Backbone.View<Hex> {
             .addClass('hex')
             .addClass('team-'+this.model.team)
         //cleanup old tenant if it exsits
-        Snap(this.el).filter('g').remove()
+        Snap(this.el).select('g') && Snap(this.el).select('g').remove()
         if(this.model.tenant){
             //get graphics for new tenant
             let svgTable:Dictionary<string> = {}
