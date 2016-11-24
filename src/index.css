@@ -18,6 +18,13 @@ body, html {
   transition-duration: 0.5s;
 }
 
+.hex .money {
+    font-size: 10px;
+    fill: #ffd600;
+    font-weight: bold;
+    stroke-width: 0;
+}
+
 .hex:hover {
   stroke: #ff0000;
   stroke-width: 2;

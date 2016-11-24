@@ -37,11 +37,13 @@ export class HexView extends Backbone.View<Hex> {
 
         var s = Snap("#svg-slaughter")
         var poly = s.polygon(polyLines)
-        var ele = s.group(poly)
+        var money = s.text(this._center.x, this._center.y, '').addClass('money')
+        var ele = s.group(poly, money)
 
         this.setElement(ele.node);
         this.listenTo(this.model, 'change:team', this.render)
         this.listenTo(this.model, 'change:tenant', this.render)
+        this.listenTo(this.model, 'change:money', this.render)
         this.render();
     }
     render():HexView{
@@ -49,6 +51,13 @@ export class HexView extends Backbone.View<Hex> {
             .attr({class:''})
             .addClass('hex')
             .addClass('team-'+this.model.team)
+        //update money
+        let moneyEl = Snap(this.el).select('.money')
+        if(moneyEl && this.model.money === 0){
+            moneyEl.attr({text: ''})
+        } else if (moneyEl){
+            moneyEl.attr({text: this.model.money.toString()})
+        }
         //cleanup old tenant if it exsits
         Snap(this.el).select('g') && Snap(this.el).select('g').remove()
         if(this.model.tenant){
