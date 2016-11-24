@@ -89,7 +89,7 @@ export class HexView extends Backbone.View<Hex> {
                     //make a group to wrap sprite to isolate transforms
                     let group:Snap.Element = Snap(1,1).g(sprite)
                     group.addClass('sprite')
-                    if(Simulator.isMobileUnit(this.model.tenant)){
+                    if(Simulator.isMobileUnit(this.model.tenant) && this.model.canMove){
                         group.addClass('draggable')
                     }
                     //add it to doc
@@ -145,6 +145,7 @@ export function setupDraggable(){
         //SVG does not support ZIndex so we hack it in by reordering nodes
         var hex = $(event.target).closest('.hex')[0];
         $(hex).parent().append(hex);
+        event.target.classList.add('drag-active')
     },
     // call this function on every dragmove event
     onmove: function (event:Interact.InteractEvent) {
@@ -160,6 +161,7 @@ export function setupDraggable(){
     },
     // call this function on every dragend event
     onend: function (event:Interact.InteractEvent) {
+        event.target.classList.add('drag-active')
         event.target.dispatchEvent(new CustomEvent('dragend',{ bubbles:true }))
     }
   });
