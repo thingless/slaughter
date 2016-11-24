@@ -1,5 +1,5 @@
 /// <reference path="../typings/index.d.ts" />
-import { Hex, Tenant, Board, TEAM_WATER, Game } from './models'
+import { Hex, Tenant, Board, TEAM_WATER, Game, Dictionary } from './models'
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
     size -= 2; //boarder
@@ -10,6 +10,7 @@ function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
 }
 
 export class HexView extends Backbone.View<Hex> {
+    private _center:THREE.Vector2;
     events(){ return {
         "click":this._onHexClick
     } as Backbone.EventsHash }
@@ -23,25 +24,51 @@ export class HexView extends Backbone.View<Hex> {
         var row = this.model.loc.z + (this.model.loc.x - (this.model.loc.x & 1)) / 2;
 
         // Find the center (TODO)
-        var center = new THREE.Vector2((col + 0.5) * width * 3/4, (row + 0.5) * height + (col % 2 === 1 && height / 2 || 0));
+        this._center = new THREE.Vector2((col + 0.5) * width * 3/4, (row + 0.5) * height + (col % 2 === 1 && height / 2 || 0));
 
         var polyLines = [];
         for (var i = 0; i < 6; i++) {
-            var corn = hexCorner(center, size, i);
+            var corn = hexCorner(this._center, size, i);
             polyLines.push(corn.x);
             polyLines.push(corn.y);
         }
 
-        var ele = Snap("#svg-slaughter").polygon(polyLines)
+        var s = Snap("#svg-slaughter")
+        var poly = s.polygon(polyLines)
+        var ele = s.group(poly)
+
         this.setElement(ele.node);
         this.listenTo(this.model, 'change:team', this.render)
         this.listenTo(this.model, 'change:tenant', this.render)
         this.render();
     }
     render():HexView{
-        Snap(this.el).attr({class:''})
+        Snap(this.el)
+            .attr({class:''})
             .addClass('hex')
             .addClass('team-'+this.model.team)
+        //cleanup old tenant if it exsits
+        //Snap(this.el).filter('use').remove()
+        if(this.model.tenant){
+            debugger
+            //get graphics for new tenant
+            let svgTable:Dictionary<string> = {}
+            svgTable[Tenant.Grave.toString()] = '/img/grave.svg'
+            svgTable[Tenant.House.toString()] = '/img/taxman.svg'
+            svgTable[Tenant.Knight.toString()] = '/img/knight.svg'
+            svgTable[Tenant.Paladan.toString()] = '/img/paladan.svg'
+            svgTable[Tenant.Peasant.toString()] = '/img/peasant.svg'
+            svgTable[Tenant.Spearman.toString()] = '/img/spearman.svg'
+            svgTable[Tenant.Tower.toString()] = '/img/tower.svg'
+            var tenantSvg:string = svgTable[this.model.tenant] || null
+            //render new tenant
+            if(tenantSvg){
+                var tenant:Snap.Element = Snap(this.el)
+                    .use() as Snap.Element
+                tenant.attr({"xlink:href":tenantSvg})
+                    .transform(`translate(${this._center.x},${this._center.y})`)
+            }
+        }
         return this;
     }
     _onHexClick(){
