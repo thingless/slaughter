@@ -66,7 +66,7 @@ export class HexView extends Backbone.View<Hex> {
             moneyEl.attr({text: this.model.money.toString()})
         }
         //cleanup old tenant if it exsits
-        Snap(this.el).select('g') && Snap(this.el).select('g').remove()
+        $(this.el).find('.sprite').remove();
         if(this.model.tenant){
             //get graphics for new tenant
             let svgTable:Dictionary<string> = {}
