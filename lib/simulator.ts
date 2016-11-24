@@ -1,5 +1,5 @@
 import * as hexops from './hexops';
-import {Board, Hex, Move, Tenant, TEAM_WATER} from './models';
+import {Board, Hex, Move, Tenant, TEAM_WATER, Dictionary} from './models';
 
 export class Simulator {
     private board:Board = null;
@@ -24,7 +24,7 @@ export class Simulator {
         return 0;
     }
 
-    private combatValueToMobileTenant(cv:number):Tenant | null {
+    private combatValueToMobileTenant(cv:number):Tenant {
         if (cv === 1)
             return Tenant.Peasant;
         if (cv === 2)
@@ -50,7 +50,7 @@ export class Simulator {
         return null;
     }
 
-    private getUpgradedTenant(move:Move):Tenant | null {
+    private getUpgradedTenant(move:Move):Tenant {
         let newTenant = move.fromHex && move.fromHex.tenant || move.newTenant;
         if (!newTenant)
             return null;
@@ -70,7 +70,7 @@ export class Simulator {
         return this.combatValueToMobileTenant(finalValue);
     }
 
-    private getHomeHex(move:Move):Hex | null {
+    private getHomeHex(move:Move):Hex {
         // Find the hex of the house of the **player's** relevant territory for this move.
         let territory = move.fromHex && move.fromHex.territory || move.toHex.territory;
 
@@ -154,7 +154,7 @@ export class Simulator {
                 if (maybeOurHex && maybeOurHex.territory === ourTerritory) {
                     return true;
                 }
-            }), (x)=>x);
+            }), (x)=>!!x);
             // We don't own any adjacent territory
             if(lst[0] !== true) {
                 console.log("We cannot move to a new territory unless the hex is adjacent to our territory");
@@ -211,7 +211,7 @@ export class Simulator {
         return true;
     }
 
-    public makeMove(move:Move):undefined {
+    public makeMove(move:Move):void {
         // Update the board based on a move
         // Make sure the move is legal
         if (!this.isMoveLegal(move))

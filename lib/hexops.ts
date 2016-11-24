@@ -1,8 +1,8 @@
 //import * as models from './models'
-import {Board, Hex, Tenant, tenantToString} from './models';
+import {Board, Hex, Tenant, tenantToString, Dictionary} from './models';
 import * as hexops from './hexops';
 
-export const DIRS = {
+export const DIRS:Dictionary<THREE.Vector3> = {
     SE: new THREE.Vector3(+1, -1, +0),
     NE: new THREE.Vector3(+1, +0, -1),
     N:  new THREE.Vector3(+0, +1, -1),
