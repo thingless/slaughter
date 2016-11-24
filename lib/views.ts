@@ -119,6 +119,9 @@ export class GameView extends Backbone.View<Game> {
     initialize(options:Backbone.ViewOptions<Game>){
         this.setElement($('#svg-slaughter'))
         this.model.board.forEach(this._onHexAdded.bind(this))
+        let bbox = Snap($('.hex').last()[0] as any).getBBox()
+        this.$el.width(bbox.x+bbox.width)
+        this.$el.height(bbox.y+bbox.height)
         this.listenTo(this.model.board, 'add', this._onHexAdded)
     }
     private _onHexAdded(hex:Hex){
