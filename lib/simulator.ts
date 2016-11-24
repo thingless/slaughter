@@ -121,6 +121,11 @@ export class Simulator {
             console.log("Cannot move to water");
             return false;
         }
+        //If the hex is from itself its a no-op
+        if(move.toHex.id === move.fromHex.id){
+            console.log("Cannot move to self");
+            return false;
+        }
 
         // Find the territory of the from hex (or of the to hex if this is a new entity)
         let ourTerritory = move.fromHex && move.fromHex.territory;
