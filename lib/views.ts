@@ -104,7 +104,7 @@ export class HexView extends Backbone.View<Hex> {
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
         if (e.button === 1) { // middle mouse, insert a peasant
-            window['sim'].makeMove(new window['Move'](window['hex'].team, window['hex'], null, window['Tenant'].Peasant));
+            window['sim'].makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
         }
     }
     private _onDrop(event){

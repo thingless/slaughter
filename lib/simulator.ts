@@ -122,7 +122,7 @@ export class Simulator {
             return false;
         }
         //If the hex is from itself its a no-op
-        if(move.toHex.id === move.fromHex.id){
+        if(move.fromHex && move.toHex && move.toHex.id === move.fromHex.id){
             console.log("Cannot move to self");
             return false;
         }
