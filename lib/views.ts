@@ -53,9 +53,11 @@ export class HexView extends Backbone.View<Hex> {
         Snap(this.el)
             .attr({class:''})
             .addClass('hex')
-            .addClass('dropzone')
             .addClass('team-'+this.model.team)
             .attr({id:'hex-'+this.model.id.replace(/,/g,'_')})
+        if(this.model.team !== TEAM_WATER){
+            Snap(this.el).addClass('dropzone')
+        }
         //update money
         let moneyEl = Snap(this.el).select('.money')
         if(moneyEl && this.model.money === 0){
@@ -109,6 +111,7 @@ export class HexView extends Backbone.View<Hex> {
         let fromHexId:string = event.detail.from.id.split("hex-")[1].replace(/_/g, ",")
         let fromHex:Hex = window['sim'].board.get(fromHexId)
         window['sim'].makeMove(new Move(fromHex.team, this.model, fromHex, null))
+        this.render() //need to update ourselfs
     }
 }
 
