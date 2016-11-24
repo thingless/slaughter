@@ -56,6 +56,10 @@ export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex>
     return output;
 }
 
+export function locToId(loc:THREE.Vector3):string {
+    return loc.x + ',' + loc.y + ',' + loc.z;
+}
+
 export function annotateTerritories(board:Board):Array<Array<Hex>> {
     // Assign the "territory" prop on each hex to the same thing for each connected component
     // Additionally, return a list of territories (which are each just a list of Hexes)

@@ -7,7 +7,7 @@ win['_'] = require('underscore');
 win['Backbone'] = require('backbone');
 win['THREE'] = require('three');
 
-import {Game} from './models'
+import {Game, Move} from './models'
 import {GameView} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
@@ -18,6 +18,9 @@ function main() {
     var gameView = new GameView({model:game})
     window['game'] = game
     window['gameView'] = gameView;
+    window['sim'] = new Simulator(game.board);
+    window['Move'] = Move;
+    window['hexops'] = hexops;
 }
 
 $(document).ready(main)
