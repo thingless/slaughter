@@ -219,6 +219,52 @@ export class Simulator {
         return true;
     }
 
+    private upkeepForTenant(tenant:Tenant):number {
+        if (tenant === Tenant.Peasant)
+            return 2;
+        if (tenant === Tenant.Spearman)
+            return 6;
+        if (tenant === Tenant.Knight)
+            return 18;
+        if (tenant === Tenant.Paladan)
+            return 54;
+        return 0;
+    }
+
+    private handleUpkeep(team:number):void {
+        // Find all territories belonging to this team
+        // Compute their income (1 for any tile not covered by TreePine or TreePalm)
+        // Compute their upkeep (# coins per mob)
+        // Kill all mobs (and replace with gravestones) if currency is negative
+
+        var territories = hexops.annotateTerritories(this.board);
+        territories.map((hexes)=>{
+            // This territory belongs to our team!
+            if(hexes[0].team === team) {
+                // Compute income & upkeep & find homeHex
+                let income:number = hexes.map((hex)=>(hex.tenant === Tenant.TreePine || hex.tenant === Tenant.TreePalm) ? 0 : 1).reduce((x, y)=>x + y, 0);
+                let upkeep:number = hexes.map((hex)=>this.upkeepForTenant(hex.tenant)).reduce((x, y)=>x + y, 0);
+                let homeHex:Hex = _.filter(hexes, (hex)=>hex.tenant === Tenant.House)[0];
+
+                // Find new money
+                let newMoney = homeHex.money + income - upkeep;
+                console.log("Territory", homeHex.territory, "for team", team, "has money = ", homeHex.money, " + ", income, " - ", upkeep, " = ", newMoney);
+
+                // If new money is negative, kill all mobs (replace with gravestones)
+                if (newMoney < 0) {
+                    hexes.map((hex)=>{
+                        if(this.upkeepForTenant(hex.tenant) > 0) {
+                            hex.tenant = Tenant.Grave;
+                        }
+                    })
+                }
+
+                // Set new money (or 0 if it was negative)
+                homeHex.money = Math.max(newMoney, 0);
+            }
+        })
+    }
+
     public makeMove(move:Move):void {
         // Update the board based on a move
         // Make sure the move is legal
