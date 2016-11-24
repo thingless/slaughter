@@ -1,20 +1,14 @@
 Slaughter
 ---------
-Making (debug) moves. "1" below is the team, 1 is Green, 2 is Red
+Making (debug) moves.
 
 ## Adding a Peasant
-Click a hex, then
-```
-sim.makeMove(new Move(1, hex, null, Tenant.Peasant));
-```
+Middle-click a hex
 
 ## Moving a unit
-Click the origin hex, then click the destination hex, then
-```
-sim.makeMove(new Move(1, hex, lastHex, null));
-```
+Click the origin hex, then shift-click the destination hex
 
-Simulator TODO:
+# Simulator TODO:
 Trees/Graves
 Upkeep
 Income

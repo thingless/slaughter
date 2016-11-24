@@ -76,10 +76,16 @@ export class HexView extends Backbone.View<Hex> {
         }
         return this;
     }
-    _onHexClick(){
+    _onHexClick(e){
         debugLogHex(this.model);
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
+        if (e.button === 1) { // middle mouse, insert a peasant
+            window['sim'].makeMove(new window['Move'](window['hex'].team, window['hex'], null, window['Tenant'].Peasant));
+        }
+        else if (e.shiftKey) { // shift-click, make a move from lastHex to hex
+            window['sim'].makeMove(new window['Move'](window['lastHex'].team, window['hex'], window['lastHex'], null));
+        }
     }
 }
 
