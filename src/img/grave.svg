@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 13.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 14948)  -->
+<svg
+    xmlns:graph="http://ns.adobe.com/Graphs/1.0/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:cc="http://web.resource.org/cc/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:x="http://ns.adobe.com/Extensibility/1.0/"
+    xmlns:i="http://ns.adobe.com/AdobeIllustrator/10.0/"
+    xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xml:space="preserve"
+    viewBox="0 0 64 64"
+    version="1.1"
+    i:rulerOrigin="0 0"
+    i:viewOrigin="274.5 427.5"
+    i:pageBounds="0 792 612 0"
+    y="0px"
+    x="0px"
+    enable-background="new 0 0 64 64"
+  >
+<g
+      id="Layer_1"
+      i:rgbTrio="#4F008000FFFF"
+      i:layer="yes"
+      i:dimmedPercent="50"
+    >
+	<g
+        id="g4337"
+        i:knockout="Off"
+        transform="matrix(2.56 0 0 2.56 -655.52 -744.87)"
+      >
+			<g
+          id="g9432"
+          inkscape:export-ydpi="90"
+          inkscape:export-filename="/home/tobi/strategiegame/skeleton.png"
+          transform="translate(-6.1882 21.964)"
+          stroke="#010101"
+          i:knockout="Off"
+          inkscape:export-xdpi="90"
+        >
+			<path
+            id="rect3918"
+            d="m270.33 285.78v6.406h3.188v-4.281h2.625v4.281h3.031v-6.406h-8.84z"
+            sodipodi:nodetypes="ccccccccc"
+            fill="#FFFFFF"
+        />
+			<path
+            id="rect3920"
+            d="m269 277.76h11.622v8.397h-11.622v-8.4z"
+            sodipodi:nodetypes="ccccc"
+            fill="#FFFFFF"
+        />
+			<path
+            id="rect3924"
+            d="m268.33 291.03v2.469h5.062v-2.469h-5.06zm7.91 0v2.469h4.937v-2.469h-4.94z"
+            fill="#FFFFFF"
+        />
+				<g
+            id="g3928"
+            transform="matrix(.99584 0 0 1.0091 -27.18 -7.495)"
+            inkscape:export-ydpi="90"
+            i:knockout="Off"
+            inkscape:export-xdpi="90"
+          >
+					<linearGradient
+              id="path3930_1_"
+              y2="270.33"
+              gradientUnits="userSpaceOnUse"
+              x2="345.7"
+              gradientTransform="matrix(2.5494 0 0 -2.5833 -581.96 986.48)"
+              y1="270.33"
+              x1="345.7"
+            >
+					<stop
+                style="stop-color:#010101"
+                offset="0"
+            />
+					<stop
+                style="stop-color:#010101"
+                offset="1"
+            />
+					<a:midPointStop
+                style="stop-color:#010101"
+                offset="0"
+            />
+					<a:midPointStop
+                style="stop-color:#010101"
+                offset="0.5"
+            />
+					<a:midPointStop
+                style="stop-color:#010101"
+                offset="1"
+            />
+				</linearGradient
+          >
+				<path
+              id="path3930"
+              d="m299.37 290.75v-5.209"
+              fill="url(#path3930_1_)"
+          />
+					<linearGradient
+              id="path3932_1_"
+              y2="270.33"
+              gradientUnits="userSpaceOnUse"
+              x2="348.71"
+              gradientTransform="matrix(2.5494 0 0 -2.5833 -581.96 986.48)"
+              y1="270.33"
+              x1="348.71"
+            >
+					<stop
+                style="stop-color:#010101"
+                offset="0"
+            />
+					<stop
+                style="stop-color:#010101"
+                offset="1"
+            />
+					<a:midPointStop
+                style="stop-color:#010101"
+                offset="0"
+            />
+					<a:midPointStop
+                style="stop-color:#010101"
+                offset="0.5"
+            />
+					<a:midPointStop
+                style="stop-color:#010101"
+                offset="1"
+            />
+				</linearGradient
+          >
+				<path
+              id="path3932"
+              d="m307.02 290.75v-5.209"
+              fill="url(#path3932_1_)"
+          />
+			</g
+        >
+			<path
+            id="rect3948"
+            d="m271.42 273.38v5.375h1.656v1.313h3.25v-1.313h1.656v-5.375h-6.57z"
+            fill="#FFFFFF"
+        />
+			<path
+            id="path3962"
+            d="m270.83 282.05l3.25-0.75"
+            fill="none"
+        />
+			<path
+            id="path3964"
+            d="m270.95 283.92l3.25-0.75"
+            fill="none"
+        />
+			<path
+            id="path3968"
+            d="m278.52 281.86l-3.25-0.75"
+            fill="none"
+        />
+			<path
+            id="path3970"
+            d="m278.39 283.74l-3.25-0.75"
+            fill="none"
+        />
+			<rect
+            id="rect3983"
+            height="1.072"
+            width="1.137"
+            y="274.86"
+            x="272.76"
+            fill="#010101"
+        />
+			<rect
+            id="rect4870"
+            height="1.076"
+            width=".983"
+            y="274.9"
+            x="275.4"
+            fill="#010101"
+        />
+		</g
+      >
+		<rect
+          id="rect4335"
+          fill-opacity="0"
+          height="25"
+          width="25"
+          y="290.96"
+          x="256.06"
+          fill="#010101"
+      />
+	</g
+    >
+</g
+  >
+<metadata
+    ><rdf:RDF
+      ><cc:Work
+        ><dc:format
+          >image/svg+xml</dc:format
+        ><dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        /><cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        /><dc:publisher
+          ><cc:Agent
+              rdf:about="http://openclipart.org/"
+            ><dc:title
+              >Openclipart</dc:title
+            ></cc:Agent
+          ></dc:publisher
+        ><dc:title
+          >Strategy Game Tileset</dc:title
+        ><dc:date
+          >2008-02-27T20:52:06</dc:date
+        ><dc:description
+          >A set of units and other graphical elements for a round-based strategy-game that I never made ... If you do so - tell me :)</dc:description
+        ><dc:source
+          >https://openclipart.org/detail/17081/strategy-game-tileset-by-mrbordello-17081</dc:source
+        ><dc:creator
+          ><cc:Agent
+            ><dc:title
+              >MrBordello</dc:title
+            ></cc:Agent
+          ></dc:creator
+        ><dc:subject
+          ><rdf:Bag
+            ><rdf:li
+              >archer</rdf:li
+            ><rdf:li
+              >computergame</rdf:li
+            ><rdf:li
+              >game</rdf:li
+            ><rdf:li
+              >horse</rdf:li
+            ><rdf:li
+              >knight</rdf:li
+            ><rdf:li
+              >map</rdf:li
+            ><rdf:li
+              >set</rdf:li
+            ><rdf:li
+              >soldiers</rdf:li
+            ><rdf:li
+              >strategy</rdf:li
+            ><rdf:li
+              >sword</rdf:li
+            ><rdf:li
+              >tile</rdf:li
+            ><rdf:li
+              >tileset</rdf:li
+            ><rdf:li
+              >unit</rdf:li
+            ><rdf:li
+              >videogame</rdf:li
+            ><rdf:li
+              >viking</rdf:li
+            ></rdf:Bag
+          ></dc:subject
+        ></cc:Work
+      ><cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        ><cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        /><cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        /><cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        /></cc:License
+      ></rdf:RDF
+    ></metadata
+  ></svg
+>

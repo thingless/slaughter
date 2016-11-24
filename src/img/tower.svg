@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 13.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 14948)  -->
+<svg
+    xmlns:graph="http://ns.adobe.com/Graphs/1.0/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:cc="http://web.resource.org/cc/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:x="http://ns.adobe.com/Extensibility/1.0/"
+    xmlns:i="http://ns.adobe.com/AdobeIllustrator/10.0/"
+    xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xml:space="preserve"
+    viewBox="0 0 64 64"
+    version="1.1"
+    i:rulerOrigin="0 0"
+    i:viewOrigin="274.5 427.5"
+    i:pageBounds="0 792 612 0"
+    y="0px"
+    x="0px"
+    enable-background="new 0 0 64 64"
+  >
+<g
+      id="Layer_1"
+      i:rgbTrio="#4F008000FFFF"
+      i:layer="yes"
+      i:dimmedPercent="50"
+    >
+		<g
+        id="g11433"
+        inkscape:export-ydpi="90"
+        inkscape:export-filename="/home/tobi/strategiegame/castle.png"
+        transform="matrix(2.56 0 0 2.56 -431.86 -690.61)"
+        i:knockout="Off"
+        inkscape:export-xdpi="90"
+      >
+		<g
+          id="g11361"
+          stroke="#010101"
+          i:knockout="Off"
+          transform="translate(22.163 -2.1974)"
+        >
+				<linearGradient
+            id="rect4086_1_"
+            y2="268.8"
+            gradientUnits="userSpaceOnUse"
+            x2="172.04"
+            gradientTransform="matrix(2.56 0 0 -2.56 -254.2 1004.5)"
+            y1="282.23"
+            x1="158.96"
+          >
+				<stop
+              style="stop-color:#AFAFAF"
+              offset="0"
+          />
+				<stop
+              style="stop-color:#FFFFFF"
+              offset="1"
+          />
+				<a:midPointStop
+              style="stop-color:#AFAFAF"
+              offset="0"
+          />
+				<a:midPointStop
+              style="stop-color:#AFAFAF"
+              offset="0.5"
+          />
+				<a:midPointStop
+              style="stop-color:#FFFFFF"
+              offset="1"
+          />
+			</linearGradient
+        >
+			<path
+            id="rect4086"
+            d="m151.22 280.38v16.093h15.625v-11.312h-0.031v-4.781h-2.937v4.781h-2.125v-4.688h-5.469v4.688h-2.125v-4.781h-2.92zm2.59 6.74h2.687v2.687h-2.687v-2.69z"
+            fill="url(#rect4086_1_)"
+        />
+			<path
+            id="path8667"
+            d="m159.03 280.07v-6.364"
+            fill="none"
+        />
+			<g
+            id="g11354"
+            i:knockout="Off"
+            fill="#F26822"
+            transform="translate(-29.257 21.158)"
+          >
+				<path
+              id="rect8669"
+              d="m189.91 253.07h3.549v3.247h-3.549v-3.25z"
+              sodipodi:nodetypes="ccccc"
+          />
+				<path
+              id="rect9556"
+              d="m188.23 252.55h2.541v3.248h-2.541v-3.25z"
+              sodipodi:nodetypes="ccccc"
+          />
+			</g
+        >
+			<rect
+            id="rect10450"
+            height="4.688"
+            width="3.092"
+            y="291.78"
+            x="155.94"
+            fill="#F26822"
+        />
+			<rect
+            id="rect10452"
+            height="4.688"
+            width="3.092"
+            y="291.78"
+            x="159.03"
+            fill="#F26822"
+        />
+		</g
+      >
+		<rect
+          id="rect11416"
+          fill-opacity="0"
+          height="25"
+          width="25"
+          y="269.77"
+          x="168.69"
+          fill="#010101"
+      />
+	</g
+    >
+</g
+  >
+<metadata
+    ><rdf:RDF
+      ><cc:Work
+        ><dc:format
+          >image/svg+xml</dc:format
+        ><dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        /><cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        /><dc:publisher
+          ><cc:Agent
+              rdf:about="http://openclipart.org/"
+            ><dc:title
+              >Openclipart</dc:title
+            ></cc:Agent
+          ></dc:publisher
+        ><dc:title
+          >Strategy Game Tileset</dc:title
+        ><dc:date
+          >2008-02-27T20:52:06</dc:date
+        ><dc:description
+          >A set of units and other graphical elements for a round-based strategy-game that I never made ... If you do so - tell me :)</dc:description
+        ><dc:source
+          >https://openclipart.org/detail/17086/strategy-game-tileset-by-mrbordello-17086</dc:source
+        ><dc:creator
+          ><cc:Agent
+            ><dc:title
+              >MrBordello</dc:title
+            ></cc:Agent
+          ></dc:creator
+        ><dc:subject
+          ><rdf:Bag
+            ><rdf:li
+              >archer</rdf:li
+            ><rdf:li
+              >computergame</rdf:li
+            ><rdf:li
+              >game</rdf:li
+            ><rdf:li
+              >horse</rdf:li
+            ><rdf:li
+              >knight</rdf:li
+            ><rdf:li
+              >map</rdf:li
+            ><rdf:li
+              >set</rdf:li
+            ><rdf:li
+              >soldiers</rdf:li
+            ><rdf:li
+              >strategy</rdf:li
+            ><rdf:li
+              >sword</rdf:li
+            ><rdf:li
+              >tile</rdf:li
+            ><rdf:li
+              >tileset</rdf:li
+            ><rdf:li
+              >unit</rdf:li
+            ><rdf:li
+              >videogame</rdf:li
+            ><rdf:li
+              >viking</rdf:li
+            ></rdf:Bag
+          ></dc:subject
+        ></cc:Work
+      ><cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        ><cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        /><cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        /><cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        /></cc:License
+      ></rdf:RDF
+    ></metadata
+  ></svg
+>
