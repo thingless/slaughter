@@ -10,6 +10,7 @@ win['THREE'] = require('three');
 import {Game} from './models'
 import {GameView} from './views'
 import * as hexops from './hexops'
+import {Simulator} from './simulator';
 
 function main() {
     var game = new Game()

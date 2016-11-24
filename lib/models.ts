@@ -92,6 +92,7 @@ export class Hex extends BaseModel {
         tenant:Tenant.Water,
         loc:new THREE.Vector3(0,0,0),
         money:0,
+        canMove:true,
     }}
     get team():number { return this.get('team') }
     set team(val:number) { this.set('team', val) }
@@ -101,13 +102,14 @@ export class Hex extends BaseModel {
     set loc(val:THREE.Vector3) { this.set('loc', val) }
     get money() { return this.get('money') }
     set money(val:number) { this.set('money', val) }
+    get canMove() { return this.get('canMove') }
+    set canMove(val:boolean) { this.set('canMove', val) }
 
     public territory:number = null;
 
     initialize(){
         this.set('id', this.loc.x+','+this.loc.y+','+this.loc.z)
     }
-
 
     /* Some example code to make backbone easier
     defaults(){ return {
@@ -128,6 +130,8 @@ export class Hex extends BaseModel {
 }
 
 export class Move {
+    public team:number = null;
+
     public newTenant:Tenant = null;
     public fromHex:Hex = null;
 
