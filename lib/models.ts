@@ -133,23 +133,6 @@ export class Hex extends BaseModel {
     initialize(){
         this.set('id', this.loc.x+','+this.loc.y+','+this.loc.z)
     }
-
-    /* Some example code to make backbone easier
-    defaults(){ return {
-        commStation:false,
-        team:-1,
-    }}
-    initialize(){
-        this.loc && this.set('id', this.loc.x+','+this.loc.y)
-        this.on('fleet:enter', this._fleetEnter, this)
-        this.on('fleet:leave', this._fleetLeave, this)
-        this.on('comm:enter', this._commEnter, this)
-        this.listenTo(this, 'change:loc', (m,val)=>this.set('id', val.x+','+val.y))
-    }
-    //Use properties for type checking
-    get time():number { return this.get('time') }
-    set time(locations:number) { this.set('time', locations) }
-    */
 }
 
 export class Move {
@@ -160,7 +143,7 @@ export class Move {
 
     public toHex:Hex = null;
 
-    constructor(team:number, toHex:Hex, fromHex:Hex | null, newTenant:Tenant | null) {
+    constructor(team:number, toHex:Hex, fromHex:Hex, newTenant:Tenant) {
         this.team = team;
         this.newTenant = newTenant;
         this.fromHex = fromHex;
