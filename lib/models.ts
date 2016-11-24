@@ -82,6 +82,29 @@ export enum Tenant {
     Paladan,
 }
 export const TEAM_WATER:number = -1;
+export function tenantToString(tenant:Tenant):string {
+    if (tenant === Tenant.Water)
+        return "water";
+    if (tenant === Tenant.House)
+        return "house";
+    if (tenant === Tenant.Tower)
+        return "tower";
+    if (tenant === Tenant.Grave)
+        return "grave";
+    if (tenant === Tenant.TreePalm)
+        return "treepalm";
+    if (tenant === Tenant.TreePine)
+        return "treepine";
+    if (tenant === Tenant.Peasant)
+        return "peasant";
+    if (tenant === Tenant.Spearman)
+        return "spearman";
+    if (tenant === Tenant.Knight)
+        return "knight";
+    if (tenant === Tenant.Paladan)
+        return "paladan";
+    return "unknown";
+}
 
 export class Hex extends BaseModel {
     //tenant:Tenant
@@ -136,6 +159,13 @@ export class Move {
     public fromHex:Hex = null;
 
     public toHex:Hex = null;
+
+    constructor(team:number, toHex:Hex, fromHex:Hex | null, newTenant:Tenant | null) {
+        this.team = team;
+        this.newTenant = newTenant;
+        this.fromHex = fromHex;
+        this.toHex = toHex;
+    }
 }
 
 export class Board extends BaseColletion<Hex> {

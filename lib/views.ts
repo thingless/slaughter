@@ -1,5 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 import { Hex, Tenant, Board, TEAM_WATER, Game, Dictionary } from './models'
+import {debugLogHex} from './hexops';
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
     size -= 2; //boarder
@@ -76,6 +77,8 @@ export class HexView extends Backbone.View<Hex> {
         return this;
     }
     _onHexClick(){
+        debugLogHex(this.model);
+        window['lastHex'] = window['hex'];
         window['hex'] = this.model;
     }
 }

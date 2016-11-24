@@ -115,6 +115,7 @@ export class Simulator {
     private isMoveLegal(move:Move):boolean {
         // If the to hex is water, we cannot move there
         if(!move.toHex || move.toHex.team == TEAM_WATER) {
+            console.log("Cannot move to water");
             return false;
         }
 
@@ -123,20 +124,24 @@ export class Simulator {
         if (!ourTerritory) {
             if (!move.newTenant) {
                 // Ill-formed move
+                console.log("No fromHex & no newTenant - ill-formed move")
                 return false;
             }
             if (move.toHex.team !== move.team) {
                 // New pieces can only go into our territory
+                console.log("New pieces must land in our territory first");
                 return false;
             }
             if (this.computeMoveCost(move) > this.getHomeHex(move).money) {
                 // We cannot afford this move
+                console.log("Move is too expensive");
                 return false;
             }
             ourTerritory = move.toHex.territory;
         } else {
             if (move.fromHex.team !== move.team) {
                 // we cannot move others' pieces
+                console.log("We cannot move others' pieces")
                 return false;
             }
         }
@@ -152,12 +157,14 @@ export class Simulator {
             }), (x)=>x);
             // We don't own any adjacent territory
             if(lst[0] !== true) {
+                console.log("We cannot move to a new territory unless the hex is adjacent to our territory");
                 return false;
             }
         }
 
         // If we don't have a new entity, we need to see if it can still move this turn
         if (move.fromHex && !this.canMove(move.fromHex)) {
+            console.log("This entity cannot move this turn");
             return false;
         }
 
@@ -167,9 +174,11 @@ export class Simulator {
         // If it's not mobile, the hex must be empty & ours, full stop
         if (!this.isMobileUnit(ourTenant)) {
             if (move.toHex.territory !== ourTerritory) {
+                console.log("This entity is not mobile, so it cannot go outside of our territory");
                 return false;
             }
             if (move.toHex.tenant) {
+                console.log("This entity is not mobile, so it cannot go where another entity is");
                 return false;
             }
         }
@@ -179,6 +188,7 @@ export class Simulator {
             // 1. It is occupied by a friendly building and we cannot move there
             if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
                 !this.isMobileUnit(move.toHex.tenant)) {
+                console.log("The target hex is occupied by a friendly building");
                 return false;
             }
             // 2. It is occupied by a friendly unit and we might be able to combine
@@ -186,13 +196,15 @@ export class Simulator {
                 this.isMobileUnit(move.toHex.tenant)) {
                 let newTenant = this.getUpgradedTenant(move);
                 if (newTenant === null) {
+                    console.log("The target hex is occupied by a friendly unit but we cannot combine");
                     return false;
                 }
             }
         }
 
         // Occupied by (or adjacent to) an enemy or neutral building or unit - we need to check combat values
-        if(!this.canDefeat(ourTenant, move.toHex)) {
+        if(move.toHex.team !== move.team && !this.canDefeat(ourTenant, move.toHex)) {
+            console.log("The target hex is occupied by an enemy building and we cannot beat it");
             return false;
         }
 
@@ -216,6 +228,14 @@ export class Simulator {
 
         // Find the territory's home unit
         let homeHex:Hex = this.getHomeHex(move);
+
+        // If there's a friendly mob there, combine them
+        if (move.toHex.team === move.team && move.toHex.tenant) {
+            let upgradedTenant = this.getUpgradedTenant(move);
+            if (upgradedTenant) {
+                ourTenant = upgradedTenant;
+            }
+        }
 
         // Remove the tenant from the old hex
         if(move.fromHex) {

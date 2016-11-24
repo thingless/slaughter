@@ -1,5 +1,6 @@
 //import * as models from './models'
-import {Board, Hex, Tenant} from './models';
+import {Board, Hex, Tenant, tenantToString} from './models';
+import * as hexops from './hexops';
 
 export const DIRS = {
     SE: new THREE.Vector3(+1, -1, +0),
@@ -12,7 +13,9 @@ export const DIRS = {
 type Direction = THREE.Vector3;
 
 export function hexNeighbor(board:Board, hex:Hex, direction:Direction):Hex {
-    let newLoc:THREE.Vector3 = hex.loc.add(direction);
+    let newLoc:THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+    newLoc.add(hex.loc);
+    newLoc.add(direction);
     return board.get(newLoc.x + ',' + newLoc.y + ',' + newLoc.z);
 }
 
@@ -33,11 +36,10 @@ export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex>
         let hex = queue.shift();
         if (hex.team === startTeam) {
             if (hex.territory) {
-                throw "Hex already has a territory!"
+                continue;
             }
 
-            /// XXX: remove me
-            console.log("Annotating", hex.loc, "for team", hex.team, "as territory", territory)
+            //console.log("Annotating", hexops.cubicToOffsetCoords(hex.loc), "for team", hex.team, "as territory", territory)
 
             // Mark this node as part of the territory
             hex.territory = territory;
@@ -46,7 +48,8 @@ export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex>
             // Add the node's neighbors to the queue (if they are the right team)
             _.map(DIRS, (dir)=>{
                 let neigh = hexNeighbor(board, hex, dir);
-                if (neigh && neigh.team === startTeam) {  // Handle walking off the edge of the board
+                if (neigh)
+                if (neigh && neigh.team === startTeam && !neigh.territory) {  // Handle walking off the edge of the board
                     queue.push(neigh);
                 }
             });
@@ -63,13 +66,19 @@ export function locToId(loc:THREE.Vector3):string {
 export function annotateTerritories(board:Board):Array<Array<Hex>> {
     // Assign the "territory" prop on each hex to the same thing for each connected component
     // Additionally, return a list of territories (which are each just a list of Hexes)
+
+    // Clear territories first
+    board.map((hex)=>hex.territory = null);
+
     let territories:Array<Array<Hex>> = [];
     let currentTerritory:number = 1;
 
     board.map((hex)=>{
         let ter = teamFloodFill(board, hex, currentTerritory);
-        territories.push(ter);
-        currentTerritory += 1;
+        if (ter && ter.length) {
+            territories.push(ter);
+            currentTerritory += 1;
+        }
     });
 
     return territories;
@@ -80,6 +89,12 @@ export function offsetCoordsToCubic(row:number, col:number):THREE.Vector3 {
     var z = row - (col - (col&1)) / 2;
     var y = -x-z;
     return new THREE.Vector3(x, y, z);
+}
+
+export function cubicToOffsetCoords(loc:THREE.Vector3):THREE.Vector2 {
+    let col = loc.x;
+    let row = loc.z + (loc.x - (loc.x&1)) / 2;
+    return new THREE.Vector2(row, col);
 }
 
 export function dumbGen(size:number):Board {
@@ -109,4 +124,17 @@ export function dumbGen(size:number):Board {
     }
 
     return board;
+}
+
+export function debugLogHex(hex:Hex):any {
+    let oc = cubicToOffsetCoords(hex.loc);
+    console.log("Hex:", {
+        "offsetLoc": oc.x + ',' + oc.y,
+        "team": hex.team,
+        "territory": hex.territory,
+        "tenant": tenantToString(hex.tenant),
+        "money": hex.money,
+        "canMove": hex.canMove,
+        "loc": hex.loc,
+    })
 }
