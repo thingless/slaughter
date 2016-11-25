@@ -11,24 +11,36 @@ export class SlaughterRuntime {
     public router:Router;
     public game:Game;
     constructor(network:NetworkProvider, game:Game) {
-
+        this.game = game
+        this.network = network;
+        this.simulator = new Simulator(game.board)
+        //this.router = new Router(game, network)
+        hexops.annotateTerritories(game.board); //XXX: move
+        SlaughterRuntime.instance = this;
+    }
+    public initBrowser():void{
+        setupDraggable();
+        new GameView({model:this.game});
     }
     public get board():Board { return this.game.board; }
+    public static instance:SlaughterRuntime; //singleton
 }
 
 function main() {
-    setupDraggable();
+    //init game
     var game = new Game()
     game.board = hexops.dumbGen(30);
-    hexops.annotateTerritories(game.board);
-    var gameView = new GameView({model:game})
-    window['game'] = game
-    window['gameView'] = gameView;
-    window['sim'] = new Simulator(game.board);
-    window['Move'] = Move;
-    window['hexops'] = hexops;
-    window['getHex'] = (row, col) => window['sim'].board.get(hexops.locToId(hexops.offsetCoordsToCubic(row, col)));
-    window['Tenant'] = Tenant;
+    //XXX: network stuff
+    var runtime = new SlaughterRuntime(null, game)
+    runtime.initBrowser();
+    window['runtime'] = runtime;
+    //window['game'] = game
+    //window['gameView'] = gameView;
+    //window['sim'] = new Simulator(game.board);
+    //window['Move'] = Move;
+    //window['hexops'] = hexops;
+    //window['getHex'] = (row, col) => window['sim'].board.get(hexops.locToId(hexops.offsetCoordsToCubic(row, col)));
+    //window['Tenant'] = Tenant;
 }
 
 $(document).ready(main)

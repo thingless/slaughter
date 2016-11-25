@@ -1,7 +1,8 @@
 /// <reference path="../typings/index.d.ts" />
 import { Hex, Tenant, Board, TEAM_WATER, Game, Dictionary, Move } from './models'
 import {debugLogHex} from './hexops';
-import {Simulator} from './simulator'
+import {Simulator} from './simulator';
+import {SlaughterRuntime} from './index';
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
     size -= 2; //boarder
@@ -106,13 +107,13 @@ export class HexView extends Backbone.View<Hex> {
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
         if (e.button === 1) { // middle mouse, insert a peasant
-            window['sim'].makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
+            SlaughterRuntime.instance.simulator.makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
         }
     }
     private _onDrop(event){
         let fromHexId:string = event.detail.from.id.split("hex-")[1].replace(/_/g, ",")
-        let fromHex:Hex = window['sim'].board.get(fromHexId)
-        window['sim'].makeMove(new Move(fromHex.team, this.model, fromHex, null))
+        let fromHex:Hex = SlaughterRuntime.instance.board.get(fromHexId)
+        SlaughterRuntime.instance.simulator.makeMove(new Move(fromHex.team, this.model, fromHex, null))
         this.render() //need to update ourselfs
     }
 }
