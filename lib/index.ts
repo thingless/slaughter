@@ -1,5 +1,5 @@
 /// <reference path="../typings/index.d.ts" />
-import {Game, Move, Tenant, Board} from './models'
+import {Game, Move, Tenant, Board, Hex} from './models'
 import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
