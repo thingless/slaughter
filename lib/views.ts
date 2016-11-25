@@ -126,7 +126,7 @@ export class GameView extends Backbone.View<Game> {
         this.setElement($('#svg-slaughter'))
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
-        this.listenTo(this.model, 'change:currentTeam', this._updateCurrentTeam);
+        this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);
         this.render();
     }
     render():GameView{
