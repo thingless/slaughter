@@ -130,37 +130,45 @@ export class Hex extends BaseModel {
     }
 }
 
-export class Move {
-    public team:number = null;
-
-    public newTenant:Tenant = null;
-    public fromHex:Hex = null;
-
-    public toHex:Hex = null;
-
+export class Move extends BaseModel {
     constructor(team:number, toHex:Hex, fromHex:Hex, newTenant:Tenant) {
-        this.team = team;
-        this.newTenant = newTenant;
-        this.fromHex = fromHex;
-        this.toHex = toHex;
+        super({
+            team:team,
+            toHex:toHex,
+            fromHex:fromHex,
+            newTenant:newTenant
+        })
     }
+    get team():number { return this.get('team') }
+    set team(val:number) { this.set('team', val) }
+    get newTenant():Tenant { return this.get('newTenant') }
+    set newTenant(val:Tenant) { this.set('newTenant', val) }
+    get fromHex():Hex { return this.get('fromHex') }
+    set fromHex(val:Hex) { this.set('fromHex', val) }
+    get toHex():Hex { return this.get('toHex') }
+    set toHex(val:Hex) { this.set('toHex', val) }
 }
 
 export class Board extends BaseColletion<Hex> {
     model=Hex
 }
 
+export class Moves extends BaseColletion<Move> {
+    model=Move
+}
+
 export class Game extends BaseModel {
-    //'board':Board
     public relations = {
         'board':Board,
+        'moves':Moves,
     }
-    defaults(){return {
-    }}
     initialize(attributes, options){
         this.set('board', new Board(null, {parent:this}))
+        this.set('moves', new Moves(null, {parent:this}))
     }
     get board():Board { return this.get('board') }
     set board(val:Board) { this.set('board', val) }
+    get moves():Board { return this.get('moves') }
+    set moves(val:Board) { this.set('moves', val) }
     get url():string{ return '/game/' + this.get('id') }
 }
