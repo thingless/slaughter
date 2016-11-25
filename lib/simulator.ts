@@ -133,6 +133,12 @@ export class Simulator {
             return false;
         }
 
+        //Is it our turn?
+        if(move.team !== this.game.currentTeam){
+            console.log("Its not your turn");
+            return false;
+        }
+
         // Find the territory of the from hex (or of the to hex if this is a new entity)
         let ourTerritory = move.fromHex && move.fromHex.territory;
         if (!ourTerritory) {
