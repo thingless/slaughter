@@ -4,7 +4,7 @@ import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {NetworkProvider, StorageEventNetworkProvider, Router} from './network';
-import {getQueryVariable} from './util'
+import {getQueryVariable, guid} from './util'
 
 export class SlaughterRuntime {
     public simulator:Simulator;
@@ -15,8 +15,7 @@ export class SlaughterRuntime {
         this.game = game
         this.network = network;
         this.simulator = new Simulator(game.board)
-        //this.router = new Router(game, network)
-        hexops.annotateTerritories(game.board); //XXX: move
+        this.router = new Router(game, network)
         SlaughterRuntime.instance = this;
     }
     public initBrowser():void{
@@ -28,11 +27,18 @@ export class SlaughterRuntime {
 }
 
 function main() {
-    //init game
-    var game = new Game()
-    game.board = hexops.dumbGen(30);
-    //XXX: network stuff
-    var runtime = new SlaughterRuntime(null, game)
+    var address = getQueryVariable('address') || 'server';
+    var gameId = getQueryVariable('gameId') || guid();
+    var game = new Game({id:gameId});
+    var network = new StorageEventNetworkProvider(address);
+    Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
+    var runtime = new SlaughterRuntime(network, game);
+    if(address === 'server'){
+        hexops.dumbGen(game.board, 30);
+        hexops.annotateTerritories(game.board); //XXX: move
+    } else {
+        game.fetch()
+    }
     runtime.initBrowser();
     window['runtime'] = runtime;
 }

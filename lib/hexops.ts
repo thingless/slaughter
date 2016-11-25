@@ -102,8 +102,8 @@ export function cubicToOffsetCoords(loc:THREE.Vector3):THREE.Vector2 {
     return new THREE.Vector2(row, col);
 }
 
-export function dumbGen(size:number):Board {
-    var board:Board = new Board();
+export function dumbGen(board:Board, size:number):Board {
+    board.reset(); //clear old board if there is one
 
     for (var row = 0; row < size; row++) {
         for (var col = 0; col < size; col++) {

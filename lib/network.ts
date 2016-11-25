@@ -14,7 +14,7 @@ export interface NetMessage {
 
 //base class for network providers. providers need to implement
 // _send and call _onMessage when they receive a message
-export abstract class NetworkProvider extends Backbone.Events {
+export abstract class NetworkProvider extends Backbone.Model {
     private _currentId:number
     private pendingMessages:Dictionary<(message:NetMessage)=>void>
     public address:string;
@@ -60,7 +60,7 @@ export abstract class NetworkProvider extends Backbone.Events {
             method:method,
             id:this._nextId(),
             from: this.address,
-            to:null
+            to:'server'
         }
         model.trigger('request', model, null, options);
         return this.send(msg)
@@ -86,6 +86,7 @@ export class StorageEventNetworkProvider extends NetworkProvider {
         this._onMessage(message);
     }
     public _send(message:NetMessage) {
+        message['rnd'] = Math.random(); //make sure its not the same as what is already stored in local storage
         let messageStr = JSON.stringify(message);
         console.log('message sent', JSON.parse(messageStr));
         if(message.to == this.address){ //we are sending msg to ourselves and the storage event wont fire
@@ -96,7 +97,7 @@ export class StorageEventNetworkProvider extends NetworkProvider {
     }
 }
 
-export class Router extends Backbone.Events {
+export class Router extends Backbone.Model {
     game:Game
     network:NetworkProvider
     constructor(game:Game, network:NetworkProvider){
@@ -106,6 +107,7 @@ export class Router extends Backbone.Events {
         this.listenTo(this.network, 'message', this.route)
     }
     public route(message:NetMessage){
+        //lookup method
         let method:(message:NetMessage)=>any = {
             'read':this._rpcRead,
             'ping':this._ping,
@@ -114,6 +116,7 @@ export class Router extends Backbone.Events {
             console.error("Method not found: "+ message.method, message)
             return; //bail
         }
+        //call method & handle result
         Promise.resolve()
             .then(()=>method.call(this, message)) //if we make call inside of promise we get promise error handling
             .then((data)=>this.network.send({

@@ -120,21 +120,25 @@ export class HexView extends Backbone.View<Hex> {
 }
 
 export class GameView extends Backbone.View<Game> {
+    _hexViews:Array<HexView>
     initialize(options:Backbone.ViewOptions<Game>){
+        this._hexViews = [];
         this.setElement($('#svg-slaughter'))
-        this.model.board.forEach(this._onHexAdded.bind(this))
+        this.listenTo(this.model.board, 'update', this.render)
+        this.listenTo(this.model, 'change:board', this.render)
+        this.render();
+    }
+    render():GameView{
+        //redraw hexes
+        this._hexViews.forEach((v)=>v.remove())
+        this._hexViews = this.model.board
+            .map((hex)=>new HexView({model: hex}))
+        //set width & height
         let bbox = Snap($('.hex').last()[0] as any).getBBox()
         this.$el.width(bbox.x+bbox.width)
         this.$el.height(bbox.y+bbox.height)
-        this.listenTo(this.model.board, 'add', this._onHexAdded)
+        return this;
     }
-    private _onHexAdded(hex:Hex){
-        var snap = Snap(this.el).attr({'id':"svg-slaughter"})
-        new HexView({model: hex})
-    }
-
-    //render():GameView{
-    //}
 }
 
 //we use interact.js to do drag and drop. This function reg/configs interact.js
