@@ -1,8 +1,20 @@
 /// <reference path="../typings/index.d.ts" />
-import {Game, Move, Tenant} from './models'
+import {Game, Move, Tenant, Board} from './models'
 import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
+import {NetworkProvider, StorageEventNetworkProvider, Router} from './network';
+
+export class SlaughterRuntime {
+    public simulator:Simulator;
+    public network:NetworkProvider;
+    public router:Router;
+    public game:Game;
+    constructor(network:NetworkProvider, game:Game) {
+
+    }
+    public get board():Board { return this.game.board; }
+}
 
 function main() {
     setupDraggable();
