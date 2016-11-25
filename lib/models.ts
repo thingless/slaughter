@@ -162,6 +162,10 @@ export class Game extends BaseModel {
         'board':Board,
         'moves':Moves,
     }
+    defaults(){ return {
+        currentTeam:1,
+        currentTurn:1
+    }}
     initialize(attributes, options){
         this.set('board', new Board(null, {parent:this}))
         this.set('moves', new Moves(null, {parent:this}))
@@ -171,4 +175,10 @@ export class Game extends BaseModel {
     get moves():Board { return this.get('moves') }
     set moves(val:Board) { this.set('moves', val) }
     get url():string{ return '/game/' + this.get('id') }
+    get numberOfTeams():number { return this.get('numberOfTeams') }
+    set numberOfTeams(val:number) { this.set('numberOfTeams', val) }
+    get currentTeam():number { return this.get('currentTeam') }
+    set currentTeam(val:number) { this.set('currentTeam', val) }
+    get currentTurn():number { return this.get('currentTurn') }
+    set currentTurn(val:number) { this.set('currentTurn', val) }
 }

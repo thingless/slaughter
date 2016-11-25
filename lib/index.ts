@@ -29,7 +29,11 @@ export class SlaughterRuntime {
 function main() {
     var address = getQueryVariable('address') || 'server';
     var gameId = getQueryVariable('gameId') || guid();
-    var game = new Game({id:gameId});
+    var numberOfTeams = getQueryVariable('numberOfTeams') || 2;
+    var game = new Game({
+        id:gameId,
+        numberOfTeams:numberOfTeams,
+    });
     var network = new StorageEventNetworkProvider(address);
     Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
     var runtime = new SlaughterRuntime(network, game);
