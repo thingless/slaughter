@@ -1,5 +1,6 @@
 //import * as models from './models'
-import {Board, Hex, Tenant, tenantToString, Dictionary} from './models';
+import {Board, Hex, Tenant, tenantToString} from './models';
+import {Dictionary} from './util'
 import * as hexops from './hexops';
 
 export const DIRS:Dictionary<THREE.Vector3> = {

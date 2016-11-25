@@ -1,8 +1,9 @@
 /// <reference path="../typings/index.d.ts" />
-import { Hex, Tenant, Board, TEAM_WATER, Game, Dictionary, Move } from './models'
+import { Hex, Tenant, Board, TEAM_WATER, Game, Move } from './models'
 import {debugLogHex} from './hexops';
 import {Simulator} from './simulator';
 import {SlaughterRuntime} from './index';
+import {Dictionary} from './util'
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
     size -= 2; //boarder

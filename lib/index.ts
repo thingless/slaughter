@@ -4,6 +4,7 @@ import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {NetworkProvider, StorageEventNetworkProvider, Router} from './network';
+import {getQueryVariable} from './util'
 
 export class SlaughterRuntime {
     public simulator:Simulator;
@@ -34,13 +35,6 @@ function main() {
     var runtime = new SlaughterRuntime(null, game)
     runtime.initBrowser();
     window['runtime'] = runtime;
-    //window['game'] = game
-    //window['gameView'] = gameView;
-    //window['sim'] = new Simulator(game.board);
-    //window['Move'] = Move;
-    //window['hexops'] = hexops;
-    //window['getHex'] = (row, col) => window['sim'].board.get(hexops.locToId(hexops.offsetCoordsToCubic(row, col)));
-    //window['Tenant'] = Tenant;
 }
 
 $(document).ready(main)

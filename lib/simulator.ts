@@ -1,6 +1,7 @@
 import * as hexops from './hexops';
 import {DIRS} from './hexops';
-import {Board, Hex, Move, Tenant, TEAM_WATER, Dictionary} from './models';
+import {Board, Hex, Move, Tenant, TEAM_WATER} from './models';
+import {Dictionary} from './util'
 
 export class Simulator {
     private board:Board = null;

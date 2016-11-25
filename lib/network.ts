@@ -1,27 +1,28 @@
 /// <reference path="../typings/index.d.ts" />
-import {Dictionary, guid, Game} from './models'
+import {Game} from './models'
+import {Dictionary, guid} from './util'
 
 export interface NetMessage {
     data?:any
     path?:string
     method?:string
-    to?:number
-    from?:number
+    to:string
+    from?:string
     id?:string
     error?:any
 }
 
 //base class for network providers. providers need to implement
 // _send and call _onMessage when they receive a message
-export abstract class NetworkProvider extends Backbone.Model {
-    //_currentId:number
-    pendingMessages:Dictionary<(message:NetMessage)=>void>
-    constructor(attributes?: any, options?: any){
-        attributes._currentId = attributes._currentId || 0;
-        attributes.id = attributes.id || guid();
-         if(!attributes.address) throw 'requires address'
-        super(attributes, options);
+export abstract class NetworkProvider extends Backbone.Events {
+    private _currentId:number
+    private pendingMessages:Dictionary<(message:NetMessage)=>void>
+    public address:string;
+    constructor(address:string){
+        super()
+        this._currentId = 0;
         this.pendingMessages = {}
+        this.address = address
     }
     protected _onMessage(message:NetMessage){
         if(this.pendingMessages[message.id]){
@@ -34,15 +35,12 @@ export abstract class NetworkProvider extends Backbone.Model {
         }
     }
     protected _nextId():string{
-        return this.get('id')+'_'+(this._currentId+=1)
+        return this.address+'_'+(this._currentId+=1)
     }
     protected abstract _send(message:NetMessage);
     public send(message:NetMessage):Promise<NetMessage> {
         message.from = message.from || this.address;
         message.id = message.id || this._nextId(); //make sure msg has id
-        if(!message.to){
-            message.to = -1; //default send it to server
-        }
         if(!message.to) throw "Message needs to be sent to someone";
         return new Promise<NetMessage>((resolve, reject)=>{
             this.pendingMessages[message.id] = (retMessage)=>{ //register for callback
@@ -76,11 +74,6 @@ export abstract class NetworkProvider extends Backbone.Model {
                 }
             })
     }
-    get _currentId():number { return this.get('_currentId') }
-    set _currentId(v:number) { this.set('_currentId', v) }
-    get address():number { return this.get('address') }
-    set address(v:number) { this.set('address', v) }
-    get isServer():boolean { return this.address < 0 }
 }
 
 export class StorageEventNetworkProvider extends NetworkProvider {
@@ -103,7 +96,7 @@ export class StorageEventNetworkProvider extends NetworkProvider {
     }
 }
 
-export class Router extends Backbone.Model {
+export class Router extends Backbone.Events {
     game:Game
     network:NetworkProvider
     constructor(game:Game, network:NetworkProvider){
@@ -115,6 +108,7 @@ export class Router extends Backbone.Model {
     public route(message:NetMessage){
         let method:(message:NetMessage)=>any = {
             'read':this._rpcRead,
+            'ping':this._ping,
         }[message.method]
         if(!method){
             console.error("Method not found: "+ message.method, message)
@@ -156,9 +150,12 @@ export class Router extends Backbone.Model {
         }
         return model;
     }
-    private _rpcRead(message:NetMessage):Object{
+    private _rpcRead(message:NetMessage):Promise<any>{
         let model = this._parseModelUrl(message);
         if(!model){ return null; }
         return Promise.resolve(model);
+    }
+    private _ping(message:NetMessage):Promise<any>{
+        return Promise.resolve({'pong':true});
     }
 }
