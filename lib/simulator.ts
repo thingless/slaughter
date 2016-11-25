@@ -1,15 +1,17 @@
 import * as hexops from './hexops';
 import {DIRS} from './hexops';
-import {Board, Hex, Move, Tenant, TEAM_WATER} from './models';
+import {Board, Hex, Move, Tenant, TEAM_WATER, Game} from './models';
 import {Dictionary} from './util'
 
 export class Simulator {
-    private board:Board = null;
+    private game:Game = null;
     private territories:Array<Array<Hex>> = [];
-    constructor(board:Board) {
-        this.board = board;
+    constructor(game:Game) {
+        this.game = game;
         this.territories = hexops.annotateTerritories(this.board);
+        game.on('change:board', ()=>hexops.annotateTerritories(this.board)); //if board changes we need to recompute
     }
+    get board():Board { return this.game.board }
 
     private tenantToCombatValue(tenant:Tenant):number {
         if (tenant === Tenant.Peasant)
@@ -442,3 +444,4 @@ export class Simulator {
         this.fixHouses();
     }
 }
+

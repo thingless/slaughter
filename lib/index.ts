@@ -14,7 +14,7 @@ export class SlaughterRuntime {
     constructor(network:NetworkProvider, game:Game) {
         this.game = game
         this.network = network;
-        this.simulator = new Simulator(game.board)
+        this.simulator = new Simulator(game)
         this.router = new Router(game, network)
         SlaughterRuntime.instance = this;
     }
@@ -34,13 +34,13 @@ function main() {
     Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
     var runtime = new SlaughterRuntime(network, game);
     if(address === 'server'){
-        hexops.dumbGen(game.board, 30);
-        hexops.annotateTerritories(game.board); //XXX: move
+        game.board = hexops.dumbGen(30);
     } else {
         game.fetch()
     }
     runtime.initBrowser();
     window['runtime'] = runtime;
+    window['hexops'] = hexops;
 }
 
 $(document).ready(main)

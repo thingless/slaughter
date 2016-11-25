@@ -1,5 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 import {guid, Dictionary} from './util'
+import * as hexops from './hexops'
 
 export class BaseModel extends Backbone.Model {
     public relations:any;
