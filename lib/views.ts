@@ -126,6 +126,7 @@ export class GameView extends Backbone.View<Game> {
         this.setElement($('#svg-slaughter'))
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
+        this.listenTo(this.model, 'change:currentTeam', this._updateCurrentTeam);
         this.render();
     }
     render():GameView{
@@ -137,13 +138,18 @@ export class GameView extends Backbone.View<Game> {
         let bbox = Snap($('.hex').last()[0] as any).getBBox()
         this.$el.width(bbox.x+bbox.width)
         this.$el.height(bbox.y+bbox.height)
+        this._updateCurrentTeam();
         return this;
+    }
+    private _updateCurrentTeam(){
+        $('.current-team').removeClass('.current-team')
+        $('.team-'+this.model.currentTeam).addClass('current-team')
     }
 }
 
 //we use interact.js to do drag and drop. This function reg/configs interact.js
 export function setupDraggable(){
-  interact('.draggable').draggable({
+  interact('.current-team .draggable').draggable({
     inertia: false, //enable inertial throwing
     // keep the element within the area of it's parent
     restrict: {

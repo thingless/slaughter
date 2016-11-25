@@ -29,7 +29,7 @@ body, html {
     stroke-width: 2
 }
 
-.draggable{
+.current-team .draggable{
     cursor:move;
     animation: bounce 5s infinite;
 }
