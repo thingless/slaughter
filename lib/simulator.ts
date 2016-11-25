@@ -1,10 +1,13 @@
 import * as hexops from './hexops';
+import {DIRS} from './hexops';
 import {Board, Hex, Move, Tenant, TEAM_WATER, Dictionary} from './models';
 
 export class Simulator {
     private board:Board = null;
+    private territories:Array<Array<Hex>> = [];
     constructor(board:Board) {
         this.board = board;
+        this.territories = hexops.annotateTerritories(this.board);
     }
 
     private tenantToCombatValue(tenant:Tenant):number {
@@ -193,19 +196,22 @@ export class Simulator {
 
         // If the target hex is occupied and we are trying to move a unit, there are three scenarios:
         if (move.toHex.tenant) {
-            // 1. It is occupied by a friendly building and we cannot move there
-            if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
-                !this.isMobileUnit(move.toHex.tenant)) {
-                console.log("The target hex is occupied by a friendly building");
-                return false;
-            }
-            // 2. It is occupied by a friendly unit and we might be able to combine
-            if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
-                this.isMobileUnit(move.toHex.tenant)) {
-                let newTenant = this.getUpgradedTenant(move);
-                if (newTenant === null) {
-                    console.log("The target hex is occupied by a friendly unit but we cannot combine");
+            // 0. It is occupied by a tree. Fuck trees.
+            if (move.toHex.tenant !== Tenant.TreePalm && move.toHex.tenant !== Tenant.TreePine) {
+                // 1. It is occupied by a friendly building and we cannot move there
+                if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
+                    !this.isMobileUnit(move.toHex.tenant)) {
+                    console.log("The target hex is occupied by a friendly building");
                     return false;
+                }
+                // 2. It is occupied by a friendly unit and we might be able to combine
+                if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
+                    this.isMobileUnit(move.toHex.tenant)) {
+                    let newTenant = this.getUpgradedTenant(move);
+                    if (newTenant === null) {
+                        console.log("The target hex is occupied by a friendly unit but we cannot combine");
+                        return false;
+                    }
                 }
             }
         }
@@ -231,24 +237,91 @@ export class Simulator {
         return 0;
     }
 
+    private handleTreeGrowth():void {
+        // Start by converting graves to trees - palm if on coast, pine otherwise
+        // Pine trees fill in triangles - if there are two in a line, they fill in the two (unoccupied) diagonals
+        // Palm trees grow along coasts - any unoccupied neighbors which neighbor water will be filled
+
+        // Now do pine tree growth
+        let newPineTrees:Array<Hex> = []
+        this.board.models.filter((hex)=>hex.tenant === Tenant.TreePine).map((hex)=>{
+            _.map(hexops.DIRS, (dir)=>{
+                let neigh = hexops.hexNeighbor(this.board, hex, dir);
+                if (neigh.tenant === Tenant.TreePine) {
+                    if (dir === DIRS['SE']) {
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['NE']));
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['S']));
+                    }
+                    if (dir === DIRS['NE']) {
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['N']));
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['SE']));
+                    }
+                    if (dir === DIRS['N']) {
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['NE']));
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['NW']));
+                    }
+                    if (dir === DIRS['NW']) {
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['N']));
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['SW']));
+                    }
+                    if (dir === DIRS['SW']) {
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['NW']));
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['S']));
+                    }
+                    if (dir === DIRS['S']) {
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['SW']));
+                        newPineTrees.push(hexops.hexNeighbor(this.board, hex, DIRS['SE']));
+                    }
+                }
+            });
+        });
+
+        // And do palm tree growth
+        let newPalmTrees:Array<Hex> = [];
+        this.board.models.filter((hex)=>hex.tenant === Tenant.TreePalm).map((hex)=>{
+            hexops.allNeighbors(this.board, hex).map((neigh)=>{
+                if (hexops.allNeighbors(this.board, neigh).filter((x)=>x.team === TEAM_WATER).length > 0)
+                    newPalmTrees.push(neigh);
+            });
+        });
+
+        // Apply the trees
+        newPineTrees.filter((hex)=>hex.tenant === null && hex.team !== TEAM_WATER).map((hex)=>hex.tenant = Tenant.TreePine)
+        newPalmTrees.filter((hex)=>hex.tenant === null && hex.team !== TEAM_WATER).map((hex)=>hex.tenant = Tenant.TreePalm)
+
+        // Graves last
+        this.board.models.filter((hex)=>hex.tenant === Tenant.Grave).map((hex)=>{
+            hex.tenant = Tenant.TreePine;
+            if (hexops.allNeighbors(this.board, hex).filter((x)=>x.team === TEAM_WATER).length > 0)
+                hex.tenant = Tenant.TreePalm;
+        })
+    }
+
     private handleUpkeep(team:number):void {
         // Find all territories belonging to this team
         // Compute their income (1 for any tile not covered by TreePine or TreePalm)
         // Compute their upkeep (# coins per mob)
         // Kill all mobs (and replace with gravestones) if currency is negative
 
-        var territories = hexops.annotateTerritories(this.board);
-        territories.map((hexes)=>{
+        this.territories.map((hexes)=>{
             // This territory belongs to our team!
             if(hexes[0].team === team) {
                 // Compute income & upkeep & find homeHex
-                let income:number = hexes.map((hex)=>(hex.tenant === Tenant.TreePine || hex.tenant === Tenant.TreePalm) ? 0 : 1).reduce((x, y)=>x + y, 0);
-                let upkeep:number = hexes.map((hex)=>this.upkeepForTenant(hex.tenant)).reduce((x, y)=>x + y, 0);
+                var newMoney = 0;
                 let homeHex:Hex = _.filter(hexes, (hex)=>hex.tenant === Tenant.House)[0];
+                if (homeHex !== undefined) {
+                    let income:number = hexes.map((hex)=>(hex.tenant === Tenant.TreePine || hex.tenant === Tenant.TreePalm) ? 0 : 1).reduce((x, y)=>x + y, 0);
+                    let upkeep:number = hexes.map((hex)=>this.upkeepForTenant(hex.tenant)).reduce((x, y)=>x + y, 0);
 
-                // Find new money
-                let newMoney = homeHex.money + income - upkeep;
-                console.log("Territory", homeHex.territory, "for team", team, "has money = ", homeHex.money, " + ", income, " - ", upkeep, " = ", newMoney);
+                    // Find new money
+                    newMoney = homeHex.money + income - upkeep;
+                    console.log("Territory", homeHex.territory, "for team", team, "has money = ", homeHex.money, " + ", income, " - ", upkeep, " = ", newMoney);
+
+                    // Set new money (or 0 if it was negative)
+                    homeHex.money = Math.max(newMoney, 0);
+                } else {
+                    newMoney = -1;  // Size 1 territories are dead
+                }
 
                 // If new money is negative, kill all mobs (replace with gravestones)
                 if (newMoney < 0) {
@@ -258,11 +331,58 @@ export class Simulator {
                         }
                     })
                 }
-
-                // Set new money (or 0 if it was negative)
-                homeHex.money = Math.max(newMoney, 0);
             }
         })
+    }
+
+    private isTree(tenant:Tenant):boolean {
+        return tenant === Tenant.TreePalm || tenant === Tenant.TreePine;
+    }
+
+    private fixHouses():void {
+        // Re-annotate territories
+        // For each territory, if they have 0 houses, insert one at "the middle"
+        // If they have >1 house, keep the house that has the most money or the first one otherwise
+        let newTerritories = hexops.annotateTerritories(this.board);
+        newTerritories.map((territory)=>{
+            if (territory.length < 2) {
+                if (territory[0].tenant === Tenant.House) {
+                    territory[0].tenant = null;
+                    territory[0].money = 0;
+                }
+            } else if (territory[0].team !== TEAM_WATER) {
+                let houseCount:number = territory.filter((hex)=>hex.tenant === Tenant.House).length;
+                if (houseCount === 0) {
+                    let worked = false;
+                    for (let i = 0; i < territory.length; i++) {
+                        let hex = territory[i];
+                        if (hex.tenant === null) {
+                            worked = true;
+                            hex.tenant = Tenant.House;
+                            break;
+                        }
+                    }
+                    if (!worked) {
+                        console.log("Nowhere to put a house in this territory!");
+                        // TODO: WHAT DO?
+                    }
+                } else if (houseCount > 1) {
+                    let houses:Array<Hex> = territory.filter((hex)=>hex.tenant === Tenant.House);
+                    let money:number = houses.map((x)=>x.money || 0).reduce((x, y)=>x + y, 0);
+
+                    let mostMoney:Hex = _.max(houses, (x)=>x.money);
+
+                    houses.map((hex)=>{
+                        hex.tenant = null;
+                        hex.money = 0;
+                    });
+
+                    mostMoney.tenant = Tenant.House;
+                    mostMoney.money = money;
+                }
+            }
+        })
+        this.territories = newTerritories;
     }
 
     public makeMove(move:Move):void {
@@ -296,13 +416,16 @@ export class Simulator {
             move.fromHex.tenant = null;
         }
 
-        // Add them to the new hex
-        move.toHex.tenant = ourTenant;
-
         // Compute if they can still move - if territories changed, they cannot move again this turn
         if (move.toHex.territory !== ourTerritory) {
             move.toHex.canMove = false;
         }
+        if (this.isTree(move.toHex.tenant)) {
+            move.toHex.canMove = false;
+        }
+
+        // Add them to the new hex
+        move.toHex.tenant = ourTenant;
 
         // The new hex now belongs to our team and is in our territory
         move.toHex.team = move.team;
@@ -312,10 +435,9 @@ export class Simulator {
         homeHex.money -= moveCost;
 
         // If there was a house on this territory, it's gone - remove its money
-        // TODO: reposition the house we destroyed
         move.toHex.money = 0;
 
-        // If we split a territory, we need to handle that by creating a house in the new territory
-        // TODO: above
+        // Reposition houses and reapportion territories
+        this.fixHouses();
     }
 }

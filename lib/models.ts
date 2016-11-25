@@ -67,7 +67,7 @@ export class BaseColletion<T extends Backbone.Model> extends Backbone.Collection
 }
 
 export enum Tenant {
-    Water,
+    UhhItBreaksIfIRemoveThis_HelpRichard,
 
     House,
     Tower,
@@ -83,8 +83,8 @@ export enum Tenant {
 }
 export const TEAM_WATER:number = -1;
 export function tenantToString(tenant:Tenant):string {
-    if (tenant === Tenant.Water)
-        return "water";
+    if (tenant === null)
+        return "null";
     if (tenant === Tenant.House)
         return "house";
     if (tenant === Tenant.Tower)
@@ -112,7 +112,7 @@ export class Hex extends BaseModel {
     //loc:THREE.Vector3
     defaults(){ return {
         team:TEAM_WATER,
-        tenant:Tenant.Water,
+        tenant:null,
         loc:new THREE.Vector3(0,0,0),
         money:0,
         canMove:true,

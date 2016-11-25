@@ -19,6 +19,10 @@ export function hexNeighbor(board:Board, hex:Hex, direction:Direction):Hex {
     return board.get(newLoc.x + ',' + newLoc.y + ',' + newLoc.z);
 }
 
+export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
+    return _.map(DIRS, (dir)=>hexNeighbor(board, hex, dir));
+}
+
 export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex> {
     let output:Array<Hex> = []
 
