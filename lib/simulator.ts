@@ -246,6 +246,16 @@ export class Simulator {
         return 0;
     }
 
+    private nextTurn(){
+        let prevTeam = this.game.currentTeam;
+        this.game.currentTurn += 1; //next turn
+        if(this.game.currentTeam === 0){
+            this.handleTreeGrowth();
+            this.game.currentTurn += 1; //team 0 is always the trees
+        }
+        this.handleUpkeep(this.game.currentTeam);
+    }
+
     private handleTreeGrowth():void {
         // Start by converting graves to trees - palm if on coast, pine otherwise
         // Pine trees fill in triangles - if there are two in a line, they fill in the two (unoccupied) diagonals

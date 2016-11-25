@@ -177,8 +177,7 @@ export class Game extends BaseModel {
     get url():string{ return '/game/' + this.get('id') }
     get numberOfTeams():number { return this.get('numberOfTeams') }
     set numberOfTeams(val:number) { this.set('numberOfTeams', val) }
-    get currentTeam():number { return this.get('currentTeam') }
-    set currentTeam(val:number) { this.set('currentTeam', val) }
     get currentTurn():number { return this.get('currentTurn') }
     set currentTurn(val:number) { this.set('currentTurn', val) }
+    get currentTeam():number { return this.currentTurn % (this.numberOfTeams+1) }
 }
