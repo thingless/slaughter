@@ -3,6 +3,7 @@ import {Board, Hex, Tenant, tenantToString} from './models';
 import {Dictionary, svgToCanvas, loadSvg} from './util';
 import * as hexops from './hexops';
 import * as random from './random';
+import * as morph from './morph';
 
 export const DIRS:Dictionary<THREE.Vector3> = {
     SE: new THREE.Vector3(+1, -1, +0),
