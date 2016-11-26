@@ -257,6 +257,12 @@ export class Simulator {
         this.handleUpkeep(this.game.currentTeam);
     }
 
+    private pickTreeForHex(hex:Hex):Tenant {
+        if (hexops.allNeighbors(this.board, hex).filter((x)=>x.team === TEAM_WATER).length > 0)
+            return Tenant.TreePalm;
+        return Tenant.TreePine;
+    }
+
     private handleTreeGrowth():void {
         // Start by converting graves to trees - palm if on coast, pine otherwise
         // Pine trees fill in triangles - if there are two in a line, they fill in the two (unoccupied) diagonals
@@ -311,9 +317,7 @@ export class Simulator {
 
         // Graves last
         this.board.models.filter((hex)=>hex.tenant === Tenant.Grave).map((hex)=>{
-            hex.tenant = Tenant.TreePine;
-            if (hexops.allNeighbors(this.board, hex).filter((x)=>x.team === TEAM_WATER).length > 0)
-                hex.tenant = Tenant.TreePalm;
+            hex.tenant = this.pickTreeForHex(hex);
         })
     }
 
@@ -365,23 +369,53 @@ export class Simulator {
         // If they have >1 house, keep the house that has the most money or the first one otherwise
         let newTerritories = hexops.annotateTerritories(this.board);
         newTerritories.map((territory)=>{
-            if (territory.length < 2) {
+            if (territory.length === 1) {
                 if (territory[0].tenant === Tenant.House) {
-                    territory[0].tenant = null;
+                    territory[0].tenant = this.pickTreeForHex(territory[0]);
                     territory[0].money = 0;
                 }
             } else if (territory[0].team !== TEAM_WATER) {
                 let houseCount:number = territory.filter((hex)=>hex.tenant === Tenant.House).length;
                 if (houseCount === 0) {
                     let worked = false;
-                    for (let i = 0; i < territory.length; i++) {
-                        let hex = territory[i];
-                        if (hex.tenant === null) {
-                            worked = true;
-                            hex.tenant = Tenant.House;
-                            break;
+
+                    // Try to find an empty hex
+                    if (!worked) {
+                        for (let i = 0; i < territory.length; i++) {
+                            let hex = territory[i];
+                            if (hex.tenant === null) {
+                                worked = true;
+                                hex.tenant = Tenant.House;
+                                break;
+                            }
                         }
                     }
+
+                    // Replace a tree or grave
+                    if (!worked) {
+                        for (let i = 0; i < territory.length; i++) {
+                            let hex = territory[i];
+                            if (hex.tenant === Tenant.TreePalm || hex.tenant === Tenant.TreePine || hex.tenant === Tenant.Grave) {
+                                worked = true;
+                                hex.tenant = Tenant.House;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Replace a tower
+                    if (!worked) {
+                        for (let i = 0; i < territory.length; i++) {
+                            let hex = territory[i];
+                            if (hex.tenant === Tenant.Tower) {
+                                worked = true;
+                                hex.tenant = Tenant.House;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Sucks.
                     if (!worked) {
                         console.log("Nowhere to put a house in this territory!");
                         // TODO: WHAT DO?
