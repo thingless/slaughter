@@ -62,19 +62,17 @@ export class BaseColletion<T extends Backbone.Model> extends Backbone.Collection
 }
 
 export enum Tenant {
-    UhhItBreaksIfIRemoveThis_HelpRichard,
+    House=1,
+    Tower=2,
 
-    House,
-    Tower,
+    Grave=3,
+    TreePalm=4,
+    TreePine=5,
 
-    Grave,
-    TreePalm,
-    TreePine,
-
-    Peasant,
-    Spearman,
-    Knight,
-    Paladan,
+    Peasant=6,
+    Spearman=7,
+    Knight=8,
+    Paladan=9,
 }
 export const TEAM_WATER:number = -1;
 export function tenantToString(tenant:Tenant):string {

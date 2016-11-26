@@ -4,7 +4,7 @@ import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {NetworkProvider, StorageEventNetworkProvider, Router} from './network';
-import {getQueryVariable, guid, svgToCanvas} from './util'
+import {getQueryVariable, guid, svgToCanvas, int} from './util'
 
 export class SlaughterRuntime {
     public simulator:Simulator;
@@ -29,9 +29,9 @@ export class SlaughterRuntime {
 function main() {
     var address = getQueryVariable('address') || 'server';
     var gameId = getQueryVariable('gameId') || guid();
-    var numberOfTeams = getQueryVariable('numberOfTeams') || 2;
-    var mapSeed:number = parseInt(getQueryVariable('mapSeed')) || 666;
-    var mapSize:number = parseInt(getQueryVariable('mapSize')) || 32;
+    var numberOfTeams = int(getQueryVariable('numberOfTeams'), 2);
+    var mapSeed = int(getQueryVariable('mapSeed'), 666);
+    var mapSize = int(getQueryVariable('mapSize'), 32);
     var game = new Game({
         id:gameId,
         numberOfTeams:numberOfTeams,
@@ -40,7 +40,7 @@ function main() {
     Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
     var runtime = new SlaughterRuntime(network, game);
     if(address === 'server'){
-        hexops.svgGen(mapSize, mapSeed).then((board)=>{
+        hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
           game.board = board
           runtime.initBrowser();
         })

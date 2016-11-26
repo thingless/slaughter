@@ -40,3 +40,9 @@ export function svgToCanvas(svgEl:HTMLElement):Promise<HTMLCanvasElement> {
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(svg);
   })
 };
+
+export function int(str:string, defaultNumber?:number):number {
+    defaultNumber = _.isUndefined(defaultNumber) ? null : defaultNumber;
+    let num = parseInt(str)
+    return isNaN(num) ? defaultNumber : num
+}

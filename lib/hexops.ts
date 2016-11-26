@@ -1,7 +1,8 @@
 //import * as models from './models'
 import {Board, Hex, Tenant, tenantToString} from './models';
-import {Dictionary, svgToCanvas, loadSvg} from './util'
+import {Dictionary, svgToCanvas, loadSvg} from './util';
 import * as hexops from './hexops';
+import * as random from './random';
 
 export const DIRS:Dictionary<THREE.Vector3> = {
     SE: new THREE.Vector3(+1, -1, +0),
@@ -131,7 +132,7 @@ export function dumbGen(size:number):Board {
     return board;
 }
 //mapGenSeed
-export function svgGen(size:number, seed?:number, svgUrl?:string):Promise<Board> {
+export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:string):Promise<Board> {
     svgUrl = svgUrl || '/img/mapgen1.svg';
     seed = seed || 666;
     return loadSvg(svgUrl)
@@ -151,13 +152,25 @@ export function svgGen(size:number, seed?:number, svgUrl?:string):Promise<Board>
                 for (var col = 0; col < size; col++) {
                     let hex:Hex = new Hex({loc: offsetCoordsToCubic(row, col)});
                     if(data[row*size*4 + col*4 + 3] !== 0){
-                        hex.team = Math.round(Math.random())+1;
+                        hex.team = 1; //tmp assign it to first team
                     }
                     board.add(hex);
                 }
             }
+            uniformRandomAssignTeams(numberOfTeams, board, seed);
             return board;
         })
+}
+
+//assigns hex on a board with a team > 0 a uniform random team
+export function uniformRandomAssignTeams(numberOfTeams:number,  board:Board, seed:number) {
+    let rnd = new random.Random(new random.MersenneTwister(seed));
+    let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team>0) //get all hexes that are not water
+    for (var i = 0; hexes.length !== 0; i++) {
+        let hexIndex = rnd.randomInt(0, hexes.length-1);
+        let hex:Hex = hexes.splice(hexIndex,1)[0]; //splice removes from original list
+        hex.team = i % numberOfTeams + 1
+    }
 }
 
 export function debugLogHex(hex:Hex):any {
