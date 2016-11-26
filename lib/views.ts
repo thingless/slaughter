@@ -85,7 +85,7 @@ export class HexView extends Backbone.View<Hex> {
             svgTable[Tenant.Peasant.toString()] = '/img/peasant.svg'
             svgTable[Tenant.Spearman.toString()] = '/img/spearman.svg'
             svgTable[Tenant.Tower.toString()] = '/img/tower.svg'
-            svgTable[Tenant.TreePine.toString()] = '/img/axeman.svg'
+            svgTable[Tenant.TreePine.toString()] = '/img/treepine.svg'
             svgTable[Tenant.TreePalm.toString()] = '/img/axeman.svg'
             var tenantSvg:string = svgTable[this.model.tenant] || null
             //render new tenant
