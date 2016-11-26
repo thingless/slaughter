@@ -49,6 +49,7 @@ export class HexView extends Backbone.View<Hex> {
         this.listenTo(this.model, 'change:team', this.render)
         this.listenTo(this.model, 'change:tenant', this.render)
         this.listenTo(this.model, 'change:money', this.render)
+        this.listenTo(this.model, 'change:canMove', this.render)
         this.render();
     }
     render():HexView{
@@ -142,7 +143,7 @@ export class GameView extends Backbone.View<Game> {
         return this;
     }
     private _updateCurrentTeam(){
-        $('.current-team').removeClass('.current-team')
+        $('.current-team').removeClass('current-team')
         $('.team-'+this.model.currentTeam).addClass('current-team')
     }
 }
