@@ -54,8 +54,9 @@ export class HexView extends Backbone.View<Hex> {
         this.render();
     }
     render():HexView{
+        //update classes
+        _.range(1, 50).forEach((i)=>this.$el.removeClass('team-'+i))
         Snap(this.el)
-            .attr({class:''})
             .addClass('hex')
             .addClass('team-'+this.model.team)
             .attr({id:'hex-'+this.model.id.replace(/,/g,'_')})
