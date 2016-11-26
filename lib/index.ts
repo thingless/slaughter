@@ -31,6 +31,7 @@ function main() {
     var gameId = getQueryVariable('gameId') || guid();
     var numberOfTeams = getQueryVariable('numberOfTeams') || 2;
     var mapSeed:number = parseInt(getQueryVariable('mapSeed')) || 666;
+    var mapSize:number = parseInt(getQueryVariable('mapSize')) || 32;
     var game = new Game({
         id:gameId,
         numberOfTeams:numberOfTeams,
@@ -39,7 +40,7 @@ function main() {
     Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
     var runtime = new SlaughterRuntime(network, game);
     if(address === 'server'){
-        hexops.svgGen(64, mapSeed).then((board)=>{
+        hexops.svgGen(mapSize, mapSeed).then((board)=>{
           game.board = board
           runtime.initBrowser();
         })

@@ -132,12 +132,14 @@ export function dumbGen(size:number):Board {
 }
 //mapGenSeed
 export function svgGen(size:number, seed?:number, svgUrl?:string):Promise<Board> {
-    size = 64 //XXX: FIX ME
     svgUrl = svgUrl || '/img/mapgen1.svg';
     seed = seed || 666;
     return loadSvg(svgUrl)
         .then((el)=>{
-            let seedEl = $(el).find("#mapGenSeed").attr('seed', seed)
+            $(el).find("#mapGenSeed")
+                .attr('seed', seed)
+            $(el).attr('width', size+'px')
+                .attr('height', size+'px')
             return el;
         }).then(svgToCanvas)
         .then((canvas)=>{
