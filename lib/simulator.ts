@@ -248,6 +248,7 @@ export class Simulator {
 
     private nextTurn(){
         let prevTeam = this.game.currentTeam;
+        this.board.models.filter((hex)=>hex.team === prevTeam).map((hex)=>hex.canMove = true);
         this.game.currentTurn += 1; //next turn
         if(this.game.currentTeam === 0){
             this.handleTreeGrowth();

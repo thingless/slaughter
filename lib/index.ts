@@ -45,6 +45,7 @@ function main() {
     runtime.initBrowser();
     window['runtime'] = runtime;
     window['hexops'] = hexops;
+    window['Move'] = Move;
 }
 
 $(document).ready(main)
