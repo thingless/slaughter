@@ -16,3 +16,27 @@ export function getQueryVariable(variable:string):string {
         }
     }
 }
+
+export function loadSvg(svgUrl:string):Promise<any>{
+  return new Promise<any>((resolve, rejct)=>{
+    Snap.load(svgUrl, resolve)
+  }).then((svg)=>
+    $('<div>').append(svg.node).children()[0]
+  )
+}
+
+export function svgToCanvas(svgEl:HTMLElement):Promise<HTMLCanvasElement> {
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var image = new Image();
+  var svg = $(svgEl)[0].outerHTML
+  return new Promise<HTMLCanvasElement>((resolve, rejct)=>{
+    image.onload = function load() {
+        canvas.height = image.height;
+        canvas.width = image.width;
+        ctx.drawImage(image, 0, 0);
+        resolve(canvas);
+    };
+    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(svg);
+  })
+};

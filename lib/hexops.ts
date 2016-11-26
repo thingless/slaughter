@@ -1,6 +1,6 @@
 //import * as models from './models'
 import {Board, Hex, Tenant, tenantToString} from './models';
-import {Dictionary} from './util'
+import {Dictionary, svgToCanvas, loadSvg} from './util'
 import * as hexops from './hexops';
 
 export const DIRS:Dictionary<THREE.Vector3> = {
@@ -129,6 +129,33 @@ export function dumbGen(size:number):Board {
     }
 
     return board;
+}
+//mapGenSeed
+export function svgGen(size:number, seed?:number, svgUrl?:string):Promise<Board> {
+    size = 64 //XXX: FIX ME
+    svgUrl = svgUrl || '/img/mapgen1.svg';
+    seed = seed || 666;
+    return loadSvg(svgUrl)
+        .then((el)=>{
+            let seedEl = $(el).find("#mapGenSeed").attr('seed', seed)
+            return el;
+        }).then(svgToCanvas)
+        .then((canvas)=>{
+            //$('body').append(canvas);
+            var board = new Board();
+            let context = canvas.getContext('2d');
+            let data = context.getImageData(0, 0, size, size).data;
+            for (var row = 0; row < size; row++) {
+                for (var col = 0; col < size; col++) {
+                    let hex:Hex = new Hex({loc: offsetCoordsToCubic(row, col)});
+                    if(data[row*size*4 + col*4 + 3] !== 0){
+                        hex.team = Math.round(Math.random())+1;
+                    }
+                    board.add(hex);
+                }
+            }
+            return board;
+        })
 }
 
 export function debugLogHex(hex:Hex):any {
