@@ -79,7 +79,7 @@ export class HexView extends Backbone.View<Hex> {
             //get graphics for new tenant
             let svgTable:Dictionary<string> = {}
             svgTable[Tenant.Grave.toString()] = '/img/grave.svg'
-            svgTable[Tenant.House.toString()] = '/img/taxman.svg'
+            svgTable[Tenant.House.toString()] = '/img/house.svg'
             svgTable[Tenant.Knight.toString()] = '/img/knight.svg'
             svgTable[Tenant.Paladan.toString()] = '/img/paladan.svg'
             svgTable[Tenant.Peasant.toString()] = '/img/peasant.svg'
