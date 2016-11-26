@@ -1,5 +1,5 @@
 //import * as models from './models'
-import {Board, Hex, Tenant, tenantToString} from './models';
+import {Board, Hex, Tenant, tenantToString, TEAM_WATER} from './models';
 import {Dictionary, svgToCanvas, loadSvg} from './util';
 import * as hexops from './hexops';
 import * as random from './random';
@@ -136,6 +136,15 @@ export function dumbGen(size:number):Board {
 export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:string):Promise<Board> {
     svgUrl = svgUrl || '/img/mapgen1.svg';
     seed = seed || 666;
+    return svgToMorph(size, seed, svgUrl)
+        .then((mo:morph.Morph)=>mo.dilateWithElement().dilateWithElement().erodeWithElement().erodeWithElement())
+        .then((mo)=>morphToBoard(mo))
+        .then((board)=>uniformRandomAssignTeams(numberOfTeams, board, seed))
+}
+
+export function svgToMorph(size:number, seed:number, svgUrl:string):Promise<morph.Morph> {
+    svgUrl = svgUrl || '/img/mapgen1.svg';
+    seed = seed || 666;
     return loadSvg(svgUrl)
         .then((el)=>{
             $(el).find("#mapGenSeed")
@@ -145,22 +154,29 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
             return el;
         }).then(svgToCanvas)
         .then((canvas)=>{
-            //$('body').append(canvas);
-            var board = new Board();
             let context = canvas.getContext('2d');
             let data = context.getImageData(0, 0, size, size).data;
+            let bits:Array<number> = []
             for (var row = 0; row < size; row++) {
                 for (var col = 0; col < size; col++) {
-                    let hex:Hex = new Hex({loc: offsetCoordsToCubic(row, col)});
-                    if(data[row*size*4 + col*4 + 3] !== 0){
-                        hex.team = 1; //tmp assign it to first team
-                    }
-                    board.add(hex);
+                    var bit = Math.min(data[row*size*4 + col*4 + 3], 1);
+                    bits.push(bit)
                 }
             }
-            uniformRandomAssignTeams(numberOfTeams, board, seed);
-            return board;
+            return new morph.Morph(size, size, bits);
         })
+}
+
+export function morphToBoard(mo:morph.Morph):Board{
+    let  board = new Board()
+    for (let col = 0; col < mo.width; col++) {
+        for (let row = 0; row < mo.height; row++) {
+            let hex:Hex = new Hex({loc: offsetCoordsToCubic(row, col)});
+            hex.team = mo.data[row*mo.width + col] > 0 ? 1: TEAM_WATER;
+            board.add(hex);
+        }
+    }
+    return board;
 }
 
 //assigns hex on a board with a team > 0 a uniform random team
@@ -172,6 +188,7 @@ export function uniformRandomAssignTeams(numberOfTeams:number,  board:Board, see
         let hex:Hex = hexes.splice(hexIndex,1)[0]; //splice removes from original list
         hex.team = i % numberOfTeams + 1
     }
+    return board;
 }
 
 export function debugLogHex(hex:Hex):any {

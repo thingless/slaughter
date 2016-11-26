@@ -204,13 +204,15 @@ export class Morph {
         this.data = result;
         return this;
     }
-    openingWithElement(el?){
+    openingWithElement(el?):Morph{
         this.dilateWithElement(el);
         this.erodeWithElement(el);
+        return this;
     }
-    closingWithElement(el?){
+    closingWithElement(el?):Morph{
         this.erodeWithElement(el);
         this.dilateWithElement(el);
+        return this;
     }
     getSubImageInRect(top:number,left:number,height:number,width:number):Array<number>{
         if(left + width > this.width || top + height > this.height){
