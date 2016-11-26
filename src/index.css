@@ -25,6 +25,12 @@ body, html {
     stroke-width: 0;
 }
 
+.hex .territory {
+    stroke-width: 0;
+    fill: black;
+    font-size: 8px;
+}
+
 .hex.drop-target{
     stroke-width: 2
 }
