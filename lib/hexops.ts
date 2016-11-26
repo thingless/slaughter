@@ -139,6 +139,15 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
     return svgToMorph(size, seed, svgUrl)
         .then((mo:morph.Morph)=>mo.dilateWithElement().dilateWithElement().erodeWithElement().erodeWithElement())
         .then((mo)=>morphToBoard(mo))
+        .then((board:Board)=>{ //remove all but largest continent
+            let continents = annotateTerritories(board)
+            continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)
+            continents.pop();
+            _.flatten(continents, true).forEach((hex:Hex)=>
+                hex.team = TEAM_WATER
+            )
+            return board;
+        })
         .then((board)=>uniformRandomAssignTeams(numberOfTeams, board, seed))
 }
 
