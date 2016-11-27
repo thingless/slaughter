@@ -264,8 +264,12 @@ export class Simulator {
       _.range(5).map(()=>_.range(this.game.numberOfTeams).map((i)=>this.handleUpkeep(i)))
     }
 
-    private pickTreeForHex(hex:Hex):Tenant {
-        if (hexops.allNeighbors(this.board, hex).filter((x)=>x.team === TEAM_WATER).length > 0)
+    public static isCoastal(board:Board, hex:Hex):boolean {
+        return hexops.allNeighbors(board, hex).filter((x)=>x.team === TEAM_WATER).length > 0;
+	}
+
+    public static pickTreeForHex(board:Board, hex:Hex):Tenant {
+        if (Simulator.isCoastal(board, hex))
             return Tenant.TreePalm;
         return Tenant.TreePine;
     }
@@ -324,7 +328,7 @@ export class Simulator {
 
         // Graves last
         this.board.models.filter((hex)=>hex.tenant === Tenant.Grave).map((hex)=>{
-            hex.tenant = this.pickTreeForHex(hex);
+            hex.tenant = Simulator.pickTreeForHex(this.board, hex);
         })
     }
 
@@ -378,7 +382,7 @@ export class Simulator {
         newTerritories.map((territory)=>{
             if (territory.length === 1) {
                 if (territory[0].tenant === Tenant.House) {
-                    territory[0].tenant = this.pickTreeForHex(territory[0]);
+                    territory[0].tenant = Simulator.pickTreeForHex(this.board, territory[0]);
                     territory[0].money = 0;
                 }
             } else if (territory[0].team !== TEAM_WATER) {
