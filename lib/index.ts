@@ -64,4 +64,8 @@ function main() {
     window['svgToCanvas'] = svgToCanvas
 }
 
-$(document).ready(main)
+if (window.document) {
+    $(document).ready(main);
+} else {
+    main();
+}

@@ -257,12 +257,14 @@ export function setupDraggable(){
   });
 }
 
-// Parse all scripts with type 'text/template'.
-// Each can be accessed as template[<id>]
-var templates:Dictionary<(...data: any[]) => string> = {};
-$(document).ready(function(){
-    $("script[type='text/template']").each((index, ele)=>{
-        if(!ele.id){ return; }
-        templates[ele.id] = _.template($(ele).html());
+if (window.document) {
+    // Parse all scripts with type 'text/template'.
+    // Each can be accessed as template[<id>]
+    var templates:Dictionary<(...data: any[]) => string> = {};
+    $(document).ready(function(){
+        $("script[type='text/template']").each((index, ele)=>{
+            if(!ele.id){ return; }
+            templates[ele.id] = _.template($(ele).html());
+        });
     });
-});
+}
