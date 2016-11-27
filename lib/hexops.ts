@@ -149,7 +149,7 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
             return board;
         })
         .then((board)=>trimWaterEdges(board))
-        .then((board)=>uniformRandomAssignTeams(numberOfTeams, board, seed))
+        .then((board)=>roundRobinRandomAssignTeams(numberOfTeams, board, seed))
 }
 
 export function trimWaterEdges(board:Board):Board{
@@ -217,11 +217,13 @@ export function morphToBoard(mo:morph.Morph):Board{
 }
 
 //assigns hex on a board with a team > 0 a uniform random team
-export function uniformRandomAssignTeams(numberOfTeams:number,  board:Board, seed:number) {
+export function roundRobinRandomAssignTeams(numberOfTeams:number,  board:Board, seed:number) {
     let rnd = new random.Random(new random.MersenneTwister(seed));
     let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team>0) //get all hexes that are not water
-    for (var i = 0; i < hexes.length; i++) {
-        hexes[i].team = rnd.randomInt(0, numberOfTeams);
+    for (var i = 0; hexes.length !== 0; i++) {
+        let hexIndex = rnd.randomInt(0, hexes.length-1);
+        let hex:Hex = hexes.splice(hexIndex,1)[0]; //splice removes from original list
+        hex.team = i % numberOfTeams + 1
     }
     return board;
 }
