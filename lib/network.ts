@@ -97,6 +97,27 @@ export class StorageEventNetworkProvider extends NetworkProvider {
     }
 }
 
+export class WebsocketNetworkProvider extends NetworkProvider {
+    initialize(attributes?: any, options?: any){
+        window.addEventListener("storage", this._messageReceive.bind(this), false);
+    }
+    private _messageReceive(event:StorageEvent){
+        if(event.key != this.address.toString()){ return; } //if its not for us ignore it
+        let message = JSON.parse(event.newValue);
+        this._onMessage(message);
+    }
+    public _send(message:NetMessage) {
+        message['rnd'] = Math.random(); //make sure its not the same as what is already stored in local storage
+        let messageStr = JSON.stringify(message);
+        console.log('message sent', JSON.parse(messageStr));
+        if(message.to == this.address){ //we are sending msg to ourselves and the storage event wont fire
+            this._messageReceive({key:message.to, newValue:messageStr} as any)
+        } else {
+            window.localStorage.setItem(message.to.toString(), messageStr);
+        }
+    }
+}
+
 export class Router extends Backbone.Model {
     game:Game
     network:NetworkProvider
