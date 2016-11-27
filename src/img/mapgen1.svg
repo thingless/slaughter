@@ -52,8 +52,7 @@
          baseFrequency="0.09"
          numOctaves="5"
          type="fractalNoise"
-         result="result6"
-         id="feTurbulence5602" />
+         result="result6" />
       <feColorMatrix
          values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 4.9 -2.9 "
          result="result5"
