@@ -4,7 +4,7 @@ import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {NetworkProvider, WebsocketNetworkProvider, Router} from './network';
-import {getQueryVariable, guid, svgToCanvas, int, detectEnv} from './util'
+import {getQueryVariable, guid, int, detectEnv} from './util'
 
 var ENV = detectEnv();
 declare var global:any;
@@ -68,7 +68,6 @@ export function main() {
         win['runtime'] = runtime;
         win['hexops'] = hexops;
         win['Move'] = Move;
-        win['svgToCanvas'] = svgToCanvas
     })
 }
 

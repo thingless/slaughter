@@ -11,6 +11,7 @@ win['$'] = require('jquery');
 win['_'] = require('underscore');
 win['Backbone'] = require('backbone');
 win['THREE'] = require('three');
+win['ROT'] = require('./rot')
 
 if(hasDom){
     win['interact'] = require('interact.js');

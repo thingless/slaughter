@@ -1,10 +1,9 @@
 //import * as models from './models'
 import {Board, Hex, Tenant, tenantToString, TEAM_WATER} from './models';
-import {Dictionary, svgToCanvas, loadSvg} from './util';
+import {Dictionary} from './util';
 import {Simulator} from './simulator';
 import * as hexops from './hexops';
 import * as random from './random';
-import * as morph from './morph';
 
 export const DIRS:Dictionary<THREE.Vector3> = {
     SE: new THREE.Vector3(+1, -1, +0),
@@ -133,13 +132,32 @@ export function dumbGen(size:number):Board {
 
     return board;
 }
-//mapGenSeed
-export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:string):Promise<Board> {
-    svgUrl = svgUrl || '/img/mapgen3.svg';
+
+declare var ROT:any;
+export function rotGen(size:number, seed:number):Board {
+    ROT.RNG.setSeed(seed)
+    /* create a connected map where the player can reach all non-wall sections */
+    var map = new ROT.Map.Cellular(size, size, { connected: true });
+    /* cells with 1/2 probability */
+    map.randomize(0.5);
+    /* make a few generations */
+    for (var i=0; i<3; i++) map.create();
+    //create board
+    var board = new Board();
+    for (var x = 0; x < size; x++) {
+        for (var y = 0; y < size; y++) {
+            let hex:Hex = new Hex({loc: offsetCoordsToCubic(y, x)});
+            hex.team = map._map[x][y]===0 ? TEAM_WATER : 1
+            board.add(hex)
+        }
+    }
+    return board;
+}
+
+export function svgGen(size:number, numberOfTeams:number, seed?:number):Promise<Board> {
     seed = seed || 666;
-    return svgToMorph(size, seed, svgUrl)
-        .then((mo:morph.Morph)=>mo.dilateWithElement().erodeWithElement())
-        .then((mo)=>morphToBoard(mo))
+    return Promise.resolve()
+        .then(()=>rotGen(size, seed))
         .then((board:Board)=>{ //remove all but largest continent
             let continents = annotateTerritories(board)
             continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)
@@ -179,43 +197,6 @@ export function trimWaterEdges(board:Board):Board{
         })
         .forEach((hex)=>ret.add(hex))
     return ret;
-}
-
-export function svgToMorph(size:number, seed:number, svgUrl:string):Promise<morph.Morph> {
-    svgUrl = svgUrl || '/img/mapgen1.svg';
-    seed = seed || 666;
-    return loadSvg(svgUrl)
-        .then((el)=>{
-            $(el).find("#mapGenSeed")
-                .attr('seed', seed)
-            $(el).attr('width', size+'px')
-                .attr('height', size+'px')
-            return el;
-        }).then(svgToCanvas)
-        .then((canvas)=>{
-            let context = canvas.getContext('2d');
-            let data = context.getImageData(0, 0, size, size).data;
-            let bits:Array<number> = []
-            for (var row = 0; row < size; row++) {
-                for (var col = 0; col < size; col++) {
-                    var bit = Math.min(data[row*size*4 + col*4 + 3], 1);
-                    bits.push(bit)
-                }
-            }
-            return new morph.Morph(size, size, bits);
-        })
-}
-
-export function morphToBoard(mo:morph.Morph):Board{
-    let  board = new Board()
-    for (let col = 0; col < mo.width; col++) {
-        for (let row = 0; row < mo.height; row++) {
-            let hex:Hex = new Hex({loc: offsetCoordsToCubic(row, col)});
-            hex.team = mo.data[row*mo.width + col] > 0 ? 1: TEAM_WATER;
-            board.add(hex);
-        }
-    }
-    return board;
 }
 
 //assigns hex on a board with a team > 0 a uniform random team
