@@ -24,7 +24,7 @@ export function hexNeighbor(board:Board, hex:Hex, direction:Direction):Hex {
 }
 
 export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
-    return _.map(DIRS, (dir)=>hexNeighbor(board, hex, dir));
+    return _.map(DIRS, (dir)=>hexNeighbor(board, hex, dir)).filter((x)=>x);
 }
 
 export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex> {
