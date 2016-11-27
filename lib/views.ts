@@ -47,13 +47,13 @@ export class HexView extends Backbone.View<Hex> {
         var ele = s.group(poly, money, territory)
 
         this.setElement(ele.node);
-        this.listenTo(this.model, 'change:team', this.render)
+        this.listenTo(this.model, 'change:team', this.render.bind(this, false))
         this.listenTo(this.model, 'change:tenant', this.render)
-        this.listenTo(this.model, 'change:money', this.render)
-        this.listenTo(this.model, 'change:canMove', this.render)
+        this.listenTo(this.model, 'change:money', this.render.bind(this, false))
+        this.listenTo(this.model, 'change:canMove', this.render.bind(this, false))
         this.render();
     }
-    render():HexView{
+    render(ignore?, dontRenderTenant?:boolean):HexView{
         //update classes
         _.range(1, 50).forEach((i)=>this.$el.removeClass('team-'+i))
         Snap(this.el)
@@ -67,8 +67,10 @@ export class HexView extends Backbone.View<Hex> {
         //let territoryEl = Snap(this.el).select('.territory')
         //territoryEl.attr({text: this.model.territory || ''})
         //cleanup old tenant if it exsits
-        $(this.el).find('.sprite').remove();
-        if(this.model.tenant){
+        if(!dontRenderTenant){
+            $(this.el).find('.sprite').remove();
+        }
+        if(this.model.tenant && !dontRenderTenant){
             //get graphics for new tenant
             let svgTable:Dictionary<string> = {}
             svgTable[Tenant.Grave.toString()] = '/img/grave.svg'
