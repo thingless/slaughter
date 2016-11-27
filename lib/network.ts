@@ -53,9 +53,7 @@ export abstract class NetworkProvider extends Backbone.Model {
                 else resolve(retMessage);
                 delete this.pendingMessages[message.id] //cleanup
             }
-            var optionalPromise:Promise<NetMessage> = this._send(message); //start things off
-            if(optionalPromise !== undefined)
-                optionalPromise.catch(reject);
+            this._send(message); //start things off
         })
     }
     public syncReplacement(method: string, model: Backbone.Model, options?: JQueryAjaxSettings) {
