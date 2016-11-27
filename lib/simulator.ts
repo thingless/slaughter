@@ -261,7 +261,7 @@ export class Simulator {
     }
 
     public handleInitialUpkeep():void {
-      _.range(5).map(()=>_.range(this.game.numberOfTeams).map((i)=>this.handleUpkeep(i)))
+      _.range(5).map(()=>_.range(this.game.numberOfTeams + 1).map((i)=>this.handleUpkeep(i)))
     }
 
     public static isCoastal(board:Board, hex:Hex):boolean {
