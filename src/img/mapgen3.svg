@@ -16,7 +16,7 @@
    id="svg4238"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="mapgen2.svg">
+   sodipodi:docname="mapgen3.svg">
   <defs
      id="defs4240">
     <linearGradient
@@ -46,64 +46,66 @@
        inkscape:menu="Pixel tools"
        inkscape:menu-tooltip="Reduce or remove antialiasing around shapes"
        style="color-interpolation-filters:sRGB;"
-       id="filter5274">
+       id="filter5315">
       <feTurbulence
-         baseFrequency="0.14"
-         numOctaves="1"
+         baseFrequency="0.09"
+         numOctaves="5"
          type="fractalNoise"
+         result="result6"
          id="mapGenSeed" />
       <feColorMatrix
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 6 -3.5 "
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 4.9 -2.9 "
          result="result5"
-         id="feColorMatrix5278" />
+         in="result6"
+         id="feColorMatrix5319" />
       <feComposite
          in2="result5"
          operator="in"
          in="SourceGraphic"
-         result="result6"
-         id="feComposite5280" />
+         id="feComposite5321" />
       <feMorphology
          result="result3"
-         radius="5"
+         radius="6"
          operator="dilate"
-         in="result6"
-         id="feMorphology5282" />
+         id="feMorphology5323" />
+      <feTurbulence
+         baseFrequency="0.2"
+         numOctaves="1"
+         type="fractalNoise"
+         result="result91"
+         id="feTurbulence5325" />
       <feDisplacementMap
          result="result4"
-         scale="0"
-         yChannelSelector="A"
+         scale="15"
+         yChannelSelector="G"
          xChannelSelector="R"
          in="result3"
-         in2="result3"
-         id="feDisplacementMap5284" />
+         in2="result91"
+         id="feDisplacementMap5327" />
       <feComposite
          in2="result4"
          operator="arithmetic"
          result="result2"
-         k1="1"
+         k1="0.5"
          k3="1"
-         id="feComposite5286" />
-      <feBlend
-         mode="darken"
-         in="result2"
-         in2="result2"
-         id="feBlend5288" />
+         id="feComposite5329" />
       <feConvolveMatrix
          order="3 3"
-         kernelMatrix="2 0 0 0 1 0 0 0 -1 "
-         targetX="1"
-         targetY="1"
-         divisor="2"
+         kernelMatrix="1 0 0 0 2 0 0 0 -1 "
+         targetX="0"
+         targetY="0"
+         divisor="1.5"
          edgeMode="duplicate"
-         id="feConvolveMatrix5290"
+         in="result2"
+         id="feConvolveMatrix5331"
          result="fbSourceGraphic" />
       <feColorMatrix
          result="fbSourceGraphicAlpha"
          in="fbSourceGraphic"
          values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
-         id="feColorMatrix5292" />
+         id="feColorMatrix5333" />
       <feColorMatrix
-         id="feColorMatrix5294"
+         id="feColorMatrix5335"
          values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1000 -500 "
          in="fbSourceGraphic" />
     </filter>
@@ -146,7 +148,7 @@
      id="layer1"
      transform="translate(0,-988.3622)">
     <rect
-       style="fill:url(#radialGradient4794);fill-opacity:1;stroke:none;stroke-width:2.55999994;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5274)"
+       style="fill:url(#radialGradient4794);fill-opacity:1;stroke:none;stroke-width:2.55999994;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5315)"
        id="rect4786"
        width="64"
        height="64"

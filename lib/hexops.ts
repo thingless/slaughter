@@ -134,7 +134,7 @@ export function dumbGen(size:number):Board {
 }
 //mapGenSeed
 export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:string):Promise<Board> {
-    svgUrl = svgUrl || '/img/mapgen1.svg';
+    svgUrl = svgUrl || '/img/mapgen3.svg';
     seed = seed || 666;
     return svgToMorph(size, seed, svgUrl)
         .then((mo:morph.Morph)=>mo.dilateWithElement().erodeWithElement())
