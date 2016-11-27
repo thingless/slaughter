@@ -221,7 +221,7 @@ export function uniformRandomAssignTeams(numberOfTeams:number,  board:Board, see
     let rnd = new random.Random(new random.MersenneTwister(seed));
     let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team>0) //get all hexes that are not water
     for (var i = 0; i < hexes.length; i++) {
-        hexes[i].team = rnd.randomInt(0, numberOfTeams);
+        hexes[i].team = rnd.randomInt(1, numberOfTeams);
     }
     return board;
 }
