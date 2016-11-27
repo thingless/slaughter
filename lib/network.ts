@@ -104,11 +104,19 @@ export class WebsocketNetworkProvider extends NetworkProvider {
         this.address = null;
         // XXX: Set this to wss if we're on https
         this.ws = new WebSocket("ws://" + window.location.host + "/ws");
-        this.ws.addEventListener("onmessage", this._messageReceive.bind(this), false);
+        this.ws.addEventListener("message", this._messageReceive.bind(this), false);
+
+        // We need to ask the server to send us our address
+        var connectionOpen = ()=>{
+            console.log("Asking for our address");
+            this.ws.send(JSON.stringify({'method': 'simonWhatsMyAddress'}));
+        }
+        this.ws.addEventListener("open", connectionOpen, false);
+        if(this.ws.readyState === WebSocket.OPEN)
+            connectionOpen();
     }
 
     private _messageReceive(event:MessageEvent){
-        console.log("HELLO");
         var msg:NetMessage = JSON.parse(event.data);
         if(msg.method === 'simonSaysSetYourAddress') {
             // An init message from the server - we have a new address
