@@ -98,23 +98,39 @@ export class StorageEventNetworkProvider extends NetworkProvider {
 }
 
 export class WebsocketNetworkProvider extends NetworkProvider {
+    private ws:WebSocket;
+
     initialize(attributes?: any, options?: any){
-        window.addEventListener("storage", this._messageReceive.bind(this), false);
+        this.address = null;
+        // XXX: Set this to wss if we're on https
+        this.ws = new WebSocket("ws://" + window.location.host + "/ws");
+        this.ws.addEventListener("onmessage", this._messageReceive.bind(this), false);
     }
-    private _messageReceive(event:StorageEvent){
-        if(event.key != this.address.toString()){ return; } //if its not for us ignore it
-        let message = JSON.parse(event.newValue);
-        this._onMessage(message);
-    }
-    public _send(message:NetMessage) {
-        message['rnd'] = Math.random(); //make sure its not the same as what is already stored in local storage
-        let messageStr = JSON.stringify(message);
-        console.log('message sent', JSON.parse(messageStr));
-        if(message.to == this.address){ //we are sending msg to ourselves and the storage event wont fire
-            this._messageReceive({key:message.to, newValue:messageStr} as any)
-        } else {
-            window.localStorage.setItem(message.to.toString(), messageStr);
+
+    private _messageReceive(event:MessageEvent){
+        console.log("HELLO");
+        var msg:NetMessage = JSON.parse(event.data);
+        if(msg.method === 'simonSaysSetYourAddress') {
+            // An init message from the server - we have a new address
+            console.log("WS server says that we are now user", msg.to);
+            this.address = msg.to;
+            return;
         }
+
+        if(msg.to !== this.address.toString()) {
+            return;
+        }
+
+        this._onMessage(msg);
+    }
+
+    public _send(message:NetMessage) {
+        if (this.address === null) {
+            throw "Not yet connected to the server";
+        }
+
+        let messageStr = JSON.stringify(message);
+        this.ws.send(messageStr);
     }
 }
 

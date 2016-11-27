@@ -3,7 +3,7 @@ import {Game, Move, Tenant, Board, Hex} from './models'
 import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
-import {NetworkProvider, StorageEventNetworkProvider, Router} from './network';
+import {NetworkProvider, WebsocketNetworkProvider, Router} from './network';
 import {getQueryVariable, guid, svgToCanvas, int} from './util'
 
 export class SlaughterRuntime {
@@ -36,7 +36,7 @@ function main() {
         id:gameId,
         numberOfTeams:numberOfTeams,
     });
-    var network = new StorageEventNetworkProvider(address);
+    var network = new WebsocketNetworkProvider(address);
     Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
     var runtime = new SlaughterRuntime(network, game);
     if(address === 'server'){
