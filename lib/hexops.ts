@@ -143,9 +143,9 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
             let continents = annotateTerritories(board)
             continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)
             continents.pop();
-            _.flatten(continents, true).forEach((hex:Hex)=>
-                hex.team = TEAM_WATER
-            )
+            //_.flatten(continents, true).forEach((hex:Hex)=>
+            //    hex.team = TEAM_WATER
+            //)
             return board;
         })
         .then((board)=>trimWaterEdges(board))
@@ -220,10 +220,8 @@ export function morphToBoard(mo:morph.Morph):Board{
 export function uniformRandomAssignTeams(numberOfTeams:number,  board:Board, seed:number) {
     let rnd = new random.Random(new random.MersenneTwister(seed));
     let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team>0) //get all hexes that are not water
-    for (var i = 0; hexes.length !== 0; i++) {
-        let hexIndex = rnd.randomInt(0, hexes.length-1);
-        let hex:Hex = hexes.splice(hexIndex,1)[0]; //splice removes from original list
-        hex.team = i % numberOfTeams + 1
+    for (var i = 0; i < hexes.length; i++) {
+        hexes[i].team = rnd.randomInt(0, numberOfTeams);
     }
     return board;
 }
