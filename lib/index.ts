@@ -30,7 +30,7 @@ export class SlaughterRuntime {
     public static instance:SlaughterRuntime; //singleton
 }
 
-function main() {
+export function main() {
     var address = getQueryVariable('address') || 'server';
     var gameId = getQueryVariable('gameId') || guid();
     var numberOfTeams = int(getQueryVariable('numberOfTeams'), 2);
@@ -62,6 +62,4 @@ function main() {
 
 if (win.document) {
     $(document).ready(main);
-} else {
-    main();
 }
