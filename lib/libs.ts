@@ -1,21 +1,18 @@
 /// <reference path="../typings/index.d.ts" />
 declare var global:any;
 
-(function normalizeGlobalScope() {
-    var self = self || {}
-    self.window = self;
-    var global = global || {}
-    global.window = global
-})()
+var win = self || global || window;
+var hasDom = false;
+try{
+    hasDom = !!window.document;
+}catch(err){}
 
-global.window = global
-window['$'] = require('jquery');
-window['_'] = require('underscore');
-window['Backbone'] = require('backbone');
-window['THREE'] = require('three');
-try {
-window['interact'] = require('interact.js');
-} catch(ex) {}
-try {
-    window['Snap'] = require('snapsvg');
-} catch(ex) {}
+win['$'] = require('jquery');
+win['_'] = require('underscore');
+win['Backbone'] = require('backbone');
+win['THREE'] = require('three');
+
+if(hasDom){
+    win['interact'] = require('interact.js');
+    win['Snap'] = require('snapsvg');
+}

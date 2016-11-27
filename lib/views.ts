@@ -144,7 +144,7 @@ export class MenuView extends Backbone.View<Game> {
 	menuTemplate():string{
 		return templates['menutemplate']({
 			team: this.model.currentTeam
-		});	
+		});
 	}
     private _onNextTurnClick(e){
     	SlaughterRuntime.instance.simulator.nextTurn();
@@ -257,7 +257,9 @@ export function setupDraggable(){
   });
 }
 
-if (window.document) {
+declare var global:any;
+var win = self || window || global;
+if (win.document) {
     // Parse all scripts with type 'text/template'.
     // Each can be accessed as template[<id>]
     var templates:Dictionary<(...data: any[]) => string> = {};

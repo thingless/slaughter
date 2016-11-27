@@ -7,12 +7,8 @@ import {NetworkProvider, WebsocketNetworkProvider, Router} from './network';
 import {getQueryVariable, guid, svgToCanvas, int, detectEnv} from './util'
 
 var ENV = detectEnv();
-(function normalizeGlobalScope() {
-    var self = self || {}
-    self.window = self;
-    var global = global || {}
-    global.window = global
-})()
+declare var global:any;
+var win = self || window || global;
 
 export class SlaughterRuntime {
     public simulator:Simulator;
@@ -58,13 +54,13 @@ function main() {
         game.fetch();
         if(ENV == 'browser') runtime.initBrowser();
     }
-    window['runtime'] = runtime;
-    window['hexops'] = hexops;
-    window['Move'] = Move;
-    window['svgToCanvas'] = svgToCanvas
+    win['runtime'] = runtime;
+    win['hexops'] = hexops;
+    win['Move'] = Move;
+    win['svgToCanvas'] = svgToCanvas
 }
 
-if (window.document) {
+if (win.document) {
     $(document).ready(main);
 } else {
     main();
