@@ -31,7 +31,6 @@ export class SlaughterRuntime {
 }
 
 export function main() {
-    debugger;
     var address = getQueryVariable('address') || 'server';
     var gameId = getQueryVariable('gameId') || guid();
     var numberOfTeams = int(getQueryVariable('numberOfTeams'), 2);
