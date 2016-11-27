@@ -160,14 +160,14 @@ export function trimWaterEdges(board:Board):Board{
     let ys = board.models
         .filter((hex:Hex)=> hex.team != TEAM_WATER)
         .map((hex:Hex)=> cubicToOffsetCoords(hex.loc).y)
-    let xmin = _.min(xs)-2
-    let xmax = _.max(xs)+2
-    let ymin = _.min(ys)-2
-    let ymax = _.max(ys)+2
+    let xmin = _.min(xs)-1
+    let xmax = _.max(xs)+1
+    let ymin = _.min(ys)-1
+    let ymax = _.max(ys)+1
     board.models
         .filter((oldHex)=>{
             let offset = cubicToOffsetCoords(oldHex.loc)
-            return offset.x > xmin && offset.x < xmax && offset.y > ymin && offset.y < ymax;
+            return offset.x >= xmin && offset.x <= xmax && offset.y >= ymin && offset.y <= ymax;
         })
         .map((oldHex)=>{
             let offset = cubicToOffsetCoords(oldHex.loc)
