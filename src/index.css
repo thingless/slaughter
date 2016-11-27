@@ -10,6 +10,24 @@ body, html {
     background-image: url("/img/water.png");
 }
 
+#menu {
+    background: white;
+    height: 20px;
+    top: 0;
+    left: 0;
+    right: 0;
+    position: fixed;
+    background: lightblue;
+}
+
+.team-swatch {
+    height: 15px;
+    width: 15px;
+    display: inline-block;
+    border: 1px solid black;
+    box-shadow: 2px 2px 0 #444;
+}
+
 .hex {
   cursor: pointer;
   stroke: #000;
@@ -75,6 +93,24 @@ body, html {
 }
 .hex.team-6 {
     fill: lightgreen;
+}
+.team-swatch.team-1 {
+    background-color: #b4cdc5;
+}
+.team-swatch.team-2 {
+    background-color: #3f6796;
+}
+.team-swatch.team-3 {
+    background-color: #f7917f;
+}
+.team-swatch.team-4 {
+    background-color: #ebebeb;
+}
+.team-swatch.team-5 {
+    background-color: #ffefbb;
+}
+.team-swatch.team-6 {
+    background-color: lightgreen;
 }
 
 @keyframes bounce {
