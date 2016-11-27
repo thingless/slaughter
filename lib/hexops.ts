@@ -137,7 +137,7 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
     svgUrl = svgUrl || '/img/mapgen1.svg';
     seed = seed || 666;
     return svgToMorph(size, seed, svgUrl)
-        .then((mo:morph.Morph)=>mo.dilateWithElement().dilateWithElement().erodeWithElement().erodeWithElement())
+        .then((mo:morph.Morph)=>mo.dilateWithElement().erodeWithElement())
         .then((mo)=>morphToBoard(mo))
         .then((board:Board)=>{ //remove all but largest continent
             let continents = annotateTerritories(board)
