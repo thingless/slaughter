@@ -148,7 +148,35 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
             )
             return board;
         })
+        .then((board)=>trimWaterEdges(board))
         .then((board)=>uniformRandomAssignTeams(numberOfTeams, board, seed))
+}
+
+export function trimWaterEdges(board:Board):Board{
+    var ret = new Board();
+    let xs = board.models
+        .filter((hex:Hex)=> hex.team != TEAM_WATER)
+        .map((hex:Hex)=> cubicToOffsetCoords(hex.loc).x)
+    let ys = board.models
+        .filter((hex:Hex)=> hex.team != TEAM_WATER)
+        .map((hex:Hex)=> cubicToOffsetCoords(hex.loc).y)
+    let xmin = _.min(xs)-2
+    let xmax = _.max(xs)+2
+    let ymin = _.min(ys)-2
+    let ymax = _.max(ys)+2
+    board.models
+        .filter((oldHex)=>{
+            let offset = cubicToOffsetCoords(oldHex.loc)
+            return offset.x > xmin && offset.x < xmax && offset.y > ymin && offset.y < ymax;
+        })
+        .map((oldHex)=>{
+            let offset = cubicToOffsetCoords(oldHex.loc)
+            offset.x -= xmin
+            offset.y -= ymin
+            return new Hex({loc:offsetCoordsToCubic(offset.y, offset.x), team:oldHex.team})
+        })
+        .forEach((hex)=>ret.add(hex))
+    return ret;
 }
 
 export function svgToMorph(size:number, seed:number, svgUrl:string):Promise<morph.Morph> {

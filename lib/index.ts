@@ -30,8 +30,8 @@ function main() {
     var address = getQueryVariable('address') || 'server';
     var gameId = getQueryVariable('gameId') || guid();
     var numberOfTeams = int(getQueryVariable('numberOfTeams'), 2);
-    var mapSeed = int(getQueryVariable('mapSeed'), 666);
-    var mapSize = int(getQueryVariable('mapSize'), 32);
+    var mapSeed = int(getQueryVariable('seed'), 666);
+    var mapSize = int(getQueryVariable('size'), 32);
     var game = new Game({
         id:gameId,
         numberOfTeams:numberOfTeams,
