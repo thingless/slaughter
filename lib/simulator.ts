@@ -249,7 +249,7 @@ export class Simulator {
         return 0;
     }
 
-    private nextTurn(){
+    nextTurn(){
         let prevTeam = this.game.currentTeam;
         this.board.models.filter((hex)=>hex.team === prevTeam).map((hex)=>hex.canMove = true);
         this.game.currentTurn += 1; //next turn
@@ -258,6 +258,10 @@ export class Simulator {
             this.game.currentTurn += 1; //team 0 is always the trees
         }
         this.handleUpkeep(this.game.currentTeam);
+    }
+
+    public handleInitialUpkeep():void {
+      _.range(5).map(()=>_.range(this.game.numberOfTeams).map((i)=>this.handleUpkeep(i)))
     }
 
     private pickTreeForHex(hex:Hex):Tenant {

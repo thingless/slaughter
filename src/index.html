@@ -10,10 +10,15 @@
   <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
   <script src="/libs.js"></script>
   <script src="/bundle.js"></script>
+  <script id="menutemplate" type="text/template">
+    TEAM: <%= team %>
+    <input type="button" class="nextTurn" value="Next Turn">
+  </script>
   <link rel="stylesheet" type="text/css" href="/index.css">
 </head>
 
 <body>
+<div id="menu"></div>
 <svg id="svg-slaughter">
   <filter id="dropshadow" height="130%">
     <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->

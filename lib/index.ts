@@ -49,13 +49,14 @@ function main() {
     var runtime = new SlaughterRuntime(network, game);
     if(address === 'server'){
         hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
-          game.board = board
-          if(ENV == "browser") runtime.initBrowser();
+            game.board = board;
+            runtime.simulator.handleInitialUpkeep();
+            if(ENV == 'browser') runtime.initBrowser();
         })
         //game.board = hexops.dumbGen(30);
     } else {
-        game.fetch()
-        if(ENV == "browser") runtime.initBrowser();
+        game.fetch();
+        if(ENV == 'browser') runtime.initBrowser();
     }
     window['runtime'] = runtime;
     window['hexops'] = hexops;
