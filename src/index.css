@@ -26,6 +26,7 @@ body, html {
 }
 
 .hex .territory {
+    display: none;
     stroke-width: 0;
     fill: black;
     font-size: 8px;
@@ -56,16 +57,22 @@ body, html {
     fill: lightblue;
 }
 .hex.team-1 {
-    fill: green;
+    fill: #b4cdc5;
 }
 .hex.team-2 {
-    fill: red;
+    fill: #3f6796;
 }
 .hex.team-3 {
-    fill: orange;
+    fill: #f7917f;
 }
 .hex.team-4 {
-    fill: purple;
+    fill: #ebebeb;
+}
+.hex.team-5 {
+    fill: #ffefbb;
+}
+.hex.team-6 {
+    fill: lightgreen;
 }
 
 @keyframes bounce {
