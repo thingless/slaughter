@@ -143,9 +143,9 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
             let continents = annotateTerritories(board)
             continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)
             continents.pop();
-            //_.flatten(continents, true).forEach((hex:Hex)=>
-            //    hex.team = TEAM_WATER
-            //)
+            _.flatten(continents, true).forEach((hex:Hex)=>
+                hex.team = TEAM_WATER
+            )
             return board;
         })
         .then((board)=>trimWaterEdges(board))

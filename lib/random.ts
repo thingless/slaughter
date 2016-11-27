@@ -80,7 +80,7 @@ export class Random {
     return this.rnd.random()*(max-min)+min;
   }
   randomInt(min?:number, max?:number){
-    return Math.round(this.random(min, max));
+    return Math.floor(this.random(min, max + 1));
   }
   randomVector3(min?:THREE.Vector3, max?:THREE.Vector3){
     min = min || new THREE.Vector3();
