@@ -249,7 +249,7 @@ export class Simulator {
         return 0;
     }
 
-    private nextTurn(){
+    nextTurn(){
         let prevTeam = this.game.currentTeam;
         this.board.models.filter((hex)=>hex.team === prevTeam).map((hex)=>hex.canMove = true);
         this.game.currentTurn += 1; //next turn
