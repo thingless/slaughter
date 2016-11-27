@@ -113,8 +113,11 @@ export class HexView extends Backbone.View<Hex> {
         debugLogHex(this.model);
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
-        if (e.button === 1) { // middle mouse, insert a peasant
-            SlaughterRuntime.instance.simulator.makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
+        if (e.button === 1) { // middle mouse, insert a peasant or tower (with shift)
+            if (e.shiftKey)
+                SlaughterRuntime.instance.simulator.makeMove(new Move(this.model.team, this.model, null, Tenant.Tower));
+            else
+                SlaughterRuntime.instance.simulator.makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
         }
     }
     private _onDrop(event){
