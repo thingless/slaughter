@@ -7,7 +7,11 @@ export function guid():string {
 }
 
 export function getQueryVariable(variable:string):string {
-    if(!window.location) return; //webworker
+    try{
+        if(!window.location) return; //webworker
+    }catch(err){
+        return;
+    }
     var query = window.location.search.substring(1);
     var vars = query.split('&');
     for (var i = 0; i < vars.length; i++) {

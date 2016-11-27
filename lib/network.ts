@@ -18,11 +18,15 @@ export abstract class NetworkProvider extends Backbone.Model {
     private _currentId:number
     private pendingMessages:Dictionary<(message:NetMessage)=>void>
     public address:string;
+    public serverAddress?:string;
+    public networkUp:Promise<boolean>;
+    protected _networkUpAccept:any;
     constructor(address:string){
         super()
         this._currentId = 0;
-        this.pendingMessages = {}
-        this.address = address
+        this.pendingMessages = {};
+        this.address = address;
+        this.networkUp = new Promise((accept)=>this._networkUpAccept = accept);
     }
     protected _onMessage(message:NetMessage){
         if(this.pendingMessages[message.id]){
@@ -62,7 +66,7 @@ export abstract class NetworkProvider extends Backbone.Model {
             method:method,
             id:this._nextId(),
             from: this.address,
-            to:'server'
+            to:this.serverAddress || this.address,
         }
         model.trigger('request', model, null, options);
         return this.send(msg)
@@ -105,7 +109,7 @@ export class WebsocketNetworkProvider extends NetworkProvider {
     initialize(attributes?: any, options?: any){
         this.address = null;
         // XXX: Set this to wss if we're on https
-        this.ws = new WebSocket("ws://" + window.location.host + "/ws");
+        this.ws = new WebSocket("ws://" + location.host + "/ws");
         this.ws.addEventListener("message", this._messageReceive.bind(this), false);
 
         // We need to ask the server to send us our address
@@ -124,6 +128,7 @@ export class WebsocketNetworkProvider extends NetworkProvider {
             // An init message from the server - we have a new address
             console.log("WS server says that we are now user", msg.to);
             this.address = msg.to;
+            this._networkUpAccept();
             return;
         }
 
@@ -141,11 +146,6 @@ export class WebsocketNetworkProvider extends NetworkProvider {
 
         let messageStr = JSON.stringify(message);
         this.ws.send(messageStr);
-
-        // Always reject after 5 seconds, but if it's already resolved this will be ignored
-        return new Promise((resolve, reject)=>{
-            setTimeout(()=>reject(_.extend({}, message, {"error": "Timeout"})), 5000);
-        });
     }
 }
 

@@ -30,38 +30,40 @@ export class SlaughterRuntime {
     public static instance:SlaughterRuntime; //singleton
 }
 
-function main() {
-    var address = getQueryVariable('address') || 'server';
-    var gameId = getQueryVariable('gameId') || guid();
+export function main() {
+    var serverAddress = getQueryVariable('serverAddress') || null;
     var numberOfTeams = int(getQueryVariable('numberOfTeams'), 2);
     var mapSeed = int(getQueryVariable('seed'), 666);
     var mapSize = int(getQueryVariable('size'), 32);
     var game = new Game({
-        id:gameId,
+        id:serverAddress || guid(),
         numberOfTeams:numberOfTeams,
     });
-    var network = new WebsocketNetworkProvider(address);
-    Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
-    var runtime = new SlaughterRuntime(network, game);
-    if(address === 'server'){
-        hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
-            game.board = board;
-            runtime.simulator.handleInitialUpkeep();
+    var network = new WebsocketNetworkProvider(null);
+    network.serverAddress = serverAddress;
+    network.networkUp.then(()=>{
+        console.log("Network is up");
+        Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
+        var runtime = new SlaughterRuntime(network, game);
+        if(serverAddress === null) {
+            game.set('id', network.address);
+            hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
+                game.board = board;
+                runtime.simulator.handleInitialUpkeep();
+                if(ENV == 'browser') runtime.initBrowser();
+                console.log("Server has generated a map and is online at", network.address);
+            })
+        } else {
+            game.fetch();
             if(ENV == 'browser') runtime.initBrowser();
-        })
-        //game.board = hexops.dumbGen(30);
-    } else {
-        game.fetch();
-        if(ENV == 'browser') runtime.initBrowser();
-    }
-    win['runtime'] = runtime;
-    win['hexops'] = hexops;
-    win['Move'] = Move;
-    win['svgToCanvas'] = svgToCanvas
+        }
+        win['runtime'] = runtime;
+        win['hexops'] = hexops;
+        win['Move'] = Move;
+        win['svgToCanvas'] = svgToCanvas
+    })
 }
 
 if (win.document) {
     $(document).ready(main);
-} else {
-    main();
 }
