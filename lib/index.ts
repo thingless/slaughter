@@ -4,7 +4,15 @@ import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {NetworkProvider, WebsocketNetworkProvider, Router} from './network';
-import {getQueryVariable, guid, svgToCanvas, int} from './util'
+import {getQueryVariable, guid, svgToCanvas, int, detectEnv} from './util'
+
+var ENV = detectEnv();
+(function normalizeGlobalScope() {
+    var self = self || {}
+    self.window = self;
+    var global = global || {}
+    global.window = global
+})()
 
 export class SlaughterRuntime {
     public simulator:Simulator;
@@ -41,13 +49,14 @@ function main() {
     var runtime = new SlaughterRuntime(network, game);
     if(address === 'server'){
         hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
-          game.board = board
-          runtime.initBrowser();
+            game.board = board;
+            runtime.simulator.handleInitialUpkeep();
+            if(ENV == 'browser') runtime.initBrowser();
         })
         //game.board = hexops.dumbGen(30);
     } else {
-        game.fetch()
-        runtime.initBrowser();
+        game.fetch();
+        if(ENV == 'browser') runtime.initBrowser();
     }
     window['runtime'] = runtime;
     window['hexops'] = hexops;

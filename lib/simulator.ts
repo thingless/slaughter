@@ -260,8 +260,12 @@ export class Simulator {
         this.handleUpkeep(this.game.currentTeam);
     }
 
+    public handleInitialUpkeep():void {
+      _.range(5).map(()=>_.range(this.game.numberOfTeams).map((i)=>this.handleUpkeep(i)))
+    }
+
     public static isCoastal(board:Board, hex:Hex):boolean {
-		return hexops.allNeighbors(board, hex).filter((x)=>x.team === TEAM_WATER).length > 0;
+        return hexops.allNeighbors(board, hex).filter((x)=>x.team === TEAM_WATER).length > 0;
 	}
 
     public static pickTreeForHex(board:Board, hex:Hex):Tenant {
