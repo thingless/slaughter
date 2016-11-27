@@ -7,6 +7,7 @@ export function guid():string {
 }
 
 export function getQueryVariable(variable:string):string {
+    if(!window.location) return; //webworker
     var query = window.location.search.substring(1);
     var vars = query.split('&');
     for (var i = 0; i < vars.length; i++) {
@@ -45,4 +46,16 @@ export function int(str:string, defaultNumber?:number):number {
     defaultNumber = _.isUndefined(defaultNumber) ? null : defaultNumber;
     let num = parseInt(str)
     return isNaN(num) ? defaultNumber : num
+}
+
+export function detectEnv():string {
+    try {
+        if (window.document === undefined) {
+            return 'webworker'
+        } else {
+            return 'browser'
+        }
+    } catch (err){
+        return 'node';
+    }
 }
