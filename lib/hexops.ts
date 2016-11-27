@@ -1,6 +1,7 @@
 //import * as models from './models'
 import {Board, Hex, Tenant, tenantToString, TEAM_WATER} from './models';
 import {Dictionary, svgToCanvas, loadSvg} from './util';
+import {Simulator} from './simulator';
 import * as hexops from './hexops';
 import * as random from './random';
 import * as morph from './morph';
@@ -150,6 +151,7 @@ export function svgGen(size:number, numberOfTeams:number, seed?:number, svgUrl?:
         })
         .then((board)=>trimWaterEdges(board))
         .then((board)=>roundRobinRandomAssignTeams(numberOfTeams, board, seed))
+        .then((board)=>populateTrees(board, 0.1, seed))
 }
 
 export function trimWaterEdges(board:Board):Board{
@@ -225,6 +227,17 @@ export function roundRobinRandomAssignTeams(numberOfTeams:number,  board:Board, 
         let hex:Hex = hexes.splice(hexIndex,1)[0]; //splice removes from original list
         hex.team = i % numberOfTeams + 1
     }
+    return board;
+}
+
+export function populateTrees(board:Board, treeChance:number, seed:number) {
+    let rnd = new random.Random(new random.MersenneTwister(seed));
+    let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team>0) //get all hexes that are not water
+    hexes.forEach(function(hex){
+        if (hex.tenant === null && rnd.random() < treeChance) {
+            hex.tenant = Simulator.pickTreeForHex(board, hex);
+        }
+    });
     return board;
 }
 
