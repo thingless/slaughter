@@ -9,8 +9,10 @@ export class Simulator {
     constructor(game:Game) {
         this.game = game;
         this.territories = hexops.annotateTerritories(this.board);
-        game.on('change:board', ()=>hexops.annotateTerritories(this.board)); //if board changes we need to recompute
-        game.on('change:board', this.fixHouses);
+        game.on('change:board', ()=>{
+            hexops.annotateTerritories(this.board)
+            this.fixHouses();
+        }); //if board changes we need to recompute
     }
     get board():Board { return this.game.board }
 
