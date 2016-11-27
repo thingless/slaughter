@@ -260,6 +260,10 @@ export class Simulator {
         this.handleUpkeep(this.game.currentTeam);
     }
 
+    public handleInitialUpkeep():void {
+      _.range(5).map(()=>_.range(this.game.numberOfTeams).map((i)=>this.handleUpkeep(i)))
+    }
+
     private pickTreeForHex(hex:Hex):Tenant {
         if (hexops.allNeighbors(this.board, hex).filter((x)=>x.team === TEAM_WATER).length > 0)
             return Tenant.TreePalm;

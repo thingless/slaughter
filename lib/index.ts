@@ -41,12 +41,13 @@ function main() {
     var runtime = new SlaughterRuntime(network, game);
     if(address === 'server'){
         hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
-          game.board = board
-          runtime.initBrowser();
+            game.board = board;
+            runtime.simulator.handleInitialUpkeep();
+            runtime.initBrowser();
         })
         //game.board = hexops.dumbGen(30);
     } else {
-        game.fetch()
+        game.fetch();
         runtime.initBrowser();
     }
     window['runtime'] = runtime;
