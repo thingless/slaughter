@@ -144,11 +144,6 @@ export class WebsocketNetworkProvider extends NetworkProvider {
 
         let messageStr = JSON.stringify(message);
         this.ws.send(messageStr);
-
-        // Always reject after 5 seconds, but if it's already resolved this will be ignored
-        return new Promise((resolve, reject)=>{
-            setTimeout(()=>reject(_.extend({}, message, {"error": "Timeout"})), 5000);
-        });
     }
 }
 
