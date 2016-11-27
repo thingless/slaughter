@@ -63,16 +63,9 @@ export class HexView extends Backbone.View<Hex> {
         if(this.model.team !== TEAM_WATER){
             Snap(this.el).addClass('dropzone')
         }
-        //update money
-        let moneyEl = Snap(this.el).select('.money')
-        if(moneyEl && this.model.money === 0){
-            moneyEl.attr({text: ''})
-        } else if (moneyEl){
-            moneyEl.attr({text: this.model.money.toString()})
-        }
-        //update territory
-        let territoryEl = Snap(this.el).select('.territory')
-        territoryEl.attr({text: this.model.territory || ''})
+        ////update territory
+        //let territoryEl = Snap(this.el).select('.territory')
+        //territoryEl.attr({text: this.model.territory || ''})
         //cleanup old tenant if it exsits
         $(this.el).find('.sprite').remove();
         if(this.model.tenant){
@@ -94,7 +87,7 @@ export class HexView extends Backbone.View<Hex> {
                     let sprite = tenant.select('g')
                     sprite.attr({
                         'transform-origin':`${this._center.x} ${this._center.y}`,
-                        'transform':`translate(${this._center.x} ${this._center.y}) scale(0.25 0.25)`,
+                        'transform':`translate(${this._center.x-15} ${this._center.y-15}) scale(0.5 0.5)`,
                     })
                     //make a group to wrap sprite to isolate transforms
                     let group:Snap.Element = Snap(1,1).g(sprite)
@@ -104,8 +97,17 @@ export class HexView extends Backbone.View<Hex> {
                     }
                     //add it to doc
                     Snap(this.el).add(group)
+                    //re add money so it renders above
+                    Snap(this.el).append(Snap(this.el).select('.money'));
                 }, this)
             }
+        }
+        //update money
+        let moneyEl = Snap(this.el).select('.money')
+        if(moneyEl && this.model.money === 0){
+            moneyEl.attr({text: ''})
+        } else if (moneyEl){
+            moneyEl.attr({text: this.model.money.toString()})
         }
         return this;
     }

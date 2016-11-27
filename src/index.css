@@ -7,6 +7,7 @@ body, html {
 #svg-slaughter{
     width: 100%;
     height: 100%;
+    background-image: url("/img/water.png");
 }
 
 .hex {
@@ -20,12 +21,13 @@ body, html {
 
 .hex .money {
     font-size: 10px;
-    fill: black;
+    fill: gold;
     font-weight: bold;
     stroke-width: 0;
 }
 
 .hex .territory {
+    display: none;
     stroke-width: 0;
     fill: black;
     font-size: 8px;
@@ -53,19 +55,26 @@ body, html {
 }
 
 .hex.team--1 {
-    fill: lightblue;
+    display: none;
+    fill: #7777cc;
 }
 .hex.team-1 {
-    fill: green;
+    fill: #b4cdc5;
 }
 .hex.team-2 {
-    fill: red;
+    fill: #3f6796;
 }
 .hex.team-3 {
-    fill: orange;
+    fill: #f7917f;
 }
 .hex.team-4 {
-    fill: purple;
+    fill: #ebebeb;
+}
+.hex.team-5 {
+    fill: #ffefbb;
+}
+.hex.team-6 {
+    fill: lightgreen;
 }
 
 @keyframes bounce {
