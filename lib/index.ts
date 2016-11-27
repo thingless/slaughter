@@ -35,6 +35,7 @@ export function main() {
     var numberOfTeams = int(getQueryVariable('numberOfTeams'), 2);
     var mapSeed = int(getQueryVariable('seed'), 666);
     var mapSize = int(getQueryVariable('size'), 32);
+    var render = !!(getQueryVariable('render') || serverAddress);
     var game = new Game({
         id:serverAddress || guid(),
         numberOfTeams:numberOfTeams,
@@ -50,7 +51,14 @@ export function main() {
             hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
                 game.board = board;
                 runtime.simulator.handleInitialUpkeep();
-                if(ENV == 'browser') runtime.initBrowser();
+                if(ENV == 'browser') {
+                    if (render) {
+                        runtime.initBrowser();
+                    }
+                    else {
+                        document.write("Server Online! <a href='" + location.href + "&serverAddress=" + network.address + "'>Tell your friends!</a>");
+                    }
+                }
                 console.log("Server has generated a map and is online at", network.address);
             })
         } else {
