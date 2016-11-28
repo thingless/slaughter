@@ -183,6 +183,7 @@ export class GameView extends Backbone.View<Game> {
         let bbox = Snap($('.hex').last()[0] as any).getBBox()
         this.$el.width(bbox.x+bbox.width)
         this.$el.height(bbox.y+bbox.height)
+        this.$el.attr('viewBox', `0 0 ${bbox.x+bbox.width} ${bbox.y+bbox.height}`)
         this._updateCurrentTeam();
         return this;
     }
