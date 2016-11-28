@@ -145,6 +145,10 @@ export class Move extends BaseModel {
     set fromHex(val:Hex) { this.set('fromHex', val) }
     get toHex():Hex { return this.get('toHex') }
     set toHex(val:Hex) { this.set('toHex', val) }
+
+    initialize(){
+        this.set('id', guid());
+    }
 }
 
 export class Board extends BaseColletion<Hex> {
@@ -162,7 +166,8 @@ export class Game extends BaseModel {
     }
     defaults(){ return {
         currentTeam:1,
-        currentTurn:1
+        currentTurn:1,
+        clientTeamMap:{},
     }}
     initialize(attributes, options){
         this.set('board', new Board(null, {parent:this}))
@@ -178,4 +183,6 @@ export class Game extends BaseModel {
     get currentTurn():number { return this.get('currentTurn') }
     set currentTurn(val:number) { this.set('currentTurn', val) }
     get currentTeam():number { return this.currentTurn % (this.numberOfTeams+1) }
+    set clientTeamMap(val:Dictionary<number>) { this.set('clientTeamMap', val); }
+    get clientTeamMap() { return this.get('clientTeamMap'); }
 }

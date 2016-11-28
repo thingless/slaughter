@@ -1,6 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
-import {Game} from './models'
+import {Game, Move, Moves} from './models'
 import {Dictionary, guid} from './util'
+import {SlaughterRuntime} from './index';
 
 export interface NetMessage {
     data?:any
@@ -148,19 +149,22 @@ export class WebsocketNetworkProvider extends NetworkProvider {
 }
 
 export class Router extends Backbone.Model {
-    game:Game
     network:NetworkProvider
-    constructor(game:Game, network:NetworkProvider){
+    constructor(network:NetworkProvider){
         super()
-        this.game = game
         this.network = network
         this.listenTo(this.network, 'message', this.route)
     }
+    get runtime() { return SlaughterRuntime.instance; }
+    get game() { return this.runtime.game; }
     public route(message:NetMessage){
         //lookup method
         let method:(message:NetMessage)=>any = {
             'read':this._rpcRead,
             'ping':this._ping,
+            'assignTeam':this._assignTeam,
+            'submitMoves':this._submitMoves,
+            'goFetchGame':this._goFetchGame,
         }[message.method]
         if(!method){
             console.error("Method not found: "+ message.method, message)
@@ -210,5 +214,84 @@ export class Router extends Backbone.Model {
     }
     private _ping(message:NetMessage):Promise<any>{
         return Promise.resolve({'pong':true});
+    }
+    private _assignTeam(msg:NetMessage):Promise<any>{
+        // See if they're claiming to be a team
+        // If it's a legal team (1<=claim<=numberOfTeams) then accept
+        // TODO: prevent hijacking
+        let theirTeam = msg.data['team'];
+
+        // If not, see if they're already in the team map
+        if (!theirTeam || theirTeam < 1 || theirTeam > this.game.numberOfTeams) {
+            theirTeam = _.map(this.game.clientTeamMap, (team, addr)=>{
+                if(addr === msg.from) {
+                    return team;
+                }
+                return null;
+            }).filter((x)=>x)[0];
+        }
+
+        // If not, assign them a team
+        if (!theirTeam) {
+            let takenTeams = _.map(this.game.clientTeamMap, (team)=>team);
+            let allTeams = _.range(1, this.game.numberOfTeams + 1);
+            let availableTeams = _.difference(allTeams, takenTeams);
+            if (!availableTeams.length) {
+                return Promise.reject('No teams available');
+            }
+            theirTeam = availableTeams[0];
+        }
+
+        // tell them their team, update the game, and return
+        this.game.clientTeamMap[msg.from] = theirTeam;
+        return Promise.resolve({'team': theirTeam});
+    }
+
+    private _goFetchGame(msg:NetMessage):Promise<any>{
+        this.game.fetch();
+        return Promise.resolve({'success': true});
+    }
+
+    private _submitMoves(msg:NetMessage):Promise<any>{
+        // Find the team of this client
+        let theirTeam = this.game.clientTeamMap[msg.from];
+
+        // Make sure it is their turn
+        if (theirTeam !== this.game.currentTeam) {
+            return Promise.reject('it is not your turn');
+        }
+
+        // Deserialize all of the passed moves
+        let moves:Array<Move> = new Moves().parse(msg.data['moves']);
+
+        // Drop any moves not for this team
+        moves = moves.filter((move)=>move.team === theirTeam);
+
+        // Replace the from & to hexes based on our local board
+        moves.forEach((move)=>{
+            if(move.toHex)
+                move.toHex = this.game.board.get(move.toHex.id);
+            if(move.fromHex)
+                move.fromHex = this.game.board.get(move.fromHex.id);
+        });
+
+        // Apply the moves
+        moves.forEach((move)=>this.runtime.simulator.makeMove(move));
+
+        // Advance the turn
+        this.runtime.simulator.nextTurn();
+
+        // Tell all known users to fetch
+        _.map(this.game.clientTeamMap, (team, address)=>{
+            let rmsg:NetMessage = {
+                'from': this.network.address,
+                'to': address,
+                'method': 'goFetchGame',
+            }
+            this.network.send(rmsg);
+        });
+
+        // Return success
+        return Promise.resolve({'success': true});
     }
 }

@@ -1,10 +1,10 @@
 /// <reference path="../typings/index.d.ts" />
-import {Game, Move, Tenant, Board, Hex} from './models'
+import {Game, Move, Tenant, Board, Hex, Moves} from './models'
 import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
-import {NetworkProvider, WebsocketNetworkProvider, Router} from './network';
 import {getQueryVariable, guid, int, detectEnv} from './util'
+import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 
 var ENV = detectEnv();
 declare var global:any;
@@ -15,11 +15,15 @@ export class SlaughterRuntime {
     public network:NetworkProvider;
     public router:Router;
     public game:Game;
+    public ourTeam:number;
+    public pendingMoves:Moves;
     constructor(network:NetworkProvider, game:Game) {
         this.game = game
         this.network = network;
         this.simulator = new Simulator(game)
-        this.router = new Router(game, network)
+        this.router = new Router(network)
+        this.ourTeam = null;
+        this.pendingMoves = new Moves();
         SlaughterRuntime.instance = this;
     }
     public initBrowser():void{
@@ -28,6 +32,18 @@ export class SlaughterRuntime {
     }
     public get board():Board { return this.game.board; }
     public static instance:SlaughterRuntime; //singleton
+    public sendMovesToServer():void {
+        let msg:NetMessage = {
+            'from': this.network.address,
+            'to': this.network.serverAddress,
+            'method': 'submitMoves',
+            'data': {'moves': this.pendingMoves.toJSON()},
+        };
+        this.network.send(msg).then((res)=>{
+            console.log("Moves submitted");
+            this.pendingMoves.reset();
+        });
+    }
 }
 
 export function main() {
@@ -36,6 +52,7 @@ export function main() {
     var mapSeed = int(getQueryVariable('seed'), 666);
     var mapSize = int(getQueryVariable('size'), 32);
     var render = !!(getQueryVariable('render') || serverAddress);
+    var team = int(getQueryVariable('team')) || null;
     var game = new Game({
         id:serverAddress || guid(),
         numberOfTeams:numberOfTeams,
@@ -46,6 +63,7 @@ export function main() {
         console.log("Network is up");
         Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
         var runtime = new SlaughterRuntime(network, game);
+        // We are the server
         if(serverAddress === null) {
             game.set('id', network.address);
             hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
@@ -62,8 +80,17 @@ export function main() {
                 console.log("Server has generated a map and is online at", network.address);
             })
         } else {
-            game.fetch();
-            if(ENV == 'browser') runtime.initBrowser();
+            // Figure out which team we are
+            network.send({'from': network.address, 'to': network.serverAddress, 'method': 'assignTeam', 'data': {'team': team}}).then((resp)=>{
+                team = resp['data']['team'];
+                console.log("Server says that we are team", team);
+                runtime.ourTeam = team;
+
+                // Load the game from the server & render
+                game.fetch();
+                if(ENV == 'browser')
+                    runtime.initBrowser();
+            });
         }
         win['runtime'] = runtime;
         win['hexops'] = hexops;

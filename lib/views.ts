@@ -113,21 +113,28 @@ export class HexView extends Backbone.View<Hex> {
         }
         return this;
     }
+    private _makeMove(move) {
+        // Make it locally
+        SlaughterRuntime.instance.simulator.makeMove(move);
+
+        // And add it to the pending move set
+        SlaughterRuntime.instance.pendingMoves.add(move);
+    }
     private _onHexClick(e){
         debugLogHex(this.model);
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
         if (e.button === 1) { // middle mouse, insert a peasant or tower (with shift)
             if (e.shiftKey)
-                SlaughterRuntime.instance.simulator.makeMove(new Move(this.model.team, this.model, null, Tenant.Tower));
+                this._makeMove(new Move(this.model.team, this.model, null, Tenant.Tower));
             else
-                SlaughterRuntime.instance.simulator.makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
+                this._makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
         }
     }
     private _onDrop(event){
         let fromHexId:string = event.detail.from.id.split("hex-")[1].replace(/_/g, ",")
         let fromHex:Hex = SlaughterRuntime.instance.board.get(fromHexId)
-        SlaughterRuntime.instance.simulator.makeMove(new Move(fromHex.team, this.model, fromHex, null))
+        this._makeMove(new Move(fromHex.team, this.model, fromHex, null))
         this.render() //need to update ourselfs
     }
 }
@@ -143,16 +150,17 @@ export class MenuView extends Backbone.View<Game> {
     events(){ return {
         "click .nextTurn":this._onNextTurnClick,
     } as Backbone.EventsHash }
-	menuTemplate():string{
-		return templates['menutemplate']({
-			team: this.model.currentTeam
-		});
-	}
+    menuTemplate():string{
+        return templates['menutemplate']({
+            team: this.model.currentTeam
+        });
+    }
     private _onNextTurnClick(e){
-    	SlaughterRuntime.instance.simulator.nextTurn();
-	}
+        SlaughterRuntime.instance.simulator.nextTurn();
+        SlaughterRuntime.instance.sendMovesToServer();
+    }
     render():MenuView{
-		this.$el.html(this.menuTemplate());
+        this.$el.html(this.menuTemplate());
         return this;
     }
 }
