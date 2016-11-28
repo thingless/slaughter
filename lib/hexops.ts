@@ -154,22 +154,20 @@ export function rotGen(size:number, seed:number):Board {
     return board;
 }
 
-export function svgGen(size:number, numberOfTeams:number, seed?:number):Promise<Board> {
+export function mapGen(size:number, numberOfTeams:number, seed?:number):Board {
     seed = seed || 666;
-    return Promise.resolve()
-        .then(()=>rotGen(size, seed))
-        .then((board:Board)=>{ //remove all but largest continent
-            let continents = annotateTerritories(board)
+    var board = rotGen(size, seed)
+    //remove all but largest continent
+    let continents = annotateTerritories(board)
             continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)
             continents.pop();
             _.flatten(continents, true).forEach((hex:Hex)=>
                 hex.team = TEAM_WATER
             )
-            return board;
-        })
-        .then((board)=>trimWaterEdges(board))
-        .then((board)=>roundRobinRandomAssignTeams(numberOfTeams, board, seed))
-        .then((board)=>populateTrees(board, 0.1, seed))
+    board = trimWaterEdges(board)
+    board = roundRobinRandomAssignTeams(numberOfTeams, board, seed)
+    board = populateTrees(board, 0.1, seed)
+    return board
 }
 
 export function trimWaterEdges(board:Board):Board{

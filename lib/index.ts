@@ -66,19 +66,17 @@ export function main() {
         // We are the server
         if(serverAddress === null) {
             game.set('id', network.address);
-            hexops.svgGen(mapSize, numberOfTeams, mapSeed).then((board)=>{
-                game.board = board;
-                runtime.simulator.handleInitialUpkeep();
-                if(ENV == 'browser') {
-                    if (render) {
-                        runtime.initBrowser();
-                    }
-                    else {
-                        document.write("Server Online! <a href='" + location.href + "&serverAddress=" + network.address + "'>Tell your friends!</a>");
-                    }
+            game.board = hexops.mapGen(mapSize, numberOfTeams, mapSeed)
+            runtime.simulator.handleInitialUpkeep();
+            if(ENV == 'browser') {
+                if (render) {
+                    runtime.initBrowser();
                 }
-                console.log("Server has generated a map and is online at", network.address);
-            })
+                else {
+                    document.write("Server Online! <a href='" + location.href + "&serverAddress=" + network.address + "'>Tell your friends!</a>");
+                }
+            }
+            console.log("Server has generated a map and is online at", network.address);
         } else {
             // Figure out which team we are
             network.send({'from': network.address, 'to': network.serverAddress, 'method': 'assignTeam', 'data': {'team': team}}).then((resp)=>{
