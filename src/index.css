@@ -64,6 +64,10 @@ body, html {
     animation: bounce 3s infinite;
 }
 
+.current-team .canbuy{
+    animation: flash 4s infinite;
+}
+
 .draggable.drag-active{
     animation-name: none;
 }
@@ -135,5 +139,15 @@ body, html {
 
   90% {
     transform: translate3d(0,-1px,0);
+  }
+}
+
+@keyframes flash {
+  from, 50%, to {
+    opacity: 1;
+  }
+
+  25%, 75% {
+    opacity: .5;
   }
 }

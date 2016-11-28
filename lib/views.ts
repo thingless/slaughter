@@ -95,6 +95,10 @@ export class HexView extends Backbone.View<Hex> {
                     if(Simulator.isMobileUnit(this.model.tenant) && this.model.canMove){
                         group.addClass('draggable')
                     }
+                    //if its a house and we can buy anything
+                    if(this.model.tenant == Tenant.House && this.model.money >= 10){
+                        group.addClass('canbuy')
+                    }
                     //add it to doc
                     Snap(this.el).add(group)
                     //re add money so it renders above
