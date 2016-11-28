@@ -230,7 +230,7 @@ export function setupDraggable(){
 
   interact('.dropzone').dropzone({
     //accept: '#yes-drop',
-    overlap: 0.75, // Require a 75% element overlap for a drop to be possible
+    overlap: 0.51, // Require a 75% element overlap for a drop to be possible
     // listen for drop related events:
     ondropactivate: function (event) {
         // add active dropzone feedback
