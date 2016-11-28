@@ -261,7 +261,11 @@ export class Simulator {
     }
 
     public handleInitialUpkeep():void {
-      _.range(5).map(()=>_.range(this.game.numberOfTeams + 1).map((i)=>this.handleUpkeep(i)))
+        var canEveryoneMakeAMove = ()=>
+            _.keys(_.groupBy(this.board.filter((hex)=>hex.money>=10), (hex)=>hex.team)).length >= this.game.numberOfTeams
+        while (!canEveryoneMakeAMove()) {
+            _.range(this.game.numberOfTeams + 1).map((i)=>this.handleUpkeep(i))
+        }
     }
 
     public static isCoastal(board:Board, hex:Hex):boolean {
