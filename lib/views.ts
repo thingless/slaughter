@@ -64,8 +64,8 @@ export class HexView extends Backbone.View<Hex> {
             Snap(this.el).addClass('dropzone')
         }
         ////update territory
-        //let territoryEl = Snap(this.el).select('.territory')
-        //territoryEl.attr({text: this.model.territory || ''})
+        let territoryEl = Snap(this.el).select('.territory')
+        territoryEl.attr({text: this.model.territory || ''})
         //cleanup old tenant if it exsits
         $(this.el).find('.sprite').remove();
         if(this.model.tenant){

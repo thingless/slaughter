@@ -49,7 +49,7 @@ body, html {
 }
 
 .hex .territory {
-    display: none;
+    /*display: none;*/
     stroke-width: 0;
     fill: black;
     font-size: 8px;
