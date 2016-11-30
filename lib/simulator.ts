@@ -124,7 +124,7 @@ export class Simulator {
         return ourCV > theirCV;
     }
 
-    private isMoveLegal(move:Move):boolean {
+    public isMoveLegal(move:Move):boolean {
         // If the to hex is water, we cannot move there
         if(!move.toHex || move.toHex.team == TEAM_WATER) {
             console.log("Cannot move to water");

@@ -1,6 +1,6 @@
 import * as util from './util';
 import * as hexops from './hexops';
-import {Board, Move, Hex, Tenant, TEAM_WATER} from './models';
+import {Game, Board, Move, Hex, Tenant, TEAM_WATER} from './models';
 import {Simulator} from './simulator';
 
 type MoveGeneratorTuple = [number,(i:number)=>Move]
@@ -31,7 +31,7 @@ export class Bandit {
         var numMoveDst:number = inner.length + outer.length;
 
         var availableMoves:number = numMoveSrc * numMoveDst;
-	var srcTeam:number = inner[0].team;
+        var srcTeam:number = inner[0].team;
 
         return [availableMoves, (i:number)=>{
             i = i | 0;  // i is an integer
@@ -53,5 +53,27 @@ export class Bandit {
             let srcHex:Hex = tenantHexes[moveSrcIdx - 2];
             return new Move(srcTeam, dstHex, srcHex, null);
         }];
+    }
+
+    public getRandomMoves(game:Game, team:number):Array<Move> {
+        let moves:Array<Move> = [];
+
+        let newGame:Game = game.clone() as Game;
+        let newBoard = new Board();
+        game.board.models.forEach((hex)=>newBoard.add(hex.clone()));
+        newGame.board = newBoard;
+
+        let homeHexes:Array<Hex> = newBoard.filter((hex)=>hex.tenant === Tenant.House && hex.team === team);
+        homeHexes.forEach((homeHex)=>{
+            let sim:Simulator = new Simulator(newGame);
+            let territory:Array<Hex> = newBoard.filter((hex)=>hex.territory === homeHex.territory);
+            let numMoves:number;
+            let moveGen:(i:number)=>Move;
+            [numMoves, moveGen] = this.buildMoveGenerator(newBoard, territory);
+            let firstLegalMove:Move = _.shuffle(_.range(numMoves)).map((moveIdx:number)=>moveGen(moveIdx)).filter((move)=>sim.isMoveLegal(move))[0];
+            if (firstLegalMove)
+                moves.push(firstLegalMove);
+        });
+        return moves;
     }
 }
