@@ -22,7 +22,6 @@ export function hexNeighbor(board:Board, hex:Hex, direction:Direction):Hex {
     return board.get(newLoc.x + ',' + newLoc.y + ',' + newLoc.z);
 }
 
-
 export function allNeighborIds(hex:Hex):Array<string> {
     var x = hex.loc.x|0;
     var y = hex.loc.y|0;
@@ -198,18 +197,18 @@ export function trimWaterEdges(board:Board):Board{
 //assigns hex on a board with a team > 0 a uniform random team
 export function roundRobinRandomAssignTeams(numberOfTeams:number,  board:Board, seed:number) {
     let rnd = new random.Random(new random.MersenneTwister(seed));
-    let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team>0) //get all hexes that are not water
+    let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team !== TEAM_WATER) //get all hexes that are not water
     for (var i = 0; hexes.length !== 0; i++) {
         let hexIndex = rnd.randomInt(0, hexes.length-1);
         let hex:Hex = hexes.splice(hexIndex,1)[0]; //splice removes from original list
-        hex.team = i % numberOfTeams + 1
+        hex.team = i % numberOfTeams + 1;
     }
     return board;
 }
 
 export function populateTrees(board:Board, treeChance:number, seed:number) {
     let rnd = new random.Random(new random.MersenneTwister(seed));
-    let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team>0) //get all hexes that are not water
+    let hexes:Array<Hex> = board.toArray().filter((hex)=>hex.team !== TEAM_WATER) //get all hexes that are not water
     hexes.forEach(function(hex){
         if (hex.tenant === null && rnd.random() < treeChance) {
             hex.tenant = Simulator.pickTreeForHex(board, hex);

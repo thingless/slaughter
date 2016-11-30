@@ -1,9 +1,10 @@
 import * as util from './util';
-import {Move, Hex, Tenant} from './models';
+import * as hexops from './hexops';
+import {Board, Move, Hex, Tenant, TEAM_WATER} from './models';
 import {Simulator} from './simulator';
 
 export class Bandit {
-    private getMoveFetcher(inner:Array<Hex>, outer:Array<Hex>):[number, (i:number)=>Move] {
+    private buildMoveGenerator(board:Board, territory:Array<Hex>):[number, (i:number)=>Move] {
 
         // There are two types of moves:
         //   Moves that create a tenant
@@ -15,6 +16,9 @@ export class Bandit {
         //       It can move to any hex in inner
         //       or any hex in outer
         // Note that these moves are (mostly) illegal - only very basic trimming is done
+
+        var inner:Array<Hex> = territory;
+        var outer:Array<Hex> = hexops.computeBorders(board, territory).filter((hex)=>hex.team !== TEAM_WATER);
 
         var tenantHexes:Array<Hex> = inner.filter((hex)=>Simulator.isMobileUnit(hex.tenant));
         var numTenants:number = tenantHexes.length;
