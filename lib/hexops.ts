@@ -67,7 +67,6 @@ export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex>
             // Add the node's neighbors to the queue (if they are the right team)
             _.map(DIRS, (dir)=>{
                 let neigh = hexNeighbor(board, hex, dir);
-                if (neigh)
                 if (neigh && neigh.team === startTeam && !neigh.territory) {  // Handle walking off the edge of the board
                     queue.push(neigh);
                 }
@@ -142,11 +141,11 @@ export function mapGen(size:number, numberOfTeams:number, seed?:number):Board {
     var board = rotGen(size, seed)
     //remove all but largest continent
     let continents = annotateTerritories(board)
-            continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)
-            continents.pop();
-            _.flatten(continents, true).forEach((hex:Hex)=>
-                hex.team = TEAM_WATER
-            )
+    continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)
+    continents.pop();
+    _.flatten(continents, true).forEach((hex:Hex)=>
+        hex.team = TEAM_WATER
+    )
     board = trimWaterEdges(board)
     board = roundRobinRandomAssignTeams(numberOfTeams, board, seed)
     board = populateTrees(board, 0.1, seed)
@@ -174,7 +173,7 @@ export function trimWaterEdges(board:Board):Board{
             let offset = cubicToOffsetCoords(oldHex.loc)
             offset.x -= xmin
             offset.y -= ymin
-            return new Hex({loc:offsetCoordsToCubic(offset.y, offset.x), team:oldHex.team})
+            return new Hex({loc:offsetCoordsToCubic(offset.x, offset.y), team:oldHex.team})
         })
         .forEach((hex)=>ret.add(hex))
     return ret;
