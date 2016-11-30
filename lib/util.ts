@@ -39,3 +39,7 @@ export function detectEnv():string {
         return 'node';
     }
 }
+
+export function sum(arr:Array<number>):number {
+    return arr.reduce((x, y)=>x+y, 0);
+}
