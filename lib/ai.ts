@@ -31,6 +31,7 @@ export class Bandit {
         var numMoveDst:number = inner.length + outer.length;
 
         var availableMoves:number = numMoveSrc * numMoveDst;
+	var srcTeam:number = inner[0].team;
 
         return [availableMoves, (i:number)=>{
             i = i | 0;  // i is an integer
@@ -45,12 +46,12 @@ export class Bandit {
 
             // If the "source" is 0, construct a peasant; 1 => tower
             if (moveSrcIdx === 0)
-                return new Move(0, dstHex, null, Tenant.Peasant);
+                return new Move(srcTeam, dstHex, null, Tenant.Peasant);
             if (moveSrcIdx === 1)
-                return new Move(0, dstHex, null, Tenant.Tower);
+                return new Move(srcTeam, dstHex, null, Tenant.Tower);
 
             let srcHex:Hex = tenantHexes[moveSrcIdx - 2];
-            return new Move(0, dstHex, srcHex, null);
+            return new Move(srcTeam, dstHex, srcHex, null);
         }];
     }
 }
