@@ -23,19 +23,35 @@ export function hexNeighbor(board:Board, hex:Hex, direction:Direction):Hex {
 }
 
 
-export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
+export function allNeighborIds(hex:Hex):Array<string> {
     var x = hex.loc.x|0;
     var y = hex.loc.y|0;
     var z = hex.loc.z|0;
-    var ret:Array<Hex> = [
-        board.get((x+1)+','+(y-1)+','+(z+0)),
-        board.get((x+1)+','+(y+0)+','+(z-1)),
-        board.get((x+0)+','+(y+1)+','+(z-1)),
-        board.get((x-1)+','+(y+1)+','+(z+0)),
-        board.get((x-1)+','+(y+0)+','+(z+1)),
-        board.get((x+0)+','+(y-1)+','+(z+1)),
-    ].filter((x)=>x)
-    return ret;
+    return [
+        (x+1)+','+(y-1)+','+(z+0),
+        (x+1)+','+(y+0)+','+(z-1),
+        (x+0)+','+(y+1)+','+(z-1),
+        (x-1)+','+(y+1)+','+(z+0),
+        (x-1)+','+(y+0)+','+(z+1),
+        (x+0)+','+(y-1)+','+(z+1),
+    ]
+}
+
+export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
+    return allNeighborIds(hex).map((id)=>board.get(id)).filter((x)=>x)
+}
+
+export function computeBorders(board:Board, territory:Array<Hex>):Array<Hex>{
+    var map:Dictionary<number> = {};
+    territory.forEach((hex)=>{
+        allNeighborIds(hex).forEach((id)=>{
+            map[id] = 1
+        })
+    })
+    territory.forEach((hex)=>{
+        delete map[hex.id]; //it can not be a border if it sin territory
+    })
+    return _.keys(map).map((id)=>board.get(id));
 }
 
 export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex> {
