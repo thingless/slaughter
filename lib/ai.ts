@@ -3,8 +3,9 @@ import * as hexops from './hexops';
 import {Board, Move, Hex, Tenant, TEAM_WATER} from './models';
 import {Simulator} from './simulator';
 
+type MoveGeneratorTuple = [number,(i:number)=>Move]
 export class Bandit {
-    private buildMoveGenerator(board:Board, territory:Array<Hex>):[number, (i:number)=>Move] {
+    private buildMoveGenerator(board:Board, territory:Array<Hex>):MoveGeneratorTuple {
 
         // There are two types of moves:
         //   Moves that create a tenant
