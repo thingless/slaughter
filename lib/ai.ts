@@ -35,12 +35,12 @@ export class Bandit {
             i = i | 0;  // i is an integer
 
             var moveSrcIdx = (i / numMoveDst) | 0;
-            var moveDstIdx = (i % numMoveDst) | 0;
+            var moveDstIdx = i % numMoveDst;
 
             // Look up the destination hex
             var dstHex:Hex = inner[moveDstIdx];
             if (dstHex === undefined)
-                dstHex = outer[moveDstIdx];
+                dstHex = outer[moveDstIdx-inner.length];
 
             // If the "source" is 0, construct a peasant; 1 => tower
             if (moveSrcIdx === 0)
