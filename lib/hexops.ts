@@ -41,7 +41,7 @@ export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
     return allNeighborIds(hex).map((id)=>board.get(id)).filter((x)=>x)
 }
 
-export function annotateBorders(board:Board, territory:Array<Hex>):Array<Hex>{
+export function computeBorders(board:Board, territory:Array<Hex>):Array<Hex>{
     var map:Dictionary<number> = {};
     territory.forEach((hex)=>{
         allNeighborIds(hex).forEach((id)=>{
