@@ -91,12 +91,13 @@ export class MonteNode {
     }
     //Runs a single monte experiment. Returns the score for the resulting board.
     public run(simulator:Simulator):number{
-        let child:MonteNode = this._select_expanded_child() || this._select_unexpanded_child(simulator) || this._select_expanded_child()
+        let child:MonteNode = this._select_expanded_child(simulator) || //see if we should revist child
+            this._select_unexpanded_child(simulator) || //visit an unexpanded child
+            this._select_expanded_child(simulator) //its possible none of the unexpanded children were legal
+        //calc score or recurse
         var score;
-        //we have children... recurse
         if(child){ //recurse
             score = child.run(simulator)
-        //leaf node eval board and backprob
         } else {
             score = this.evalBoardScore(simulator)
         }
@@ -108,7 +109,7 @@ export class MonteNode {
     public evalBoardScore(simulator:Simulator){
         return 1; //all boards are winners :)
     }
-    private _select_expanded_child():MonteNode {
+    private _select_expanded_child(simulator:Simulator):MonteNode {
         if(this.children.length === 0) return null;
         let children = this.children;
         //The score of an unvisited child is 1 so if we have any unvisited children
@@ -124,7 +125,9 @@ export class MonteNode {
                 bestChild = child;
             }
         }
-        return bestChild || null;
+        if(!bestChild) return null;
+        simulator.makeMove(bestChild);
+        return bestChild
     }
     private _select_unexpanded_child(simulator:Simulator):MonteNode {
         var move;
