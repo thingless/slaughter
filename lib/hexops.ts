@@ -132,6 +132,7 @@ export function cubicToOffsetCoords(loc:THREE.Vector3):THREE.Vector2 {
 
 declare var ROT:any;
 export function rotGen(size:number, seed:number):Board {
+    // Returns a board. All land squares have 6 neighbors
     ROT.RNG.setSeed(seed)
     /* create a connected map where the player can reach all non-wall sections */
     var map = new ROT.Map.Cellular(size, size, { connected: true });
@@ -141,11 +142,12 @@ export function rotGen(size:number, seed:number):Board {
     for (var i=0; i<3; i++) map.create();
     //create board
     var board = new Board();
-    for (var x = 0; x < size; x++) {
-        for (var y = 0; y < size; y++) {
+    for (var x = 0; x < size + 1; x++) {
+        for (var y = 0; y < size + 1; y++) {
             let hex:Hex = new Hex({loc: offsetCoordsToCubic(y, x)});
-            hex.team = map._map[x][y]===0 ? TEAM_WATER : 1
-            board.add(hex)
+            let waterTrim:boolean = x < 1 || x > size || y < 1 || y > size;
+            hex.team = (waterTrim || map._map[x-1][y-1]===0) ? TEAM_WATER : 1;
+            board.add(hex);
         }
     }
     return board;
@@ -153,7 +155,7 @@ export function rotGen(size:number, seed:number):Board {
 
 export function mapGen(size:number, numberOfTeams:number, seed?:number):Board {
     seed = seed || 666;
-    var board = rotGen(size, seed)
+    var board = rotGen(size, seed) // All land squares have 6 neighbors for water trim to work
     //remove all but largest continent
     let continents = annotateTerritories(board)
     continents = _.sortBy(continents, (continent)=>continent.length).filter((continent)=>continent[0].team != TEAM_WATER)

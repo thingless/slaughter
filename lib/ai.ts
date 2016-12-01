@@ -1,6 +1,6 @@
 import * as util from './util';
 import * as hexops from './hexops';
-import {Board, Move, Hex, Tenant, TEAM_WATER} from './models';
+import {Game, Board, Move, Hex, Tenant, TEAM_WATER} from './models';
 import {Simulator} from './simulator';
 
 export interface MoveGenerator{
@@ -50,6 +50,7 @@ function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>):MoveG
     var numMoveDst:number = inner.length + outer.length;
 
     var availableMoves:number = numMoveSrc * numMoveDst;
+    var srcTeam = territory[0].team;
 
     return {
         availableMoves:availableMoves,
@@ -57,22 +58,46 @@ function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>):MoveG
             i = i | 0;  // i is an integer
 
             var moveSrcIdx = (i / numMoveDst) | 0;
-            var moveDstIdx = (i % numMoveDst) | 0;
+            var moveDstIdx = i % numMoveDst;
 
             // Look up the destination hex
             var dstHex:Hex = board.get(inner[moveDstIdx] || outer[moveDstIdx]);
 
             // If the "source" is 0, construct a peasant; 1 => tower
             if (moveSrcIdx === 0)
-                return new Move(0, dstHex, null, Tenant.Peasant);
+                return new Move(srcTeam, dstHex, null, Tenant.Peasant);
             if (moveSrcIdx === 1)
-                return new Move(0, dstHex, null, Tenant.Tower);
+                return new Move(srcTeam, dstHex, null, Tenant.Tower);
 
             let srcHex:Hex = board.get(tenantHexes[moveSrcIdx - 2]);
-            return new Move(0, dstHex, srcHex, null);
+            return new Move(srcTeam, dstHex, srcHex, null);
         }
     }
 }
+
+/*
+public getRandomMoves(game:Game, team:number):Array<Move> {
+    let moves:Array<Move> = [];
+
+    let newGame:Game = game.clone() as Game;
+    let newBoard = new Board();
+    game.board.models.forEach((hex)=>newBoard.add(hex.clone()));
+    newGame.board = newBoard;
+
+    let homeHexes:Array<Hex> = newBoard.filter((hex)=>hex.tenant === Tenant.House && hex.team === team);
+    homeHexes.forEach((homeHex)=>{
+        let sim:Simulator = new Simulator(newGame);
+        let territory:Array<Hex> = newBoard.filter((hex)=>hex.territory === homeHex.territory);
+        let numMoves:number;
+        let moveGen:(i:number)=>Move;
+        [numMoves, moveGen] = this.buildMoveGenerator(newBoard, territory);
+        let firstLegalMove:Move = _.shuffle(_.range(numMoves)).map((moveIdx:number)=>moveGen(moveIdx)).filter((move)=>sim.isMoveLegal(move))[0];
+        if (firstLegalMove)
+            moves.push(firstLegalMove);
+    });
+    return moves;
+}
+*/
 
 export class MonteNode {
     public children:Array<MonteNode>;
@@ -109,7 +134,7 @@ export class MonteNode {
     public evalBoardScore(simulator:Simulator){
         return 1; //all boards are winners :)
     }
-    private _select_expanded_child(simulator:Simulator):MonteNode {
+    protected _select_expanded_child(simulator:Simulator):MonteNode {
         if(this.children.length === 0) return null;
         let children = this.children;
         //The score of an unvisited child is 1 so if we have any unvisited children
@@ -129,7 +154,7 @@ export class MonteNode {
         simulator.makeMove(bestChild);
         return bestChild
     }
-    private _select_unexpanded_child(simulator:Simulator):MonteNode {
+    protected _select_unexpanded_child(simulator:Simulator):MonteNode {
         var move;
         var moveIndex;
         while (typeof(moveIndex = this.unvisitedChildren.pop()) !== "undefined") {
@@ -143,7 +168,7 @@ export class MonteNode {
         this.children.push(child)
         return child;
     }
-    private static _ucb1(score, plays, totalSims){
+    protected _ucb1(score, plays, totalSims){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
         const C = 1.4142135623730951; //aka Math.sqrt(2)
         return (score/plays)+C*Math.sqrt(Math.log(totalSims)/plays);
