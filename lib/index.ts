@@ -5,7 +5,6 @@ import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {getQueryVariable, guid, int, detectEnv} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
-import {Bandit} from './ai';
 
 var ENV = detectEnv();
 declare var global:any;
@@ -94,7 +93,6 @@ export function main() {
         win['runtime'] = runtime;
         win['hexops'] = hexops;
         win['Move'] = Move;
-        win['Bandit'] = Bandit;
     })
 }
 

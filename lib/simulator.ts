@@ -5,7 +5,7 @@ import {Dictionary} from './util'
 
 export class Simulator {
     private game:Game = null;
-    private territories:Array<Array<Hex>> = [];
+    public territories:Array<Array<Hex>> = [];
     constructor(game:Game) {
         this.game = game;
         this.territories = hexops.annotateTerritories(this.board);
@@ -454,11 +454,11 @@ export class Simulator {
         this.territories = newTerritories;
     }
 
-    public makeMove(move:Move):void {
+    public makeMove(move:Move):boolean {
         // Update the board based on a move
         // Make sure the move is legal
         if (!this.isMoveLegal(move))
-            return;
+            return false;
 
         // Find out who we're moving
         let ourTenant:Tenant = move.fromHex && move.fromHex.tenant || move.newTenant;
@@ -508,6 +508,7 @@ export class Simulator {
 
         // Reposition houses and reapportion territories
         this.fixHouses();
+        return true;
     }
 }
 
