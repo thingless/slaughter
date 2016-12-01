@@ -143,7 +143,7 @@ export class MonteNode {
         this.children.push(child)
         return child;
     }
-    private _ucb1(score, plays, totalSims){
+    private static _ucb1(score, plays, totalSims){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
         const C = 1.4142135623730951; //aka Math.sqrt(2)
         return (score/plays)+C*Math.sqrt(Math.log(totalSims)/plays);
