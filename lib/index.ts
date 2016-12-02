@@ -95,6 +95,7 @@ export function main() {
         win['Move'] = Move;
     })
 }
+win['main'] = main;
 
 if (win.document) {
     $(document).ready(main);

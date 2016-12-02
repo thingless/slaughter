@@ -1,13 +1,13 @@
 /// <reference path="../typings/index.d.ts" />
-require('./libs')
+self['importScripts']('/libs.js');
 
 import {Game, Move, Tenant, Board, Hex, Moves} from './models'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {getQueryVariable, guid, int, detectEnv} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
-import {Bandit} from './ai';
 import {SlaughterRuntime} from './index';
+import {getRandomMoves} from './ai'
 
 var ENV = detectEnv();
 declare var global:any;
@@ -39,7 +39,7 @@ export function aimain() {
                             console.log("It's our turn!");
 
                             // Make one legal move per territory
-                            new Bandit().getRandomMoves(game, runtime.ourTeam).forEach((move)=>runtime.pendingMoves.add(move));
+                            getRandomMoves(game, runtime.ourTeam).forEach((move)=>runtime.pendingMoves.add(move));
 
                             runtime.sendMovesToServer();
                         }

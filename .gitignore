@@ -49,4 +49,5 @@ jspm_packages
 
 src/bundle.js
 src/libs.js
-src/worker.js
+src/aiworker.js
+

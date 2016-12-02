@@ -75,8 +75,8 @@ function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>):MoveG
     }
 }
 
-/*
-public getRandomMoves(game:Game, team:number):Array<Move> {
+
+export  function getRandomMoves(game:Game, team:number):Array<Move> {
     let moves:Array<Move> = [];
 
     let newGame:Game = game.clone() as Game;
@@ -88,16 +88,15 @@ public getRandomMoves(game:Game, team:number):Array<Move> {
     homeHexes.forEach((homeHex)=>{
         let sim:Simulator = new Simulator(newGame);
         let territory:Array<Hex> = newBoard.filter((hex)=>hex.territory === homeHex.territory);
-        let numMoves:number;
-        let moveGen:(i:number)=>Move;
-        [numMoves, moveGen] = this.buildMoveGenerator(newBoard, territory);
-        let firstLegalMove:Move = _.shuffle(_.range(numMoves)).map((moveIdx:number)=>moveGen(moveIdx)).filter((move)=>sim.isMoveLegal(move))[0];
+        let moveGenerator = buildMoveGeneratorForTerritory(newBoard, territory);
+        let firstLegalMove:Move = _.shuffle(_.range(moveGenerator.availableMoves))
+            .map((moveIdx:number)=>moveGenerator.generate(moveIdx, newBoard))
+            .filter((move)=>sim.isMoveLegal(move))[0];
         if (firstLegalMove)
             moves.push(firstLegalMove);
     });
     return moves;
 }
-*/
 
 export class MonteNode {
     public children:Array<MonteNode>;
