@@ -137,14 +137,13 @@ export class MonteNode {
     protected _select_expanded_child(simulator:Simulator):MonteNode {
         if(this.children.length === 0) return null;
         let children = this.children;
-        //The score of an unvisited child is 1 so if we have any unvisited children
-        //the maxScore starts at 1. Otherwise, it starts at -Inf so that one of the
-        //visited children will be selected.
-        let maxScore = this.unvisitedChildren ? -Infinity : 1;
+        //The estimatedValue for an unvisitedChild is just the avg for this node.
+        //If there are no unvisitedChildren its -Inf so that we will not choose one
+        let maxScore = this.unvisitedChildren.length ? this._ucb1(this.score/this.plays, this.plays, 1) : -Infinity;
         let bestChild = null;
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
-            let score = this._ucb1(child.score, child.plays, this.plays);
+            let score = this._ucb1(child.score/child.plays, child.plays, this.plays);
             if(score > maxScore){
                 maxScore = score;
                 bestChild = child;
@@ -168,10 +167,10 @@ export class MonteNode {
         this.children.push(child)
         return child;
     }
-    protected _ucb1(score, plays, totalSims){
+    protected _ucb1(estimatedValue:number, plays:number, totalSims:number){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
         const C = 1.4142135623730951; //aka Math.sqrt(2)
-        return (score/plays)+C*Math.sqrt(Math.log(totalSims)/plays);
+        return estimatedValue+C*Math.sqrt(Math.log(totalSims)/plays);
     }
 }
 
