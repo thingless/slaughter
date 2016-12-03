@@ -75,6 +75,32 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
     }
 }
 
+export class MonteRunner {
+    public root:MonteNode
+    public simulator:Simulator
+    public bestScoreSoFar:number //purely for analytics
+
+    constructor(root:MonteNode, simulator:Simulator){
+        this.root = root
+        this.simulator = simulator
+        this.bestScoreSoFar = 0;
+    }
+    public runForIterations(iterations:number){
+        for (var i = 0; i < iterations; i++) { this.runOnce() }
+    }
+    public runOnce(){
+        let simulator = this.simulator.deepClone()
+        let score = this.root.run(simulator)
+        if(score > this.bestScoreSoFar){
+            console.log('found a new highscore ' + score)
+            this.bestScoreSoFar = score
+        }
+    }
+    public getBestMoveSequence():Array<Move>{
+        return this.root.bestMoveSequence(this.simulator);
+    }
+}
+
 export abstract class MonteNode {
     public children:Array<MonteNode>;
     private unvisitedChildren:Array<number>;
@@ -89,6 +115,29 @@ export abstract class MonteNode {
         this.score = 0;
         this.plays = 0;
         this.moveIndex = moveIndex;
+    }
+    public bestMoveSequence(simulator:Simulator):Array<Move>{
+        let ret:Array<Move> = [];
+        this._bestMoveSequenceRecurse(simulator, ret)
+        return ret
+    }
+    protected _bestMoveSequenceRecurse(simulator:Simulator, sequence:Array<Move>):void{
+        let children = this.children;
+        if(children.length == 0) return; //no more moves
+        let maxScore = -Infinity;
+        let bestChild:MonteNode = null;
+        for (var i = 0; i < children.length; i++) {
+            let child = children[i];
+            //we want to find the node with the highest lowest confidence bound
+            let score = this._ucb1(child.score/child.plays, child.plays, this.plays, -1.4142135623730951); //neg c calcs lower confidence bound
+            if(score > maxScore){
+                maxScore = score
+                bestChild = child
+            }
+        }
+        let move = this.moveGenerator.generate(bestChild.moveIndex, simulator.board)
+        sequence.push(move)
+        bestChild._bestMoveSequenceRecurse(simulator, sequence)
     }
     //Runs a single monte experiment. Returns the score for the resulting board.
     public run(simulator:Simulator):number{
@@ -114,7 +163,7 @@ export abstract class MonteNode {
         //The estimatedValue for an unvisitedChild is just the avg for this node.
         //If there are no unvisitedChildren its -Inf so that we will not choose one
         let maxScore = this.unvisitedChildren.length ? this._ucb1(this.score/this.plays, this.plays, 1) : -Infinity;
-        let bestChild = null;
+        let bestChild:MonteNode = null;
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
             let score = this._ucb1(child.score/child.plays, child.plays, this.plays);
@@ -124,7 +173,8 @@ export abstract class MonteNode {
             }
         }
         if(!bestChild) return null;
-        simulator.makeMove(bestChild);
+        let move = this.moveGenerator.generate(bestChild.moveIndex, simulator.board)
+        simulator.makeMove(move);
         return bestChild
     }
     protected _select_unexpanded_child(simulator:Simulator):MonteNode {
@@ -141,10 +191,10 @@ export abstract class MonteNode {
         this.children.push(child)
         return child;
     }
-    protected _ucb1(estimatedValue:number, plays:number, totalSims:number){
+    protected _ucb1(estimatedValue:number, plays:number, totalSims:number, c?:number){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
-        const C = 1.4142135623730951; //aka Math.sqrt(2)
-        return estimatedValue+C*Math.sqrt(Math.log(totalSims)/plays);
+        c = +(c || 1.4142135623730951) //aka Math.sqrt(2)
+        return estimatedValue+c*Math.sqrt(Math.log(totalSims)/plays);
     }
 }
 
