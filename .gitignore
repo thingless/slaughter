@@ -47,7 +47,5 @@ jspm_packages
 # Yarn Integrity file
 .yarn-integrity
 
-src/bundle.js
-src/libs.js
-src/aiworker.js
+src/*.js
 
