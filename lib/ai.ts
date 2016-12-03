@@ -138,7 +138,7 @@ export class MonteNode {
             }
         }
         if(!moveIndex) return null; //we ran out of potential moves :(
-        var child = new MonteNode(moveIndex, buildMoveGenerator(simulator.board, simulator.territories));
+        var child = new (this.constructor as any)(moveIndex, buildMoveGenerator(simulator.board, simulator.territories));
         this.children.push(child)
         return child;
     }
