@@ -44,6 +44,19 @@ export class SlaughterRuntime {
             this.pendingMoves.reset();
         });
     }
+    public assignTeam(team:number):Promise<number>{
+        let network = this.network;
+        return network.send({
+            'from': network.address,
+            'to': network.serverAddress,
+            'method': 'assignTeam',
+            'data': {'team': team}
+        }).then((resp)=>{
+            team = resp['data']['team'];
+            console.log("Server says that we are team", team);
+            return team;
+        })
+    }
 }
 
 export function main() {
