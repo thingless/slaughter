@@ -74,7 +74,8 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
         }
     }
 }
-export class MonteNode {
+
+export abstract class MonteNode {
     public children:Array<MonteNode>;
     private unvisitedChildren:Array<number>;
     public score:number;
@@ -106,9 +107,7 @@ export class MonteNode {
         this.plays += 1;
         return score;
     }
-    public evalBoardScore(simulator:Simulator){
-        return 1; //all boards are winners :)
-    }
+    public abstract evalBoardScore(simulator:Simulator):number;
     protected _select_expanded_child(simulator:Simulator):MonteNode {
         if(this.children.length === 0) return null;
         let children = this.children;
@@ -149,3 +148,11 @@ export class MonteNode {
     }
 }
 
+export class GreedyMonteNode extends MonteNode{
+    public evalBoardScore(simulator:Simulator){
+        let  myTeam = simulator.game.currentTeam;
+        let myHexes = simulator.board.filter((hex)=>hex.team == myTeam)
+        if (myHexes.length == 0) return 0;
+        return myHexes.length / simulator.board.length;
+    }
+}

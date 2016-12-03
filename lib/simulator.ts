@@ -4,7 +4,7 @@ import {Board, Hex, Move, Tenant, TEAM_WATER, Game} from './models';
 import {Dictionary} from './util'
 
 export class Simulator {
-    private game:Game = null;
+    public game:Game = null;
     public territories:Array<Array<Hex>> = [];
     constructor(game:Game) {
         this.game = game;
