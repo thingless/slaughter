@@ -85,7 +85,7 @@ export class MonteRunner {
         this.simulator = simulator
         this.bestScoreSoFar = 0;
     }
-    public runForIterations(iterations:number){
+    public runIterations(iterations:number){
         for (var i = 0; i < iterations; i++) { this.runOnce() }
     }
     public runOnce(){
