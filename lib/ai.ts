@@ -61,7 +61,6 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
 
             // Look up the destination hex
             var dstHex:Hex = board.get(inner[moveDstIdx] || outer[moveDstIdx-inner.length]);
-
             // If the "source" is 0, construct a peasant; 1 => tower
             if (moveSrcIdx === 0)
                 return new Move(srcTeam, dstHex, null, Tenant.Peasant);
@@ -185,7 +184,7 @@ export abstract class MonteNode {
                 break; //we have found a truely valid move!
             }
         }
-        if(!moveIndex) return null; //we ran out of potential moves :(
+        if(!_.isNumber(moveIndex)) return null; //we ran out of potential moves :(
         var currentTeam = simulator.game.currentTeam;
         var territories = simulator.territories.filter((territory)=>territory.length>1 && territory[0].team == currentTeam)
         var child = new (this.constructor as any)(moveIndex, buildMoveGenerator(simulator.board, territories));
