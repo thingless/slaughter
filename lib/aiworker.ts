@@ -26,11 +26,11 @@ export class AiPlayer<T extends MonteNode>{
         let runtime = this.runtime;
         let currentTeam = runtime.game.currentTeam;
         if (currentTeam !== runtime.ourTeam) return; //its not actually our turn
-        let territories = runtime.simulator.territories.filter((territory)=>territory[0] && territory[0].team == currentTeam)
+        let territories = runtime.simulator.territories.filter((territory)=>territory.length>1 && territory[0].team == currentTeam)
         let moveGenerator = buildMoveGenerator(runtime.game.board, territories)
         let root = new this.monteNodeClass(-1, moveGenerator)
         let runner = new MonteRunner(root, runtime.simulator)
-        runner.runIterations(100);
+        runner.runIterations(1000);
         runner.getBestMoveSequence()
             .forEach((move)=> runtime.pendingMoves.add(move))
         runtime.sendMovesToServer();
