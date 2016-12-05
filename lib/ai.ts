@@ -36,7 +36,6 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
     //       It can move to any hex in inner
     //       or any hex in outer
     // Note that these moves are (mostly) illegal - only very basic trimming is done
-
     var tenantHexes:Array<string> = territory.filter((hex)=>Simulator.isMobileUnit(hex.tenant)).map((hex)=>hex.id)
     var numTenants:number = tenantHexes.length;
 
@@ -187,7 +186,9 @@ export abstract class MonteNode {
             }
         }
         if(!moveIndex) return null; //we ran out of potential moves :(
-        var child = new (this.constructor as any)(moveIndex, buildMoveGenerator(simulator.board, simulator.territories));
+        var currentTeam = simulator.game.currentTeam;
+        var territories = simulator.territories.filter((territory)=>territory[0] && territory[0].team == currentTeam)
+        var child = new (this.constructor as any)(moveIndex, buildMoveGenerator(simulator.board, territories));
         this.children.push(child)
         return child;
     }

@@ -53,8 +53,19 @@ export class SlaughterRuntime {
             'data': {'team': team}
         }).then((resp)=>{
             team = resp['data']['team'];
-            console.log("Server says that we are team", team);
             return team;
+        })
+    }
+    public startAiWorker():Promise<Worker>{
+        return Promise.resolve().then(()=>{
+            let worker = new Worker('/aiworker.js')
+            worker.postMessage({
+                method:'connect',
+                data:{
+                    serverAddress:this.network.serverAddress
+                }
+            })
+            return worker;
         })
     }
 }
