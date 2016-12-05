@@ -30,7 +30,7 @@ export class AiPlayer<T extends MonteNode>{
         let moveGenerator = buildMoveGenerator(runtime.game.board, territories)
         let root = new this.monteNodeClass(-1, moveGenerator)
         let runner = new MonteRunner(root, runtime.simulator)
-        runner.runIterations(2000);
+        runner.runIterations(1000);
         runner.getBestMoveSequence()
             .forEach((move)=> runtime.pendingMoves.add(move))
         runtime.sendMovesToServer();

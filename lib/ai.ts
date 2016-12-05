@@ -84,7 +84,10 @@ export class MonteRunner {
         this.bestScoreSoFar = 0;
     }
     public runIterations(iterations:number){
-        for (var i = 0; i < iterations; i++) { this.runOnce() }
+        for (var i = 0; i < iterations; i++) {
+            this.runOnce()
+            if(i%100===0) console.log('Finished MonteRunner iteration #'+i)
+        }
         console.log(this.root);
     }
     public runOnce(){
@@ -164,7 +167,8 @@ export abstract class MonteNode {
         let children = this.children;
         //The estimatedValue for an unvisitedChild is just the avg for this node.
         //If there are no unvisitedChildren its -Inf so that we will not choose one
-        let maxScore = this.unvisitedChildren.length ? this._ucb1(this.score/this.plays, this.plays, 1) : -Infinity;
+        //if(this.moveIndex < 0){ debugger; }
+        let maxScore = this.unvisitedChildren.length ? this._ucb1(this.score/this.plays, 1, this.plays) : -Infinity;
         let bestChild:MonteNode = null;
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
