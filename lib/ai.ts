@@ -89,7 +89,10 @@ export class MonteRunner {
     }
     public runOnce(){
         let simulator = this.simulator.deepClone()
+        let oldLog = console.log
+        console.log = function(){}
         let score = this.root.run(simulator)
+        console.log = oldLog;
         if(score > this.bestScoreSoFar){
             console.log('found a new highscore ' + score)
             this.bestScoreSoFar = score
