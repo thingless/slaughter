@@ -17,12 +17,10 @@ export class Simulator {
     get board():Board { return this.game.board }
 
     public deepClone():Simulator{
-        let game = this.game;
-        let newGame:Game = game.clone() as Game;
-        let newBoard = new Board();
-        game.board.models.forEach((hex)=>newBoard.add(hex.clone()));
+        let newBoard = new Board(this.game.board.models.map((hex)=>hex.clone()))
+        let newGame:Game = this.game.clone() as Game;
         newGame.board = newBoard;
-        return new Simulator(game);
+        return new Simulator(newGame);
     }
 
     private tenantToCombatValue(tenant:Tenant):number {

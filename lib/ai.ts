@@ -89,14 +89,7 @@ export class MonteRunner {
     }
     public runOnce(){
         let simulator = this.simulator.deepClone()
-        let oldLog = console.log;
-        //disable logging
-        console.log = function(){}
-        //do actual sim
         let score = this.root.run(simulator)
-        //restore logging
-        console.log = oldLog
-
         if(score > this.bestScoreSoFar){
             console.log('found a new highscore ' + score)
             this.bestScoreSoFar = score
@@ -184,10 +177,9 @@ export abstract class MonteNode {
         return bestChild
     }
     protected _select_unexpanded_child(simulator:Simulator):MonteNode {
-        var move;
         var moveIndex;
         while (typeof(moveIndex = this.unvisitedChildren.pop()) !== "undefined") {
-            move = this.moveGenerator.generate(moveIndex, simulator.board);
+            let move = this.moveGenerator.generate(moveIndex, simulator.board);
             if(simulator.makeMove(move)){
                 break; //we have found a truely valid move!
             }
