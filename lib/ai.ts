@@ -85,10 +85,18 @@ export class MonteRunner {
     }
     public runIterations(iterations:number){
         for (var i = 0; i < iterations; i++) { this.runOnce() }
+        console.log(this.root);
     }
     public runOnce(){
         let simulator = this.simulator.deepClone()
+        let oldLog = console.log;
+        //disable logging
+        console.log = function(){}
+        //do actual sim
         let score = this.root.run(simulator)
+        //restore logging
+        console.log = oldLog
+
         if(score > this.bestScoreSoFar){
             console.log('found a new highscore ' + score)
             this.bestScoreSoFar = score

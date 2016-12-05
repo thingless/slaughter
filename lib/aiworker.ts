@@ -30,7 +30,7 @@ export class AiPlayer<T extends MonteNode>{
         let moveGenerator = buildMoveGenerator(runtime.game.board, territories)
         let root = new this.monteNodeClass(-1, moveGenerator)
         let runner = new MonteRunner(root, runtime.simulator)
-        runner.runIterations(1000);
+        runner.runIterations(2000);
         runner.getBestMoveSequence()
             .forEach((move)=> runtime.pendingMoves.add(move))
         runtime.sendMovesToServer();
@@ -59,7 +59,7 @@ export function aimain() {
             console.log("Server says that we are team", team);
             runtime.ourTeam = team;
             game.fetch();
-            let player = new AiPlayer(runtime, GreedyMonteNode)
+            var player = new AiPlayer(runtime, GreedyMonteNode)
             player.takeTurn() //just to make sure its not our turn
         })
     })
