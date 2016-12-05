@@ -80,12 +80,11 @@ export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex>
             output.push(hex);
 
             // Add the node's neighbors to the queue (if they are the right team)
-            _.map(DIRS, (dir)=>{
-                let neigh = hexNeighbor(board, hex, dir);
+            allNeighbors(board, hex).map((neigh)=>{
                 if (neigh && neigh.team === startTeam && !neigh.territory) {  // Handle walking off the edge of the board
                     queue.push(neigh);
                 }
-            });
+            })
         }
     }
 
