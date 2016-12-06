@@ -54,9 +54,23 @@ export class Simulator {
         let newGame:any = {
             board: newBoard,
             currentTeam: this.game.currentTeam,
+            currentTurn: this.game.currentTurn,
             on:function(){},
         }
         return new Simulator(newGame);
+    }
+
+    public deepFastClear(originalSimulator:Simulator):void{
+        let origBoard = originalSimulator.board;
+        this.game.board.map((hex)=>{
+            let origHex = origBoard.get(hex.id)
+            hex.team = origHex.team
+            hex.tenant = origHex.tenant
+            hex.money = origHex.money
+            hex.canMove = origHex.canMove
+            hex.territory = origHex.territory
+        })
+        this.game.currentTurn = originalSimulator.game.currentTurn;
     }
 
     private tenantToCombatValue(tenant:Tenant):number {

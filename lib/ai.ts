@@ -75,12 +75,14 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
 
 export class MonteRunner {
     public root:MonteNode
+    public originalSimulator:Simulator
     public simulator:Simulator
     public bestScoreSoFar:number //purely for analytics
 
     constructor(root:MonteNode, simulator:Simulator){
         this.root = root
-        this.simulator = simulator
+        this.originalSimulator = simulator
+        this.simulator = simulator.deepFastClone()
         this.bestScoreSoFar = 0;
     }
     public runIterations(iterations:number){
@@ -91,10 +93,11 @@ export class MonteRunner {
         console.log(this.root);
     }
     public runOnce(){
-        let simulator = this.simulator.deepFastClone()
+        this.simulator.deepFastClear(this.originalSimulator)
+        this.simulator.recomputeCachedState();
         let oldLog = console.log
         console.log = function(){}
-        let score = this.root.run(simulator)
+        let score = this.root.run(this.simulator)
         console.log = oldLog;
         if(score > this.bestScoreSoFar){
             console.log('found a new highscore ' + score)
