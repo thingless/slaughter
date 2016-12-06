@@ -2,19 +2,12 @@
 import {guid, Dictionary} from './util'
 import * as hexops from './hexops'
 
-var baseGuid = guid().replace(/-/g, '')
-var sGuidCount = 0;
-function sguid(){
-    sGuidCount++
-    return baseGuid+sGuidCount;
-}
-
 export class BaseModel extends Backbone.Model {
     public relations:any;
     constructor(attributes?: any, options?: any){
         if(!attributes || _.isUndefined(attributes.id)){
             attributes = attributes || {};
-            attributes.id = sguid();
+            attributes.id = guid();
         }
         super(attributes, options)
         this.set('type', this.constructor['name'])
