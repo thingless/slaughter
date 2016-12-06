@@ -54,7 +54,7 @@ export function computeBorders(board:Board, territory:Array<Hex>):Array<Hex>{
 }
 
 export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex> {
-    let output:Array<Hex> = []
+    var output:Array<Hex> = []
 
     // Set the "territory" property of this hex and all connected hexes.
     if (hex.territory) {
