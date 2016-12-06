@@ -9,12 +9,14 @@ export class Simulator {
     constructor(game:Game) {
         this.game = game;
         this.territories = hexops.annotateTerritories(this.board);
-        game.on('change:board', ()=>{
-            hexops.annotateTerritories(this.board)
-            this.fixHouses();
-        }); //if board changes we need to recompute
+        game.on('change:board', this.recomputeCachedState.bind(this));
     }
     get board():Board { return this.game.board }
+
+    public recomputeCachedState():void {
+        hexops.annotateTerritories(this.board);
+        this.fixHouses();
+    }
 
     public deepClone():Simulator{
         let newBoard = new Board(this.game.board.models.map((hex)=>hex.clone()))

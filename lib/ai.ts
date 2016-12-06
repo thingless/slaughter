@@ -40,7 +40,7 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
     var numTenants:number = tenantHexes.length;
 
     var inner:Array<string> = territory.map((hex)=>hex.id);
-    var outer:Array<string> = hexops.computeBorders(board, territory).filter((hex)=>hex.team !== TEAM_WATER).map((hex)=>hex.id)
+    var outer:Array<string> = hexops.computeBorders(board, territory).filter((hex)=>hex && hex.team !== TEAM_WATER).map((hex)=>hex.id)
 
     // To assign a move an index, we need to arithmetically encode a tuple indexing to the move
     // The highest order "digit" encodes the index of the source tenant (or 0 for create peasant, 1 for create tower)

@@ -56,13 +56,14 @@ export class SlaughterRuntime {
             return team;
         })
     }
-    public startAiWorker():Promise<Worker>{
+    public startAiWorker(team?:number):Promise<Worker>{
         return Promise.resolve().then(()=>{
             let worker = new Worker('/aiworker.js')
             worker.postMessage({
                 method:'connect',
                 data:{
-                    serverAddress:this.network.serverAddress
+                    serverAddress:this.network.serverAddress,
+                    team:team || null,
                 }
             })
             return worker;
