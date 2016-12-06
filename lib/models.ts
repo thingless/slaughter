@@ -2,12 +2,19 @@
 import {guid, Dictionary} from './util'
 import * as hexops from './hexops'
 
+var baseGuid = guid().replace(/-/g, '')
+var sGuidCount = 0;
+function sguid(){
+    sGuidCount++
+    return baseGuid+sGuidCount;
+}
+
 export class BaseModel extends Backbone.Model {
     public relations:any;
     constructor(attributes?: any, options?: any){
         if(!attributes || _.isUndefined(attributes.id)){
             attributes = attributes || {};
-            attributes.id = guid();
+            attributes.id = sguid();
         }
         super(attributes, options)
         this.set('type', this.constructor['name'])
@@ -146,8 +153,7 @@ export class Move extends BaseModel {
             team:team,
             toHex:toHex,
             fromHex:fromHex,
-            newTenant:newTenant,
-            id:moveIdBaseGuid+(moveIdCount++)
+            newTenant:newTenant
         })
     }
     get team():number { return this.get('team') }
