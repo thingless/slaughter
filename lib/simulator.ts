@@ -19,8 +19,11 @@ export class Simulator {
     }
 
     public needToFixHouses(hex:Hex, oldTeam:number, newTeam:number):boolean {
-        let edgesA = hexops.countEdgesForTeam(this.board, hex, oldTeam);
-        let edgesB = hexops.countEdgesForTeam(this.board, hex, newTeam);
+        if (oldTeam === newTeam)
+            return false;
+
+        let edgesA:number = hexops.countEdgesForTeam(this.board, hex, oldTeam);
+        let edgesB:number = hexops.countEdgesForTeam(this.board, hex, newTeam);
 
         return !(edgesA <= 2 && edgesB <= 2);
     }
@@ -525,7 +528,7 @@ export class Simulator {
         move.toHex.money = 0;
 
         // Reposition houses and reapportion territories
-        if (this.needToFixHouses(hex, oldTeam, move.toHex.team))
+        if (this.needToFixHouses(move.toHex, oldTeam, move.toHex.team))
             this.fixHouses();
         return true;
     }
