@@ -1,6 +1,6 @@
 import * as util from './util';
 import * as hexops from './hexops';
-import {Game, Board, Move, Hex, Tenant, TEAM_WATER} from './models';
+import {Game, Board, Move, Hex, Tenant, TEAM_WATER, FastMove} from './models';
 import {Simulator} from './simulator';
 
 export interface MoveGenerator{
@@ -63,12 +63,12 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
             var dstHex:Hex = board.get(inner[moveDstIdx] || outer[moveDstIdx-inner.length]);
             // If the "source" is 0, construct a peasant; 1 => tower
             if (moveSrcIdx === 0)
-                return new Move(srcTeam, dstHex, null, Tenant.Peasant);
+                return new FastMove(srcTeam, dstHex, null, Tenant.Peasant) as Move;
             if (moveSrcIdx === 1)
-                return new Move(srcTeam, dstHex, null, Tenant.Tower);
+                return new FastMove(srcTeam, dstHex, null, Tenant.Tower) as Move;
 
             let srcHex:Hex = board.get(tenantHexes[moveSrcIdx - 2]);
-            return new Move(srcTeam, dstHex, srcHex, null);
+            return new FastMove(srcTeam, dstHex, srcHex, null) as Move;
         }
     }
 }

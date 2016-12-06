@@ -145,8 +145,18 @@ export class Hex extends BaseModel {
     }
 }
 
-var moveIdBaseGuid = guid()
-var moveIdCount = 0
+export class FastMove{
+    constructor(team:number, toHex:Hex, fromHex:Hex, newTenant:Tenant) {
+        this.team = team;
+        this.toHex = toHex;
+        this.fromHex = fromHex;
+        this.newTenant = newTenant;
+    }
+    public team:number
+    public newTenant:Tenant
+    public fromHex:Hex
+    public toHex:Hex
+}
 export class Move extends BaseModel {
     constructor(team:number, toHex:Hex, fromHex:Hex, newTenant:Tenant) {
         super({
@@ -164,11 +174,8 @@ export class Move extends BaseModel {
     set fromHex(val:Hex) { this.set('fromHex', val) }
     get toHex():Hex { return this.get('toHex') }
     set toHex(val:Hex) { this.set('toHex', val) }
-
-    initialize(){
-        this.set('id', guid());
-    }
 }
+
 
 export class Board extends BaseColletion<Hex> {
     model=Hex
