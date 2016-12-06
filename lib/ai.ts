@@ -207,9 +207,10 @@ export abstract class MonteNode {
 
 export class GreedyMonteNode extends MonteNode{
     public evalBoardScore(simulator:Simulator){
-        let  myTeam = simulator.game.currentTeam;
-        let myHexes = simulator.board.filter((hex)=>hex.team == myTeam)
+        let myTeam = simulator.game.currentTeam;
+        let hexes = simulator.board.filter((hex)=>hex.team !== TEAM_WATER)
+        let myHexes = hexes.filter((hex)=>hex.team == myTeam)
         if (myHexes.length == 0) return 0;
-        return myHexes.length / simulator.board.length;
+        return myHexes.length / hexes.length;
     }
 }
