@@ -18,6 +18,13 @@ export class Simulator {
         this.fixHouses();
     }
 
+    public needToFixHouses(hex:Hex, oldTeam:number, newTeam:number):boolean {
+        let edgesA = hexops.countEdgesForTeam(this.board, hex, oldTeam);
+        let edgesB = hexops.countEdgesForTeam(this.board, hex, newTeam);
+
+        return !(edgesA <= 2 && edgesB <= 2);
+    }
+
     public deepClone():Simulator{
         let newBoard = new Board(this.game.board.models.map((hex)=>hex.clone()))
         let newGame:Game = this.game.clone() as Game;
@@ -505,6 +512,8 @@ export class Simulator {
         // Add them to the new hex
         move.toHex.tenant = ourTenant;
 
+        let oldTeam = move.toHex.team;
+
         // The new hex now belongs to our team and is in our territory
         move.toHex.team = move.team;
         move.toHex.territory = ourTerritory;
@@ -516,7 +525,8 @@ export class Simulator {
         move.toHex.money = 0;
 
         // Reposition houses and reapportion territories
-        this.fixHouses();
+        if (this.needToFixHouses(hex, oldTeam, move.toHex.team))
+            this.fixHouses();
         return true;
     }
 }

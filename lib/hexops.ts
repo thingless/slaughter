@@ -230,3 +230,11 @@ export function debugLogHex(hex:Hex):any {
         "loc": hex.loc,
     })
 }
+
+export function countEdgesForTeam(board:Board, hex:Hex, team:number):number {
+    var neighs:Array<Hex> = allNeighbors(board, hex);
+    var mine:Array<boolean> = neighs.map((x)=>x.team === team);
+    mine.push(mine[0]);
+    return mine.filter((x, i)=>i > 0 && x !== mine[i-1]).length;
+}
+
