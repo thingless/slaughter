@@ -1,6 +1,6 @@
 import * as hexops from './hexops';
 import {DIRS} from './hexops';
-import {Board, Hex, Move, Tenant, TEAM_WATER, Game} from './models';
+import {Board, Hex, Move, Tenant, TEAM_WATER, Game, FastHex} from './models';
 import {Dictionary} from './util'
 
 export class Simulator {
@@ -18,10 +18,11 @@ export class Simulator {
         this.fixHouses();
     }
 
-    public needToFixHouses(hex:Hex, oldTeam:number, newTeam:number):boolean {
-        if (oldTeam === newTeam)
+    public needToFixHouses(hex:Hex, oldTeam:number, newTeam:number, oldTenant:Tenant):boolean {
+        if(oldTeam === newTeam)
             return false;
-
+        if(oldTenant === Tenant.House)
+            return true;
         let edgesA:number = hexops.countEdgesForTeam(this.board, hex, oldTeam);
         let edgesB:number = hexops.countEdgesForTeam(this.board, hex, newTeam);
 
@@ -32,6 +33,29 @@ export class Simulator {
         let newBoard = new Board(this.game.board.models.map((hex)=>hex.clone()))
         let newGame:Game = this.game.clone() as Game;
         newGame.board = newBoard;
+        return new Simulator(newGame);
+    }
+
+    public deepFastClone():Simulator{
+        let dict = {}
+        let newBoard:any = this.game.board.models.map((hex)=>{
+            let fastHex = new FastHex()
+            fastHex.id = hex.id
+            fastHex.team = hex.team
+            fastHex.tenant = hex.tenant
+            fastHex.loc = hex.loc
+            fastHex.money = hex.money
+            fastHex.canMove = hex.canMove
+            fastHex.territory = hex.territory
+            dict[fastHex.id] = fastHex;
+            return fastHex;
+        })
+        newBoard.get = (id)=>dict[id] || null
+        let newGame:any = {
+            board: newBoard,
+            currentTeam: this.game.currentTeam,
+            on:function(){},
+        }
         return new Simulator(newGame);
     }
 
@@ -478,6 +502,8 @@ export class Simulator {
         // Make sure the move is legal
         if (!this.isMoveLegal(move))
             return false;
+        // save hex's current tenant
+        let oldTenant:Tenant = move.toHex && move.toHex.tenant;
 
         // Find out who we're moving
         let ourTenant:Tenant = move.fromHex && move.fromHex.tenant || move.newTenant;
@@ -528,7 +554,7 @@ export class Simulator {
         move.toHex.money = 0;
 
         // Reposition houses and reapportion territories
-        if (this.needToFixHouses(move.toHex, oldTeam, move.toHex.team))
+        if (this.needToFixHouses(move.toHex, oldTeam, move.toHex.team, oldTenant))
             this.fixHouses();
         return true;
     }

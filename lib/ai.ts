@@ -91,7 +91,7 @@ export class MonteRunner {
         console.log(this.root);
     }
     public runOnce(){
-        let simulator = this.simulator.deepClone()
+        let simulator = this.simulator.deepFastClone()
         let oldLog = console.log
         console.log = function(){}
         let score = this.root.run(simulator)

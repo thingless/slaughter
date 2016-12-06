@@ -99,6 +99,16 @@ export function tenantToString(tenant:Tenant):string {
     return "unknown";
 }
 
+export class FastHex {
+    id:string
+    team:number
+    tenant:number
+    loc:THREE.Vector3
+    money:number
+    canMove:boolean
+    territory:number
+}
+
 export class Hex extends BaseModel {
     //tenant:Tenant
     //team:number
@@ -128,13 +138,16 @@ export class Hex extends BaseModel {
     }
 }
 
+var moveIdBaseGuid = guid()
+var moveIdCount = 0
 export class Move extends BaseModel {
     constructor(team:number, toHex:Hex, fromHex:Hex, newTenant:Tenant) {
         super({
             team:team,
             toHex:toHex,
             fromHex:fromHex,
-            newTenant:newTenant
+            newTenant:newTenant,
+            id:moveIdBaseGuid+(moveIdCount++)
         })
     }
     get team():number { return this.get('team') }
