@@ -532,9 +532,6 @@ export class Simulator {
         // Find out how much the move cost
         let moveCost:number = this.computeMoveCost(move);
 
-        // Find the territory's home unit
-        let homeHex:Hex = this.getHomeHex(move);
-
         // If there's a friendly mob there, combine them
         if (move.toHex.team === move.team && move.toHex.tenant) {
             let upgradedTenant = this.getUpgradedTenant(move);
@@ -566,7 +563,9 @@ export class Simulator {
         move.toHex.territory = ourTerritory;
 
         // Subtract money from our house
-        homeHex.money -= moveCost;
+        if (moveCost > 0) {
+            this.getHomeHex(move).money -= moveCost;
+        }
 
         // If there was a house on this territory, it's gone - remove its money
         move.toHex.money = 0;
