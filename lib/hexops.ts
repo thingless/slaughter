@@ -22,11 +22,13 @@ export function hexNeighbor(board:Board, hex:Hex, direction:Direction):Hex {
     return board.get(newLoc.x + ',' + newLoc.y + ',' + newLoc.z);
 }
 
+var _allNeighborIdsCache = {};
 export function allNeighborIds(hex:Hex):Array<string> {
+    if(_allNeighborIdsCache[hex.id]) return _allNeighborIdsCache[hex.id];
     var x = hex.loc.x|0;
     var y = hex.loc.y|0;
     var z = hex.loc.z|0;
-    return [
+    var allNeighborIds = [
         (x+1)+','+(y-1)+','+(z+0),
         (x+1)+','+(y+0)+','+(z-1),
         (x+0)+','+(y+1)+','+(z-1),
@@ -34,10 +36,12 @@ export function allNeighborIds(hex:Hex):Array<string> {
         (x-1)+','+(y+0)+','+(z+1),
         (x+0)+','+(y-1)+','+(z+1),
     ]
+    _allNeighborIdsCache[hex.id] = allNeighborIds;
+    return allNeighborIds;
 }
 
 export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
-    return allNeighborIds(hex).map((id)=>board.get(id)).filter((x)=>x)
+    return allNeighborIds(hex).map((id)=>board.get(id)).filter((x)=>!!x)
 }
 
 export function computeBorders(board:Board, territory:Array<Hex>):Array<Hex>{
