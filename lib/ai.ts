@@ -1,6 +1,6 @@
 import * as util from './util';
 import * as hexops from './hexops';
-import {Game, Board, Move, Hex, Tenant, TEAM_WATER, FastMove} from './models';
+import {Game, Board, Move, Hex, Tenant, TEAM_WATER, FastMove, tenantToString} from './models';
 import {Simulator} from './simulator';
 
 export interface MoveGenerator{
@@ -100,6 +100,7 @@ export class MonteRunner {
             if(i%100===0) console.log('Finished MonteRunner iteration #'+i)
         }
         console.log(this.root);
+        //console.log(this.root.generateDot())
     }
     public runOnce(){
         this.simulator.deepFastClear(this.originalSimulator)
@@ -132,6 +133,18 @@ export abstract class MonteNode {
         this.score = 0;
         this.plays = 0;
         this.moveIndex = moveIndex;
+    }
+    public generateDot():string{
+        var lines = ['digraph graphname {']
+        this._generateDotRecurse(null, lines)
+        lines.push('}')
+        return lines.join('')
+    }
+    public _generateDotRecurse(parent:string, lines:Array<string>):void{
+        var id = util.guid()
+        if(parent) lines.push(`${parent} -> ${id};`)
+        lines.push(`${id} [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length} = ${this.score}/${this.plays}"];`)
+        this.children.forEach((child)=>child._generateDotRecurse(id, lines))
     }
     public bestMoveSequence(simulator:Simulator):Array<Move>{
         let ret:Array<Move> = [];
