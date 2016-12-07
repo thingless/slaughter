@@ -10,9 +10,12 @@ export interface MoveGenerator{
 }
 
 export function buildMoveGenerator(board:Board, territories:Array<Array<Hex>>):MoveGenerator {
-    var moveGenerators:Array<MoveGenerator> = territories.map(buildMoveGeneratorForTerritory.bind(this, board)) as Array<MoveGenerator>;
+    var moveGenerators:Array<MoveGenerator> = territories
+        .map((territory)=>buildMoveGeneratorForTerritory(board, territory))
+        .filter((i)=>!!i);
+    var availableMoves = util.sum(moveGenerators.map((gen)=>gen.availableMoves));
     return {
-        availableMoves:util.sum(moveGenerators.map((gen)=>gen.availableMoves)),
+        availableMoves:availableMoves,
         generate:(moveIndex:number, board)=>{
             let sum = 0;
             for (var i = 0; i < moveGenerators.length; i++) {
@@ -36,21 +39,25 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
     //       It can move to any hex in inner
     //       or any hex in outer
     // Note that these moves are (mostly) illegal - only very basic trimming is done
-    var tenantHexes:Array<string> = territory.filter((hex)=>Simulator.isMobileUnit(hex.tenant)).map((hex)=>hex.id)
-    var numTenants:number = tenantHexes.length;
+    var tenantHexes:Array<string> = territory.filter((hex)=>Simulator.canMove(hex)).map((hex)=>hex.id)
+    //add virtual build tenants if appropriate
+    var money = Simulator.getHomeHex(board, territory[0].territory).money;
+    if(money >= 10) tenantHexes.push(Tenant.Peasant as any);
+    if(money >= 15) tenantHexes.push(Tenant.Tower as any);
+
 
     var inner:Array<string> = territory.map((hex)=>hex.id);
     var outer:Array<string> = hexops.computeBorders(board, territory).filter((hex)=>hex && hex.team !== TEAM_WATER).map((hex)=>hex.id)
 
     // To assign a move an index, we need to arithmetically encode a tuple indexing to the move
-    // The highest order "digit" encodes the index of the source tenant (or 0 for create peasant, 1 for create tower)
+    // The highest order "digit" encodes the index of the source tenant (create peasant, create tower are virtual sources)
     // The lower order "digit" encodes the index of the destination hex
-    var numMoveSrc:number = numTenants + 2;
+    var numMoveSrc:number = tenantHexes.length ;
     var numMoveDst:number = inner.length + outer.length;
 
     var availableMoves:number = numMoveSrc * numMoveDst;
     var srcTeam = territory[0].team;
-
+    if(availableMoves === 0) return null;
     return {
         availableMoves:availableMoves,
         generate:(i:number, board:Board)=>{
@@ -59,15 +66,17 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
             var moveSrcIdx = (i / numMoveDst) | 0;
             var moveDstIdx = i % numMoveDst;
 
-            // Look up the destination hex
+            // Look up the src & destination hex
+            let srcHex:Hex = board.get(tenantHexes[moveSrcIdx]) || (tenantHexes[moveSrcIdx] as any);
             var dstHex:Hex = board.get(inner[moveDstIdx] || outer[moveDstIdx-inner.length]);
-            // If the "source" is 0, construct a peasant; 1 => tower
-            if (moveSrcIdx === 0)
+
+            // If the "source" is Tenant.Peasant, construct a peasant; Tenant.Tower => tower
+            if ((srcHex as any) === Tenant.Peasant){
                 return new FastMove(srcTeam, dstHex, null, Tenant.Peasant) as Move;
-            if (moveSrcIdx === 1)
+            }
+            if ((srcHex as any) === Tenant.Tower)
                 return new FastMove(srcTeam, dstHex, null, Tenant.Tower) as Move;
 
-            let srcHex:Hex = board.get(tenantHexes[moveSrcIdx - 2]);
             return new FastMove(srcTeam, dstHex, srcHex, null) as Move;
         }
     }

@@ -136,12 +136,14 @@ export class Simulator {
         return this.combatValueToMobileTenant(finalValue);
     }
 
-    private getHomeHex(move:Move):Hex {
+    public static getHomeHex(board:Board, territory:number){
+        // TODO: don't just search the whole board lol
+        return board.filter((hex)=>hex.territory === territory && hex.tenant === Tenant.House)[0] || null;
+    }
+    public getHomeHex(move:Move):Hex {
         // Find the hex of the house of the **player's** relevant territory for this move.
         let territory = move.fromHex && move.fromHex.territory || move.toHex.territory;
-
-        // TODO: don't just search the whole board lol
-        return this.board.filter((hex)=>hex.territory === territory && hex.tenant === Tenant.House)[0];
+        return Simulator.getHomeHex(this.board, territory)
     }
 
     public static isMobileUnit(tenant:Tenant):boolean {
@@ -155,9 +157,11 @@ export class Simulator {
         return Simulator.isMobileUnit(tenant);
     }
 
-    private canMove(hex:Hex):boolean {
-        // See if it is mobile and has moves left
+    public static canMove(hex:Hex):boolean{
         return this.isMobileUnit(hex.tenant) && hex.canMove;
+    }
+    public canMove(hex:Hex):boolean {
+        return Simulator.canMove(hex);
     }
 
     private findCombatValue(hex:Hex):number {

@@ -61,13 +61,13 @@ export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex>
         return;  // The hex already has a territory
     }
 
-    let startTeam = hex.team;
+    var startTeam = hex.team;
 
-    let queue:Array<Hex> = [];
+    var queue:Array<Hex> = [];
     queue.push(hex);
 
     while(queue.length > 0) {
-        let hex = queue.shift();
+        var hex = queue.shift();
         if (hex.team === startTeam) {
             if (hex.territory) {
                 continue;
