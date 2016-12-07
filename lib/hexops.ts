@@ -106,7 +106,7 @@ export function annotateTerritories(board:Board):Array<Array<Hex>> {
     let currentTerritory:number = 1;
 
     board.map((hex)=>{
-        let ter = teamFloodFill(board, hex, currentTerritory);
+        var ter = teamFloodFill(board, hex, currentTerritory);
         if (ter && ter.length) {
             territories.push(ter);
             currentTerritory += 1;
