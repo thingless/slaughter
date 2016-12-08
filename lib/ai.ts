@@ -2,6 +2,7 @@ import * as util from './util';
 import * as hexops from './hexops';
 import {Game, Board, Move, Hex, Tenant, TEAM_WATER, FastMove, tenantToString} from './models';
 import {Simulator} from './simulator';
+import * as request from 'request'
 
 export interface MoveGenerator{
     availableMoves:number
@@ -69,7 +70,6 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
             // Look up the src & destination hex
             let srcHex:Hex = board.get(tenantHexes[moveSrcIdx]) || (tenantHexes[moveSrcIdx] as any);
             var dstHex:Hex = board.get(inner[moveDstIdx] || outer[moveDstIdx-inner.length]);
-
             // If the "source" is Tenant.Peasant, construct a peasant; Tenant.Tower => tower
             if ((srcHex as any) === Tenant.Peasant){
                 return new FastMove(srcTeam, dstHex, null, Tenant.Peasant) as Move;
@@ -100,7 +100,11 @@ export class MonteRunner {
             if(i%100===0) console.log('Finished MonteRunner iteration #'+i)
         }
         console.log(this.root);
-        //console.log(this.root.generateDot())
+        request({
+            method:"POST",
+            uri:'http://localhost:8080/filesave',
+            json: {dot:this.root.generateDot()},
+        })
     }
     public runOnce(){
         this.simulator.deepFastClear(this.originalSimulator)
@@ -138,12 +142,12 @@ export abstract class MonteNode {
         var lines = ['digraph graphname {']
         this._generateDotRecurse(null, lines)
         lines.push('}')
-        return lines.join('')
+        return lines.join('\n')
     }
     public _generateDotRecurse(parent:string, lines:Array<string>):void{
-        var id = util.guid()
-        if(parent) lines.push(`${parent} -> ${id};`)
-        lines.push(`${id} [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length} = ${this.score}/${this.plays}"];`)
+        var id = util.guid().replace(/-/gi, '').substring(0,10)
+        if(parent) lines.push(`"${parent}" -> "${id}";`)
+        lines.push(`"${id}" [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length} = ${this.score}/${this.plays}"];`)
         this.children.forEach((child)=>child._generateDotRecurse(id, lines))
     }
     public bestMoveSequence(simulator:Simulator):Array<Move>{
@@ -205,14 +209,14 @@ export abstract class MonteNode {
         }
         if(!bestChild) return null;
         let move = this.moveGenerator.generate(bestChild.moveIndex, simulator.board)
-        simulator.makeMove(move);
+        simulator.makeMove(move, true);
         return bestChild
     }
     protected _select_unexpanded_child(simulator:Simulator):MonteNode {
         var moveIndex;
         while (typeof(moveIndex = this.unvisitedChildren.pop()) !== "undefined") {
             let move = this.moveGenerator.generate(moveIndex, simulator.board);
-            if(simulator.makeMove(move)){
+            if(simulator.makeMove(move, true)){
                 break; //we have found a truely valid move!
             }
         }

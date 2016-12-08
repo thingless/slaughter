@@ -515,7 +515,8 @@ export class Simulator {
         this.territories = newTerritories;
     }
 
-    public makeMove(move:Move):boolean {
+    public makeMove(move:Move, isAIMove?:boolean):boolean {
+        isAIMove = !!isAIMove;
         // Update the board based on a move
         // Make sure the move is legal
         if (!this.isMoveLegal(move))
@@ -539,6 +540,10 @@ export class Simulator {
                 ourTenant = upgradedTenant;
             }
         }
+        // If this is an ai move and its not a new unit we can not move (significantly reduces game tree)
+        else if(isAIMove && !move.newTenant){
+            move.toHex.canMove = false
+        }
 
         // Remove the tenant from the old hex
         if(move.fromHex) {
@@ -549,9 +554,11 @@ export class Simulator {
         if (move.toHex.territory !== ourTerritory) {
             move.toHex.canMove = false;
         }
+        //if its to a tree we cant move
         if (this.isTree(move.toHex.tenant)) {
             move.toHex.canMove = false;
         }
+
 
         // Add them to the new hex
         move.toHex.tenant = ourTenant;
