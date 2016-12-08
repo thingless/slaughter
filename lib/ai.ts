@@ -251,7 +251,7 @@ export abstract class MonteNode {
     }
     protected _ucb1(estimatedValue:number, plays:number, totalSims:number, c?:number){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
-        c = +(c || 0.5) //aka Math.sqrt(2)
+        c = +(c || 0.25) //aka Math.sqrt(2)
         return estimatedValue+c*Math.sqrt(Math.log(totalSims)/plays);
     }
 }
