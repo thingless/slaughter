@@ -151,7 +151,7 @@ export abstract class MonteNode {
     public _generateDotRecurse(parent:string, lines:Array<string>):void{
         var id = util.guid().replace(/-/gi, '').substring(0,10)
         if(parent) lines.push(`"${parent}" -> "${id}";`)
-        lines.push(`"${id}" [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length}\n${(this.score/this.plays).toFixed(4)}"];`)
+        lines.push(`"${id}" [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length}\n${(this.score/this.plays).toFixed(4)}x${this.plays}"];`)
         this.children.forEach((child)=>child._generateDotRecurse(id, lines))
     }
     public bestMoveSequence(simulator:Simulator):Array<Move>{
