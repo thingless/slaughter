@@ -131,8 +131,6 @@ export abstract class MonteNode {
     public moveGenerator:MoveGenerator
     public moveIndex:number; //the move index that got to this node state
     public averageScore:number;
-    public globalMinScore:number;
-    public globalMaxScore:number;
     constructor(moveIndex:number, moveGenerator:MoveGenerator){
         this.children = [];
         this.unvisitedChildren = _.shuffle(_.range(moveGenerator.availableMoves)) as Array<number>;
@@ -177,29 +175,15 @@ export abstract class MonteNode {
         sequence.push(move)
         bestChild._bestMoveSequenceRecurse(simulator, sequence)
     }
-    public run(simulator:Simulator):number{
-        this.globalMinScore = _.isUndefined(this.globalMinScore) ? 1 : this.globalMinScore
-        this.globalMaxScore = _.isUndefined(this.globalMaxScore) ? 0 : this.globalMaxScore
-        var scalingFactor;
-        if(this.globalMaxScore === this.globalMinScore){
-            scalingFactor = 1
-        } else {
-            scalingFactor = Math.abs(1.0/(this.globalMaxScore-this.globalMinScore))
-        }
-        var score  = this._runRecurse(simulator, scalingFactor)
-        this.globalMinScore = Math.min(this.globalMinScore, score)
-        this.globalMaxScore = Math.max(this.globalMaxScore, score)
-        return score
-    }
     //Runs a single monte experiment. Returns the score for the resulting board.
-    public _runRecurse(simulator:Simulator, scalingFactor:number):number{
-        let child:MonteNode = this._select_expanded_child(simulator, scalingFactor) || //see if we should revist child
+    public run(simulator:Simulator):number{
+        let child:MonteNode = this._select_expanded_child(simulator) || //see if we should revist child
             this._select_unexpanded_child(simulator) || //visit an unexpanded child
-            this._select_expanded_child(simulator, scalingFactor) //its possible none of the unexpanded children were legal
+            this._select_expanded_child(simulator) //its possible none of the unexpanded children were legal
         //calc score or recurse
         var score;
         if(child){ //recurse
-            score = child._runRecurse(simulator, scalingFactor)
+            score = child.run(simulator)
         } else {
             score = this.evalBoardScore(simulator)
         }
@@ -210,18 +194,18 @@ export abstract class MonteNode {
         return score;
     }
     public abstract evalBoardScore(simulator:Simulator):number;
-    protected _select_expanded_child(simulator:Simulator, scalingFactor:number):MonteNode {
+    protected _select_expanded_child(simulator:Simulator):MonteNode {
         if(this.children.length === 0) return null;
         let children = this.children;
         //The estimatedValue for an unvisitedChild is just the avg for this node.
         //If there are no unvisitedChildren its -Inf so that we will not choose one
         //if(this.moveIndex < 0){ debugger; }
         var averageChildScore = util.sum(children.map((child)=>child.averageScore)) / children.length;
-        let maxScore = this.unvisitedChildren.length ? this._ucb1(averageChildScore*scalingFactor, 1, this.plays) : -Infinity;
+        let maxScore = this.unvisitedChildren.length ? this._ucb1(averageChildScore, 1, this.plays) : -Infinity;
         let bestChild:MonteNode = null;
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
-            let score = this._ucb1(child.averageScore*scalingFactor, child.plays, this.plays);
+            let score = this._ucb1(child.averageScore, child.plays, this.plays);
             if(score > maxScore){
                 maxScore = score;
                 bestChild = child;
