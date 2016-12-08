@@ -130,12 +130,14 @@ export abstract class MonteNode {
     public plays:number;
     public moveGenerator:MoveGenerator
     public moveIndex:number; //the move index that got to this node state
+    public averageScore:number;
     constructor(moveIndex:number, moveGenerator:MoveGenerator){
         this.children = [];
         this.unvisitedChildren = _.shuffle(_.range(moveGenerator.availableMoves)) as Array<number>;
         this.moveGenerator = moveGenerator;
         this.score = 0;
         this.plays = 0;
+        this.averageScore = 0;
         this.moveIndex = moveIndex;
     }
     public generateDot():string{
@@ -147,7 +149,7 @@ export abstract class MonteNode {
     public _generateDotRecurse(parent:string, lines:Array<string>):void{
         var id = util.guid().replace(/-/gi, '').substring(0,10)
         if(parent) lines.push(`"${parent}" -> "${id}";`)
-        lines.push(`"${id}" [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length} = ${this.score}/${this.plays}"];`)
+        lines.push(`"${id}" [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length}\n${(this.score/this.plays).toFixed(4)}"];`)
         this.children.forEach((child)=>child._generateDotRecurse(id, lines))
     }
     public bestMoveSequence(simulator:Simulator):Array<Move>{
@@ -188,6 +190,7 @@ export abstract class MonteNode {
         //update stats & return
         this.score += score;
         this.plays += 1;
+        this.averageScore = this.score / this.plays;
         return score;
     }
     public abstract evalBoardScore(simulator:Simulator):number;
@@ -197,11 +200,12 @@ export abstract class MonteNode {
         //The estimatedValue for an unvisitedChild is just the avg for this node.
         //If there are no unvisitedChildren its -Inf so that we will not choose one
         //if(this.moveIndex < 0){ debugger; }
-        let maxScore = this.unvisitedChildren.length ? this._ucb1(this.score/this.plays, 1, this.plays) : -Infinity;
+        var averageChildScore = util.sum(children.map((child)=>child.averageScore)) / children.length;
+        let maxScore = this.unvisitedChildren.length ? this._ucb1(averageChildScore, 1, this.plays) : -Infinity;
         let bestChild:MonteNode = null;
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
-            let score = this._ucb1(child.score/child.plays, child.plays, this.plays);
+            let score = this._ucb1(child.averageScore, child.plays, this.plays);
             if(score > maxScore){
                 maxScore = score;
                 bestChild = child;
