@@ -159,8 +159,8 @@ export abstract class MonteNode {
         let ret:Array<Move> = [];
         var bestMoveIndexes = this.bestMoveIndexes.slice();
         bestMoveIndexes.shift(); // remove -1
-        this._bestMoveSequenceRecurse(simulator, ret, bestMoveIndexes)
-        return ret
+        this._bestMoveSequenceRecurse(simulator, ret, bestMoveIndexes);
+        return ret.map((move)=>new Move(move.team, move.toHex, move.fromHex, move.newTenant));
     }
     protected _bestMoveSequenceRecurse(simulator:Simulator, sequence:Array<Move>, bestMoveIndexes:Array<number>):void{
         let moveIndex = bestMoveIndexes.shift();
