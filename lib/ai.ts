@@ -167,7 +167,7 @@ export abstract class MonteNode {
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
             //we want to find the node with the highest lowest confidence bound
-            let score = this._ucb1(child.score/child.plays, child.plays, this.plays, -1.4142135623730951); //neg c calcs lower confidence bound
+            let score = this._ucb1(child.maxScore, child.plays, this.plays, -1.4142135623730951); //neg c calcs lower confidence bound
             if(score > maxScore){
                 maxScore = score
                 bestChild = child
