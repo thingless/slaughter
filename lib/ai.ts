@@ -165,6 +165,7 @@ export abstract class MonteNode {
     protected _bestMoveSequenceRecurse(simulator:Simulator, sequence:Array<Move>, bestMoveIndexes:Array<number>):void{
         let moveIndex = bestMoveIndexes.shift();
         let bestChild = this.children[bestMoveIndexes.shift()];
+        if(!bestChild) return;
         let move = this.moveGenerator.generate(moveIndex, simulator.board)
         sequence.push(move);
         bestChild._bestMoveSequenceRecurse(simulator, sequence, bestMoveIndexes);

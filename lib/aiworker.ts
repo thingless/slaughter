@@ -33,7 +33,7 @@ export class AiPlayer<T extends MonteNode>{
         let runner = new MonteRunner(root, runtime.simulator)
         runner.runIterations(500);
         runner.getBestMoveSequence()
-            .forEach((move)=> runtime.pendingMoves.add(move))
+            .forEach((move)=>runtime.pendingMoves.add(move))
         runtime.sendMovesToServer();
     }
 }
