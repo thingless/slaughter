@@ -130,17 +130,17 @@ export abstract class MonteNode {
     public plays:number;
     public moveGenerator:MoveGenerator
     public moveIndex:number; //the move index that got to this node state
-    public averageScore:number;
-    public globalMinScore:number;
-    public globalMaxScore:number;
+    public minScore:number;
+    public maxScore:number;
     constructor(moveIndex:number, moveGenerator:MoveGenerator){
         this.children = [];
         this.unvisitedChildren = _.shuffle(_.range(moveGenerator.availableMoves)) as Array<number>;
         this.moveGenerator = moveGenerator;
         this.score = 0;
         this.plays = 0;
-        this.averageScore = 0;
         this.moveIndex = moveIndex;
+        this.minScore = 1;
+        this.maxScore = 0;
     }
     public generateDot():string{
         var lines = ['digraph graphname {']
@@ -151,7 +151,7 @@ export abstract class MonteNode {
     public _generateDotRecurse(parent:string, lines:Array<string>):void{
         var id = util.guid().replace(/-/gi, '').substring(0,10)
         if(parent) lines.push(`"${parent}" -> "${id}";`)
-        lines.push(`"${id}" [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length}\n${(this.score/this.plays).toFixed(4)}x${this.plays}"];`)
+        lines.push(`"${id}" [label="${this.children.length} of ${this.children.length+this.unvisitedChildren.length}\n${(this.maxScore).toFixed(4)}x${this.plays}"];`)
         this.children.forEach((child)=>child._generateDotRecurse(id, lines))
     }
     public bestMoveSequence(simulator:Simulator):Array<Move>{
@@ -178,19 +178,15 @@ export abstract class MonteNode {
         bestChild._bestMoveSequenceRecurse(simulator, sequence)
     }
     public run(simulator:Simulator):number{
-        this.globalMinScore = _.isUndefined(this.globalMinScore) ? 1 : this.globalMinScore;
-        this.globalMaxScore = _.isUndefined(this.globalMaxScore) ? 0 : this.globalMaxScore;
         var scaleFunc;
-        if(this.globalMaxScore-this.globalMinScore > 0){
-            var scaleFactor = 1.0/(this.globalMaxScore-this.globalMinScore)
-            var globalMinScore = this.globalMinScore
+        if(this.maxScore-this.minScore > 0){
+            var scaleFactor = 1.0/(this.maxScore-this.minScore)
+            var globalMinScore = this.minScore
             scaleFunc = (val)=>(val-globalMinScore)*scaleFactor;
         } else {
             scaleFunc = (val)=>val
         }
         var score = this._runRecurse(simulator, scaleFunc);
-        this.globalMinScore = Math.min(this.globalMinScore, score);
-        this.globalMaxScore = Math.max(this.globalMaxScore, score);
         return score;
     }
     //Runs a single monte experiment. Returns the score for the resulting board.
@@ -208,7 +204,8 @@ export abstract class MonteNode {
         //update stats & return
         this.score += score;
         this.plays += 1;
-        this.averageScore = this.score / this.plays;
+        this.minScore = Math.min(this.minScore, score);
+        this.maxScore = Math.max(this.maxScore, score);
         return score;
     }
     public abstract evalBoardScore(simulator:Simulator):number;
@@ -218,12 +215,12 @@ export abstract class MonteNode {
         //The estimatedValue for an unvisitedChild is just the avg for this node.
         //If there are no unvisitedChildren its -Inf so that we will not choose one
         //if(this.moveIndex < 0){ debugger; }
-        var averageChildScore = util.sum(children.map((child)=>child.averageScore)) / children.length;
+        var averageChildScore = util.sum(children.map((child)=>child.maxScore)) / children.length;
         let maxScore = this.unvisitedChildren.length ? this._ucb1(scaleFunc(averageChildScore), 1, this.plays) : -Infinity;
         let bestChild:MonteNode = null;
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
-            let score = this._ucb1(scaleFunc(child.averageScore), child.plays, this.plays);
+            let score = this._ucb1(scaleFunc(child.maxScore), child.plays, this.plays);
             if(score > maxScore){
                 maxScore = score;
                 bestChild = child;
@@ -251,7 +248,7 @@ export abstract class MonteNode {
     }
     protected _ucb1(estimatedValue:number, plays:number, totalSims:number, c?:number){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
-        c = +(c || 0.25) //aka Math.sqrt(2)
+        c = +(c || 0.4) //aka Math.sqrt(2)
         return estimatedValue+c*Math.sqrt(Math.log(totalSims)/plays);
     }
 }
