@@ -132,6 +132,7 @@ export abstract class MonteNode {
     public moveIndex:number; //the move index that got to this node state
     public minScore:number;
     public maxScore:number;
+    public bestMoveIndexes:Array<number>;
     constructor(moveIndex:number, moveGenerator:MoveGenerator){
         this.children = [];
         this.unvisitedChildren = _.shuffle(_.range(moveGenerator.availableMoves)) as Array<number>;
@@ -156,26 +157,17 @@ export abstract class MonteNode {
     }
     public bestMoveSequence(simulator:Simulator):Array<Move>{
         let ret:Array<Move> = [];
-        this._bestMoveSequenceRecurse(simulator, ret)
+        var bestMoveIndexes = this.bestMoveIndexes.slice();
+        bestMoveIndexes.shift(); // remove -1
+        this._bestMoveSequenceRecurse(simulator, ret, bestMoveIndexes)
         return ret
     }
-    protected _bestMoveSequenceRecurse(simulator:Simulator, sequence:Array<Move>):void{
-        let children = this.children;
-        if(children.length == 0) return; //no more moves
-        let maxScore = -Infinity;
-        let bestChild:MonteNode = null;
-        for (var i = 0; i < children.length; i++) {
-            let child = children[i];
-            //we want to find the node with the highest lowest confidence bound
-            let score = this._ucb1(child.maxScore, child.plays, this.plays, -1.4142135623730951); //neg c calcs lower confidence bound
-            if(score > maxScore){
-                maxScore = score
-                bestChild = child
-            }
-        }
-        let move = this.moveGenerator.generate(bestChild.moveIndex, simulator.board)
-        sequence.push(move)
-        bestChild._bestMoveSequenceRecurse(simulator, sequence)
+    protected _bestMoveSequenceRecurse(simulator:Simulator, sequence:Array<Move>, bestMoveIndexes:Array<number>):void{
+        let moveIndex = bestMoveIndexes.shift();
+        let bestChild = this.children[bestMoveIndexes.shift()];
+        let move = this.moveGenerator.generate(moveIndex, simulator.board)
+        sequence.push(move);
+        bestChild._bestMoveSequenceRecurse(simulator, sequence, bestMoveIndexes);
     }
     public run(simulator:Simulator):number{
         var scaleFunc;
@@ -186,18 +178,24 @@ export abstract class MonteNode {
         } else {
             scaleFunc = (val)=>val
         }
-        var score = this._runRecurse(simulator, scaleFunc);
+        var oldGlobalMaxScore = this.maxScore; //_runRecurse updates this.maxScore so we have to copy it off
+        var moveIndexes = [];
+        var score = this._runRecurse(simulator, scaleFunc, moveIndexes);
+        if(score > oldGlobalMaxScore){
+            this.bestMoveIndexes = moveIndexes;
+        }
         return score;
     }
     //Runs a single monte experiment. Returns the score for the resulting board.
-    public _runRecurse(simulator:Simulator, scaleFunc:any):number{
+    public _runRecurse(simulator:Simulator, scaleFunc:any, moveIndexes:Array<number>):number{
+        moveIndexes.push(this.moveIndex);
         let child:MonteNode = this._select_expanded_child(simulator, scaleFunc) || //see if we should revist child
             this._select_unexpanded_child(simulator) || //visit an unexpanded child
             this._select_expanded_child(simulator, scaleFunc) //its possible none of the unexpanded children were legal
         //calc score or recurse
         var score;
         if(child){ //recurse
-            score = child._runRecurse(simulator, scaleFunc)
+            score = child._runRecurse(simulator, scaleFunc, moveIndexes)
         } else {
             score = this.evalBoardScore(simulator)
         }
