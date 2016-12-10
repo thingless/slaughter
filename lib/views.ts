@@ -13,6 +13,19 @@ function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
                              center.y + size * Math.sin(angle_rad));
 }
 
+export var svgCache:Dictionary<Promise<DocumentFragment>> = {}
+function getSvg(url):Promise<DocumentFragment>{
+    if(svgCache[url]){
+        return svgCache[url].then((frag:DocumentFragment)=>frag.cloneNode(true));
+    }
+    svgCache[url] = new Promise((accept, reject)=>{
+        Snap.load(url, (tenant)=>{
+            accept(tenant.node);
+        })
+    });
+    return getSvg(url);
+}
+
 export const HEX_RADIUS = 22;
 export class HexView extends Backbone.View<Hex> {
     private _center:THREE.Vector2;
@@ -83,8 +96,9 @@ export class HexView extends Backbone.View<Hex> {
             var tenantSvg:string = svgTable[this.model.tenant] || null
             //render new tenant
             if(tenantSvg){
-                Snap.load(tenantSvg, (tenant:Snap.Element)=>{
-                    let sprite = tenant.select('g')
+                getSvg(tenantSvg).then((frag:DocumentFragment)=>{
+                    var tenant = Snap(frag as any);
+                    let sprite = tenant.select('g');
                     sprite.attr({
                         'transform-origin':`${this._center.x} ${this._center.y}`,
                         'transform':`translate(${this._center.x-15} ${this._center.y-15}) scale(0.5 0.5)`,
@@ -103,7 +117,7 @@ export class HexView extends Backbone.View<Hex> {
                     Snap(this.el).add(group)
                     //re add money so it renders above
                     Snap(this.el).append(Snap(this.el).select('.money'));
-                }, this)
+                })
             }
         }
         //update money
