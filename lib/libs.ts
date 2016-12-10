@@ -8,10 +8,12 @@ try{
 }catch(err){}
 
 win['$'] = require('jquery');
+win['jQuery'] = win['$'];
 win['_'] = require('underscore');
 win['Backbone'] = require('backbone');
+require('bootstrap');
 win['THREE'] = require('three');
-win['ROT'] = require('./rot')
+win['ROT'] = require('./rot');
 
 if(hasDom){
     win['interact'] = require('interact.js');
