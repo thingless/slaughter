@@ -132,7 +132,7 @@ export abstract class MonteNode {
     public moveIndex:number; //the move index that got to this node state
     public minScore:number;
     public maxScore:number;
-    public bestMoveIndexes:Array<number>;
+    public bestChildrenIndexes:Array<number>;
     constructor(moveIndex:number, moveGenerator:MoveGenerator){
         this.children = [];
         this.unvisitedChildren = _.shuffle(_.range(moveGenerator.availableMoves)) as Array<number>;
@@ -157,18 +157,16 @@ export abstract class MonteNode {
     }
     public bestMoveSequence(simulator:Simulator):Array<Move>{
         let ret:Array<Move> = [];
-        var bestMoveIndexes = this.bestMoveIndexes.slice();
-        bestMoveIndexes.shift(); // remove -1
-        this._bestMoveSequenceRecurse(simulator, ret, bestMoveIndexes);
+        this._bestMoveSequenceRecurse(simulator, ret, this.bestChildrenIndexes.slice());
         return ret.map((move)=>new Move(move.team, move.toHex, move.fromHex, move.newTenant));
     }
-    protected _bestMoveSequenceRecurse(simulator:Simulator, sequence:Array<Move>, bestMoveIndexes:Array<number>):void{
-        let moveIndex = bestMoveIndexes.shift();
-        let bestChild = this.children[moveIndex];
+    protected _bestMoveSequenceRecurse(simulator:Simulator, sequence:Array<Move>, bestChildrenIndexes:Array<number>):void{
+        let childIndex = bestChildrenIndexes.shift();
+        let bestChild = this.children[childIndex];
         if(!bestChild) return;
-        let move = this.moveGenerator.generate(moveIndex, simulator.board)
+        let move = this.moveGenerator.generate(bestChild.moveIndex, simulator.board)
         sequence.push(move);
-        bestChild._bestMoveSequenceRecurse(simulator, sequence, bestMoveIndexes);
+        bestChild._bestMoveSequenceRecurse(simulator, sequence, bestChildrenIndexes);
     }
     public run(simulator:Simulator):number{
         var scaleFunc;
@@ -180,25 +178,25 @@ export abstract class MonteNode {
             scaleFunc = (val)=>val
         }
         var oldGlobalMaxScore = this.maxScore; //_runRecurse updates this.maxScore so we have to copy it off
-        var moveIndexes = [];
-        var score = this._runRecurse(simulator, scaleFunc, moveIndexes);
+        var childIndexes = [];
+        var score = this._runRecurse(simulator, scaleFunc, childIndexes);
         if(score > oldGlobalMaxScore){
-            this.bestMoveIndexes = moveIndexes;
+            this.bestChildrenIndexes = childIndexes;
         }
         return score;
     }
     //Runs a single monte experiment. Returns the score for the resulting board.
-    public _runRecurse(simulator:Simulator, scaleFunc:any, moveIndexes:Array<number>):number{
-        moveIndexes.push(this.moveIndex);
-        let child:MonteNode = this._select_expanded_child(simulator, scaleFunc) || //see if we should revist child
+    public _runRecurse(simulator:Simulator, scaleFunc:any, childIndexes:Array<number>):number{
+        let child = this._select_expanded_child(simulator, scaleFunc) || //see if we should revist child
             this._select_unexpanded_child(simulator) || //visit an unexpanded child
             this._select_expanded_child(simulator, scaleFunc) //its possible none of the unexpanded children were legal
         //calc score or recurse
         var score;
         if(child){ //recurse
-            score = child._runRecurse(simulator, scaleFunc, moveIndexes)
+            childIndexes.push(child[1]);
+            score = child[0]._runRecurse(simulator, scaleFunc, childIndexes);
         } else {
-            score = this.evalBoardScore(simulator)
+            score = this.evalBoardScore(simulator);
         }
         //update stats & return
         this.score += score;
@@ -208,7 +206,7 @@ export abstract class MonteNode {
         return score;
     }
     public abstract evalBoardScore(simulator:Simulator):number;
-    protected _select_expanded_child(simulator:Simulator, scaleFunc:any):MonteNode {
+    protected _select_expanded_child(simulator:Simulator, scaleFunc:any):[MonteNode,number] {
         if(this.children.length === 0) return null;
         let children = this.children;
         //The estimatedValue for an unvisitedChild is just the avg for this node.
@@ -217,20 +215,22 @@ export abstract class MonteNode {
         var averageChildScore = util.sum(children.map((child)=>child.maxScore)) / children.length;
         let maxScore = this.unvisitedChildren.length ? this._ucb1(scaleFunc(averageChildScore), 1, this.plays) : -Infinity;
         let bestChild:MonteNode = null;
+        let bestChildIndex:number = null;
         for (var i = 0; i < children.length; i++) {
             let child = children[i];
             let score = this._ucb1(scaleFunc(child.maxScore), child.plays, this.plays);
             if(score > maxScore){
                 maxScore = score;
                 bestChild = child;
+                bestChildIndex = i;
             }
         }
         if(!bestChild) return null;
         let move = this.moveGenerator.generate(bestChild.moveIndex, simulator.board)
         simulator.makeMove(move, true);
-        return bestChild
+        return [bestChild, bestChildIndex]
     }
-    protected _select_unexpanded_child(simulator:Simulator):MonteNode {
+    protected _select_unexpanded_child(simulator:Simulator):[MonteNode,number] {
         var moveIndex;
         while (typeof(moveIndex = this.unvisitedChildren.pop()) !== "undefined") {
             let move = this.moveGenerator.generate(moveIndex, simulator.board);
@@ -243,7 +243,7 @@ export abstract class MonteNode {
         var territories = simulator.territories.filter((territory)=>territory.length>1 && territory[0].team == currentTeam)
         var child = new (this.constructor as any)(moveIndex, buildMoveGenerator(simulator.board, territories));
         this.children.push(child)
-        return child;
+        return [child, this.children.length-1];
     }
     protected _ucb1(estimatedValue:number, plays:number, totalSims:number, c?:number){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
