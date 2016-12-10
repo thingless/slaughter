@@ -256,7 +256,9 @@ export class GreedyMonteNode extends MonteNode{
     public evalBoardScore(simulator:Simulator){
         let myTeam = simulator.game.currentTeam;
         let hexes = simulator.board.filter((hex)=>hex.team !== TEAM_WATER)
-        let myHexes = hexes.filter((hex)=>hex.team == myTeam)
+        let myHexes = hexes
+            .filter((hex)=>hex.team == myTeam)
+            .filter((hex)=>hex.tenant!==Tenant.TreePalm && hex.tenant!==Tenant.TreePine)
         if (myHexes.length == 0) return 0;
         return myHexes.length / hexes.length;
     }
