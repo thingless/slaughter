@@ -100,11 +100,11 @@ export class MonteRunner {
             if(i%100===0) console.log('Finished MonteRunner iteration #'+i)
         }
         console.log(this.root);
-        request({
+        /*request({
             method:"POST",
             uri:'http://localhost:8080/filesave',
             json: {dot:this.root.generateDot()},
-        })
+        })*/
     }
     public runOnce(){
         this.simulator.deepFastClear(this.originalSimulator)
