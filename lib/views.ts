@@ -13,12 +13,12 @@ function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
                              center.y + size * Math.sin(angle_rad));
 }
 
-export var svgCache:Dictionary<Promise<DocumentFragment>> = {}
+var _svgCache:Dictionary<Promise<DocumentFragment>> = {}
 function getSvg(url):Promise<DocumentFragment>{
-    if(svgCache[url]){
-        return svgCache[url].then((frag:DocumentFragment)=>frag.cloneNode(true));
+    if(_svgCache[url]){
+        return _svgCache[url].then((frag:DocumentFragment)=>frag.cloneNode(true));
     }
-    svgCache[url] = new Promise((accept, reject)=>{
+    _svgCache[url] = new Promise((accept, reject)=>{
         Snap.load(url, (tenant)=>{
             accept(tenant.node);
         })
