@@ -91,6 +91,7 @@ export function main() {
         // We are the server
         if(serverAddress === null) {
             game.set('id', network.address);
+            network.serverAddress = network.address;
             game.board = hexops.mapGen(mapSize, numberOfTeams, mapSeed)
             runtime.simulator.handleInitialUpkeep();
             if(ENV == 'browser') {
