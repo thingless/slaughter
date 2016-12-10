@@ -216,7 +216,7 @@ export class Simulator {
                 console.log("New pieces must land in our territory first");
                 return false;
             }
-            if (this.computeMoveCost(move) > this.getHomeHex(move).money) {
+            if (this.computeMoveCost(move) > (this.getHomeHex(move)||{})['money']||0) {
                 // We cannot afford this move
                 console.log("Move is too expensive");
                 return false;
