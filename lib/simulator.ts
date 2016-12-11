@@ -167,14 +167,8 @@ export class Simulator {
     private findCombatValue(hex:Hex):number {
         // The combat value of a hex is the max of the combat values of that hex's unit and the surrounding
         // units in the same territories. So we find all neighbors of the same territory and take the max CV.
-        let combatValue:number = _.max(_.map(hexops.DIRS, (dir)=>{
-            let maybeHex = hexops.hexNeighbor(this.board, hex, dir);
-            if (maybeHex.territory === hex.territory) {
-                return this.tenantToCombatValue(maybeHex.tenant) || 0;
-            }
-            return 0;
-        }));
-
+        let combatValue:number = _.max(hexops.allNeighbors(this.board, hex)
+            .map((hex)=>this.tenantToCombatValue(hex.tenant)));
         // The hex's tenant counts too!
         return Math.max(combatValue, this.tenantToCombatValue(hex.tenant) || 0);
     }
