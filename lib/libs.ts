@@ -11,11 +11,11 @@ win['$'] = require('jquery');
 win['jQuery'] = win['$'];
 win['_'] = require('underscore');
 win['Backbone'] = require('backbone');
-require('bootstrap');
 win['THREE'] = require('three');
 win['ROT'] = require('./rot');
 
 if(hasDom){
+    require('bootstrap');
     win['interact'] = require('interact.js');
     win['Snap'] = require('snapsvg');
 }
