@@ -227,14 +227,10 @@ export class Simulator {
         // If this move is to a territory that isn't our own, we need to ensure the target hex
         // is adjacent to one of this territory.
         if (ourTerritory !== move.toHex.territory) {
-            let lst = _.filter(_.map(hexops.DIRS, (dir)=>{
-                let maybeOurHex = hexops.hexNeighbor(this.board, move.toHex, dir);
-                if (maybeOurHex && maybeOurHex.territory === ourTerritory) {
-                    return true;
-                }
-            }), (x)=>!!x);
+            let lst = hexops.allNeighbors(this.board, move.toHex)
+                .filter((maybeOurHex)=> maybeOurHex.territory===ourTerritory)
             // We don't own any adjacent territory
-            if(lst[0] !== true) {
+            if(lst.length === 0) {
                 console.log("We cannot move to a new territory unless the hex is adjacent to our territory");
                 return false;
             }
