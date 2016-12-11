@@ -40,8 +40,13 @@ export function allNeighborIds(hex:Hex):Array<string> {
     return allNeighborIds;
 }
 
+var _allNeighborsCache = new WeakMap();
 export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
-    return allNeighborIds(hex).map((id)=>board.get(id)).filter((x)=>!!x)
+    var ret:Array<Hex> = _allNeighborsCache.get(hex) as any;
+    if(ret) return ret;
+    ret = allNeighborIds(hex).map((id)=>board.get(id)).filter((x)=>!!x);
+    _allNeighborsCache.set(hex, ret)
+    return ret;
 }
 
 export function computeBorders(board:Board, territory:Array<Hex>):Array<Hex>{
