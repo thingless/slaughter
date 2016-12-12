@@ -50,16 +50,14 @@ export function allNeighbors(board:Board, hex:Hex):Array<Hex> {
 }
 
 export function computeBorders(board:Board, territory:Array<Hex>):Array<Hex>{
-    var map:Dictionary<number> = {};
+    var myTerritory = territory[0].territory;
+    var set = new Set();
     territory.forEach((hex)=>{
-        allNeighborIds(hex).forEach((id)=>{
-            map[id] = 1
-        })
+        allNeighbors(board, hex)
+            .filter((hex)=>hex.territory!==myTerritory)
+            .forEach(set.add.bind(set));
     })
-    territory.forEach((hex)=>{
-        delete map[hex.id]; //it can not be a border if it sin territory
-    })
-    return _.keys(map).map((id)=>board.get(id));
+    return Array.from(set);
 }
 
 export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex> {
