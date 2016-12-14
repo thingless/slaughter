@@ -1,5 +1,7 @@
 extern crate websocket;
 
+use std::collections::HashMap;
+
 // struct Hex {
 // team:u16,
 //
@@ -24,14 +26,14 @@ enum Tenant {
     Paladan = 9,
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Hash, Debug)]
 struct Vec3 {
     x: i32,
     y: i32,
     z: i32,
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Hash, Debug)]
 struct Hex<'a> {
     id: &'a str,
     team: i32,
@@ -40,6 +42,22 @@ struct Hex<'a> {
     money: i32,
     can_move: bool,
     territory: i32,
+}
+
+struct Board<'a> {
+    map: HashMap<&'a str, &'a Hex<'a>>,
+}
+
+trait BoardTrait {
+    fn all_neighbors(&self, &Hex) -> [Hex; 6];
+}
+
+impl<'a> BoardTrait for Board<'a> {
+    fn all_neighbors(&self, hex:&Hex) -> [Hex; 6] {
+        let mut out = [Default::default(); 6];
+        //out[0] = Hex { id:"a", team:0, tenant:0, loc:Vec3 {x:0, y:0, z:0}, money:0, can_move:false, territory:0 };
+        return out;
+    }
 }
 
 //fn all_neighbors(hex:&Hex) -> [&Hex; 6] {
@@ -61,7 +79,10 @@ fn computeTenantCost(tenant: Tenant) -> i32 {
 }
 
 fn main() {
-    let m: i32 = computeTenantCost(Tenant::House);
-    // let s:String = m.to_string();
-    println!("{}", m);
+    let board = Board { map: HashMap::new() };
+    let cool_hex : Hex = Default::default();
+    let neighs: [Hex; 6] = board.all_neighbors(&cool_hex);
+    for &hex in neighs.iter() {
+        println!("{:?}", hex);
+    }
 }
