@@ -86,3 +86,15 @@ fn main() {
         println!("{:?}", hex);
     }
 }
+
+
+/*
+    let url = Url::parse("ws://127.0.0.1:8080/ws").unwrap();
+    println!("Connecting to {}", url);
+    let request = Client::connect().unwrap(); // Send the request and retrieve a response
+    let response = request.send().unwrap(); // Send the request and retrieve a response
+    println!("Validating response...");
+    response.validate().unwrap(); // Validate the response
+    println!("Successfully connected");
+    let (mut sender, mut receiver) = response.begin().split();
+*/
