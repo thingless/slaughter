@@ -1,3 +1,5 @@
+extern crate websocket;
+
 // struct Hex {
 // team:u16,
 //
