@@ -9,7 +9,6 @@ extern crate websocket;
 //
 // }
 //
-
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 enum Tenant {
     House = 1,
@@ -25,9 +24,34 @@ enum Tenant {
     Paladan = 9,
 }
 
-struct Hex {
-
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+struct Vec3 {
+    x: i32,
+    y: i32,
+    z: i32,
 }
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+struct Hex<'a> {
+    id: &'a str,
+    team: i32,
+    tenant: i32,
+    loc: Vec3,
+    money: i32,
+    can_move: bool,
+    territory: i32,
+}
+
+//fn all_neighbors(hex:&Hex) -> [&Hex; 6] {
+//    let mut out: [&Hex; 6];
+//    out[0] = Hex {};
+//    out[1] = Hex {};
+//    out[2] = Hex {};
+//    out[3] = Hex {};
+//    out[4] = Hex {};
+//    out[5] = Hex {};
+//    return out;
+//}
 
 fn computeTenantCost(tenant: Tenant) -> i32 {
     if tenant == Tenant::House {
