@@ -565,6 +565,7 @@ export class Simulator {
 
         // Subtract money from our house
         if (moveCost > 0) {
+            if(!this.getHomeHex(move)) debugger; //rare bug where this is null :(
             this.getHomeHex(move).money -= moveCost;
         }
 
