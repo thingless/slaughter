@@ -7,7 +7,7 @@ import {Simulator} from './simulator';
 import {getQueryVariable, guid, int, detectEnv} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 import {SlaughterRuntime} from './index';
-import {MonteRunner, GreedyMonteNode, MonteNode, MoveGenerator, buildMoveGenerator} from './ai';
+import {MonteRunner, GreedyMonteNode, LCMonteNode, MonteNode, MoveGenerator, buildMoveGenerator} from './ai';
 
 var ENV = detectEnv();
 declare var global:any;
@@ -60,7 +60,7 @@ export function aimain() {
             console.log("Server says that we are team", team);
             runtime.ourTeam = team;
             game.fetch();
-            var player = new AiPlayer(runtime, GreedyMonteNode)
+            var player = new AiPlayer(runtime, LCMonteNode)
             player.takeTurn() //just to make sure its not our turn
         })
     })

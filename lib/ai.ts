@@ -253,7 +253,7 @@ export abstract class MonteNode {
 }
 
 export class GreedyMonteNode extends MonteNode{
-    public evalBoardScore(simulator:Simulator){
+    public evalBoardScore(simulator:Simulator):number{
         let myTeam = simulator.game.currentTeam;
         let hexes = simulator.board.filter((hex)=>hex.team !== TEAM_WATER)
         let myHexes = hexes
@@ -261,5 +261,55 @@ export class GreedyMonteNode extends MonteNode{
             .filter((hex)=>hex.tenant!==Tenant.TreePalm && hex.tenant!==Tenant.TreePine)
         if (myHexes.length == 0) return 0;
         return myHexes.length / hexes.length;
+    }
+}
+
+export class LCMonteNode extends MonteNode{
+    public evalBoardScore(simulator:Simulator):number{
+        //precompute and store some common vars
+        var hexes = simulator.game.board;
+        var myTeam = simulator.game.currentTeam;
+        var myTerritories = simulator.territories.filter((territory)=>territory[0].team == myTeam)
+        var myHexes:Array<Hex> = _.flatten(myTerritories);
+
+        //total number of hexes includeing my hexes;
+        var totalNumberOfHexes = simulator.board.filter((hex)=>hex.team != TEAM_WATER).length;
+        //number of my hexes
+        var numberOfHexes = myHexes.length;
+        //number of my hexes I can not afford
+        var numberOfHexesICanAfford = myHexes.length;
+        //number of hexes that are profitable... aka no trees
+        var numberOfHexesThatAreProfitable = 0;
+        //The number of hexes we own that are currently defended
+        var numberOfDefendedHexes = this.calcDefendedHexes(simulator, myHexes)
+
+        //do computations related to territories... aka upkeep based stuff
+        myTerritories.forEach((territory)=>{
+            var profitableTerritory = territory.filter((hex)=>!simulator.isTree(hex.tenant));
+            numberOfHexesThatAreProfitable += profitableTerritory.length;
+            var upkeepCost = util.sum(territory.map((hex)=>Simulator.upkeepForTenant(hex.tenant)));
+            if(upkeepCost > profitableTerritory.length)
+                numberOfHexesICanAfford -= territory.length;
+        })
+
+        var ret = (numberOfHexes/totalNumberOfHexes)*0.35 +
+            (numberOfHexesICanAfford/numberOfHexes)*-0.5 +
+            (numberOfDefendedHexes/numberOfHexes)*.4 +
+            (numberOfHexesThatAreProfitable/numberOfHexes)*.25
+        ;
+        return Math.max(0, Math.min(1, ret)); //clamp to 0-1 range
+    }
+
+    private calcDefendedHexes(simulator:Simulator, myHexes:Array<Hex>){
+        //do computations that are hex based
+        var undefendedHexes = new Set(myHexes);
+        myHexes.forEach((hex)=>{
+            if(simulator.tenantToCombatValue(hex.tenant) > 0){
+                undefendedHexes.delete(hex);
+                hexops.allNeighbors(simulator.board, hex)
+                    .forEach(undefendedHexes.delete.bind(undefendedHexes));
+            }
+        })
+        return myHexes.length - undefendedHexes.size;
     }
 }

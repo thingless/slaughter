@@ -73,7 +73,7 @@ export class Simulator {
         this.game.currentTurn = originalSimulator.game.currentTurn;
     }
 
-    private tenantToCombatValue(tenant:Tenant):number {
+    public tenantToCombatValue(tenant:Tenant):number {
         if (tenant === Tenant.Peasant)
             return 1;
         if (tenant === Tenant.Spearman)
@@ -86,7 +86,7 @@ export class Simulator {
         if (tenant === Tenant.House)
             return 1;
         if (tenant === Tenant.Tower)
-            return 1;
+            return 2;
         return 0;
     }
 
@@ -288,7 +288,7 @@ export class Simulator {
         return true;
     }
 
-    private upkeepForTenant(tenant:Tenant):number {
+    public static upkeepForTenant(tenant:Tenant):number {
         if (tenant === Tenant.Peasant)
             return 2;
         if (tenant === Tenant.Spearman)
@@ -298,6 +298,10 @@ export class Simulator {
         if (tenant === Tenant.Paladan)
             return 54;
         return 0;
+    }
+
+    public upkeepForTenant(tenant:Tenant):number {
+        return Simulator.upkeepForTenant(tenant);
     }
 
     nextTurn(){
@@ -425,7 +429,7 @@ export class Simulator {
         })
     }
 
-    private isTree(tenant:Tenant):boolean {
+    public isTree(tenant:Tenant):boolean {
         return tenant === Tenant.TreePalm || tenant === Tenant.TreePine;
     }
 
