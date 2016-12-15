@@ -334,14 +334,14 @@ export class Simulator {
         return Tenant.TreePine;
     }
 
-    private handleTreeGrowth():void {
+    public handleTreeGrowth():void {
         // Start by converting graves to trees - palm if on coast, pine otherwise
         // Pine trees fill in triangles - if there are two in a line, they fill in the two (unoccupied) diagonals
         // Palm trees grow along coasts - any unoccupied neighbors which neighbor water will be filled
 
         // Now do pine tree growth
         let newPineTrees:Array<Hex> = []
-        this.board.models.filter((hex)=>hex.tenant === Tenant.TreePine).map((hex)=>{
+        this.board.filter((hex)=>hex.tenant === Tenant.TreePine).map((hex)=>{
             _.map(hexops.DIRS, (dir)=>{
                 let neigh = hexops.hexNeighbor(this.board, hex, dir);
                 if (neigh.tenant === Tenant.TreePine) {
@@ -375,7 +375,7 @@ export class Simulator {
 
         // And do palm tree growth
         let newPalmTrees:Array<Hex> = [];
-        this.board.models.filter((hex)=>hex.tenant === Tenant.TreePalm).map((hex)=>{
+        this.board.filter((hex)=>hex.tenant === Tenant.TreePalm).map((hex)=>{
             hexops.allNeighbors(this.board, hex).map((neigh)=>{
                 if (hexops.allNeighbors(this.board, neigh).filter((x)=>x.team === TEAM_WATER).length > 0)
                     newPalmTrees.push(neigh);
@@ -387,7 +387,7 @@ export class Simulator {
         newPalmTrees.filter((hex)=>hex.tenant === null && hex.team !== TEAM_WATER).map((hex)=>hex.tenant = Tenant.TreePalm)
 
         // Graves last
-        this.board.models.filter((hex)=>hex.tenant === Tenant.Grave).map((hex)=>{
+        this.board.filter((hex)=>hex.tenant === Tenant.Grave).map((hex)=>{
             hex.tenant = Simulator.pickTreeForHex(this.board, hex);
         })
     }
