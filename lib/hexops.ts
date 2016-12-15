@@ -145,7 +145,7 @@ export function rotGen(size:number, seed:number):Board {
     /* cells with 1/2 probability */
     map.randomize(0.5);
     /* make a few generations */
-    for (var i=0; i<3; i++) map.create();
+    for (var i=0; i<4; i++) map.create();
     //create board
     var board = new Board();
     for (var x = 0; x < size + 1; x++) {
