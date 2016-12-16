@@ -178,6 +178,7 @@ export abstract class MonteNode {
             scaleFunc = (val)=>val
         }
         var oldGlobalMaxScore = this.maxScore; //_runRecurse updates this.maxScore so we have to copy it off
+        this.bestChildrenIndexes = this.bestChildrenIndexes || [];
         var childIndexes = [];
         var score = this._runRecurse(simulator, scaleFunc, childIndexes);
         if(score > oldGlobalMaxScore){
@@ -268,6 +269,7 @@ export class LCMonteNode extends MonteNode{
     public evalBoardScore(simulator:Simulator):number{
         //grow trees to predict the future
         simulator.handleTreeGrowth();
+        simulator.handleTreeGrowth();
         //precompute and store some common vars
         var hexes = simulator.game.board;
         var myTeam = simulator.game.currentTeam;
@@ -294,7 +296,7 @@ export class LCMonteNode extends MonteNode{
                 numberOfHexesICanAfford -= territory.length;
         })
         var ret = (numberOfHexes/totalNumberOfHexes)*0.2 +
-            (numberOfHexesICanAfford/numberOfHexes)*-5 +
+            (numberOfHexesICanAfford/numberOfHexes)*-0.5 +
             (numberOfDefendedHexes/numberOfHexes)*0.4 +
             (numberOfHexesThatAreProfitable/numberOfHexes)*0.4
         ;
