@@ -59,9 +59,10 @@ export function aimain() {
             team = assignedTeam;
             console.log("Server says that we are team", team);
             runtime.ourTeam = team;
-            game.fetch();
-            var player = new AiPlayer(runtime, LCMonteNode)
-            player.takeTurn() //just to make sure its not our turn
+            var player;
+            game.fetch().then(()=>{
+                player = new AiPlayer(runtime, LCMonteNode)
+            })
         })
     })
 }
