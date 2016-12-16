@@ -248,7 +248,7 @@ export abstract class MonteNode {
     }
     protected _ucb1(estimatedValue:number, plays:number, totalSims:number, c?:number){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
-        c = +(c || 0.4) //aka Math.sqrt(2)
+        c = +(c || 0.4)
         return estimatedValue+c*Math.sqrt(Math.log(totalSims)/plays);
     }
 }
@@ -294,12 +294,12 @@ export class LCMonteNode extends MonteNode{
             if(upkeepCost > profitableTerritory.length)
                 numberOfHexesICanAfford -= territory.length;
         })
-        var ret = (numberOfHexes/totalNumberOfHexes)*0.2 +
-            (numberOfHexesICanAfford/numberOfHexes)*0.4 +
-            (numberOfDefendedHexes/numberOfHexes)*0.4 +
-            (numberOfHexesThatAreProfitable/numberOfHexes)*-0.4
+        var ret = (numberOfHexes/totalNumberOfHexes)*0.3 +
+            (numberOfHexesICanAfford/numberOfHexes)*3.0 +
+            (numberOfDefendedHexes/numberOfHexes)*0.3 +
+            (numberOfHexesThatAreProfitable/numberOfHexes)*1.0
         ;
-        return Math.max(0, Math.min(1, ret)); //clamp to 0-1 range
+        return Math.max(0, ret); //clamp to 0-1 range
     }
 
     private calcDefendedHexes(simulator:Simulator, myHexes:Array<Hex>){
