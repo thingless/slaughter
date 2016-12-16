@@ -269,7 +269,6 @@ export class LCMonteNode extends MonteNode{
     public evalBoardScore(simulator:Simulator):number{
         //grow trees to predict the future
         simulator.handleTreeGrowth();
-        simulator.handleTreeGrowth();
         //precompute and store some common vars
         var hexes = simulator.game.board;
         var myTeam = simulator.game.currentTeam;
@@ -296,9 +295,9 @@ export class LCMonteNode extends MonteNode{
                 numberOfHexesICanAfford -= territory.length;
         })
         var ret = (numberOfHexes/totalNumberOfHexes)*0.2 +
-            (numberOfHexesICanAfford/numberOfHexes)*-0.5 +
+            (numberOfHexesICanAfford/numberOfHexes)*0.4 +
             (numberOfDefendedHexes/numberOfHexes)*0.4 +
-            (numberOfHexesThatAreProfitable/numberOfHexes)*0.4
+            (numberOfHexesThatAreProfitable/numberOfHexes)*-0.4
         ;
         return Math.max(0, Math.min(1, ret)); //clamp to 0-1 range
     }
