@@ -211,7 +211,7 @@ export class Simulator {
                 console.log("New pieces must land in our territory first");
                 return false;
             }
-            if (this.computeMoveCost(move) > (this.getHomeHex(move)||{})['money']||0) {
+            if (this.computeMoveCost(move) > ((this.getHomeHex(move)||{})['money']||0)) {
                 // We cannot afford this move
                 console.log("Move is too expensive");
                 return false;
@@ -566,7 +566,6 @@ export class Simulator {
 
         // Subtract money from our house
         if (moveCost > 0) {
-            if(!this.getHomeHex(move)) debugger; //rare bug where this is null :(
             this.getHomeHex(move).money -= moveCost;
         }
 
