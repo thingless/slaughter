@@ -302,7 +302,7 @@ export class LCMonteNode extends MonteNode{
         return Math.max(0, ret); //clamp to 0-1 range
     }
 
-    private calcDefendedHexes(simulator:Simulator, myHexes:Array<Hex>){
+    private calcDefendedHexes(simulator:Simulator, myHexes:Array<Hex>):number{
         //do computations that are hex based
         var undefendedHexes = new Set(myHexes);
         myHexes.forEach((hex)=>{
