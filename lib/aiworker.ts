@@ -4,7 +4,7 @@ self['importScripts']('/libs.js');
 import {Game, Move, Tenant, Board, Hex, Moves} from './models'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
-import {getQueryVariable, guid, int, detectEnv} from './util'
+import {guid, int, detectEnv} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 import {SlaughterRuntime} from './index';
 import {MonteRunner, GreedyMonteNode, LCMonteNode, MonteNode, MoveGenerator, buildMoveGenerator} from './ai';

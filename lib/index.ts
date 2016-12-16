@@ -3,7 +3,7 @@ import {Game, Move, Tenant, Board, Hex, Moves} from './models'
 import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
-import {getQueryVariable, guid, int, detectEnv} from './util'
+import {getConfigVariable, guid, int, detectEnv} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 
 var ENV = detectEnv();
@@ -72,12 +72,12 @@ export class SlaughterRuntime {
 }
 
 export function main() {
-    var serverAddress = getQueryVariable('serverAddress') || null;
-    var numberOfTeams = int(getQueryVariable('numberOfTeams'), 2);
-    var mapSeed = int(getQueryVariable('seed'), 666);
-    var mapSize = int(getQueryVariable('size'), 32);
-    var render = !!(getQueryVariable('render') || serverAddress);
-    var team = int(getQueryVariable('team')) || null;
+    var serverAddress = getConfigVariable('serverAddress') || null;
+    var numberOfTeams = int(getConfigVariable('numberOfTeams'), 2);
+    var mapSeed = int(getConfigVariable('seed'), 666);
+    var mapSize = int(getConfigVariable('size'), 32);
+    var render = !!(getConfigVariable('render') || serverAddress);
+    var team = int(getConfigVariable('team')) || null;
     var game = new Game({
         id:serverAddress || guid(),
         numberOfTeams:numberOfTeams,
