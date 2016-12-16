@@ -43,6 +43,7 @@ export function aimain() {
     self.addEventListener("message", function(e) {
         console.log('got message', e.data);
         if (e.data['method'] !== 'connect')  return;
+        global['env'] = e.data['data']; //this is where getConfigVariable gets its value
         var serverAddress:string = e.data['data']['serverAddress'];
         if(!serverAddress) throw "ai worker must have server address";
         var team:number = e.data['data']['team'] || null;
