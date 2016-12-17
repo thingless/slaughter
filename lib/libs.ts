@@ -1,13 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
-import {detectEnv} from './util';
-declare var global:any;
-if(detectEnv() === "browser"){
-    var win = window as any;
-} else if(detectEnv() === "webworker"){
-    var win = self as any;
-} else if(detectEnv() === "node"){
-    var win = global as any;
-}
+import {getGlobal, detectEnv} from './util';
+var win = getGlobal();
 
 win['$'] = require('jquery');
 win['_'] = require('underscore');

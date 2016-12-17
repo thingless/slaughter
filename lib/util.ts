@@ -50,6 +50,17 @@ export function detectEnv():string {
     return global && "node";
 }
 
+export function getGlobal():any {
+    if(detectEnv() === "browser"){
+        return window as any;
+    } else if(detectEnv() === "webworker"){
+        return self as any;
+    } else if(detectEnv() === "node"){
+        return global as any;
+    }
+    return null;
+}
+
 export function sum(arr:Array<number>):number {
     return arr.reduce((x, y)=>x+y, 0);
 }
