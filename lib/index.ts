@@ -1,9 +1,13 @@
 /// <reference path="../typings/index.d.ts" />
+import {detectEnv} from './util'
+if (detectEnv() == "node") {
+    require('./libs.js');
+}
 import {Game, Move, Tenant, Board, Hex, Moves} from './models'
 import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
-import {getConfigVariable, guid, int, detectEnv, getGlobal} from './util'
+import {getConfigVariable, guid, int, getGlobal} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 
 var ENV = detectEnv();
@@ -122,6 +126,8 @@ export function main() {
 }
 global['main'] = main;
 
-if (global.document) {
-    $(document).ready(main);
+if(detectEnv() == "browser"){
+   $(document).ready(main);
+} else {
+    main();
 }
