@@ -1,7 +1,10 @@
 /// <reference path="../typings/index.d.ts" />
 import {Game, Move, Moves} from './models'
-import {Dictionary, guid} from './util'
+import {Dictionary, guid, detectEnv, getGlobal, getConfigVariable} from './util'
 import {SlaughterRuntime} from './index';
+
+var global:any = getGlobal()
+var WebSocket = global.WebSocket || require('ws'); //require 'ws' if WebSocket is not defined.. aka if node
 
 export interface NetMessage {
     data?:any
@@ -108,7 +111,8 @@ export class WebsocketNetworkProvider extends NetworkProvider {
     initialize(attributes?: any, options?: any){
         this.address = null;
         // XXX: Set this to wss if we're on https
-        this.ws = new WebSocket("ws://" + location.host + "/ws");
+        var host = getConfigVariable('host') || location.host;
+        this.ws = new WebSocket("ws://" + host + "/ws");
         this.ws.addEventListener("message", this._messageReceive.bind(this), false);
 
         // We need to ask the server to send us our address
