@@ -11,7 +11,7 @@ import * as hexops from './hexops'
 import {Simulator} from './simulator';
 import {guid, int, getGlobal, getConfigVariable} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
-import {SlaughterRuntime} from './index';
+import {SlaughterRuntime} from './runtime'
 import {MonteRunner, GreedyMonteNode, LCMonteNode, MonteNode, MoveGenerator, buildMoveGenerator} from './ai';
 
 var ENV = detectEnv();

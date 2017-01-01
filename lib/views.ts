@@ -2,7 +2,7 @@
 import { Hex, Tenant, Board, TEAM_WATER, Game, Move } from './models'
 import {debugLogHex} from './hexops';
 import {Simulator} from './simulator';
-import {SlaughterRuntime} from './index';
+import {SlaughterRuntime} from './runtime'
 import {Dictionary, getGlobal} from './util'
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {

@@ -1,7 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 import {Game, Move, Moves} from './models'
 import {Dictionary, guid, detectEnv, getGlobal, getConfigVariable} from './util'
-import {SlaughterRuntime} from './index';
+import {SlaughterRuntime} from './runtime'
 
 var global:any = getGlobal()
 var WebSocket = global.WebSocket || require('ws'); //require 'ws' if WebSocket is not defined.. aka if node
