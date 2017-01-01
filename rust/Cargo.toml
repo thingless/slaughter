@@ -1,7 +1,0 @@
-[package]
-name = "slaughter"
-version = "0.1.0"
-authors = ["Richard Klafter <richard@zinc.com>"]
-
-[dependencies]
-websocket = "0.17.1"
