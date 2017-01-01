@@ -1,17 +1,21 @@
 /// <reference path="../typings/index.d.ts" />
-self['importScripts']('/libs.js');
+import {detectEnv} from './util'
+if(detectEnv() === "webworker"){
+    self['importScripts']('/libs.js');
+} else if (detectEnv() == "node") {
+    require('./libs.js');
+}
 
 import {Game, Move, Tenant, Board, Hex, Moves} from './models'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
-import {guid, int, detectEnv, getGlobal, getConfigVariable} from './util'
+import {guid, int, getGlobal, getConfigVariable} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 import {SlaughterRuntime} from './index';
 import {MonteRunner, GreedyMonteNode, LCMonteNode, MonteNode, MoveGenerator, buildMoveGenerator} from './ai';
 
 var ENV = detectEnv();
-declare var global:any;
-var win = self || window || global;
+var global = getGlobal();
 
 export class AiPlayer<T extends MonteNode>{
     public runtime:SlaughterRuntime

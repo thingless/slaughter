@@ -3,12 +3,11 @@ import {Game, Move, Tenant, Board, Hex, Moves} from './models'
 import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {Simulator} from './simulator';
-import {getConfigVariable, guid, int, detectEnv} from './util'
+import {getConfigVariable, guid, int, detectEnv, getGlobal} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 
 var ENV = detectEnv();
-declare var global:any;
-var win = self || window || global;
+var global:any = getGlobal();
 
 export class SlaughterRuntime {
     public simulator:Simulator;
@@ -116,13 +115,13 @@ export function main() {
                     runtime.initBrowser();
             });
         }
-        win['runtime'] = runtime;
-        win['hexops'] = hexops;
-        win['Move'] = Move;
+        global['runtime'] = runtime;
+        global['hexops'] = hexops;
+        global['Move'] = Move;
     })
 }
-win['main'] = main;
+global['main'] = main;
 
-if (win.document) {
+if (global.document) {
     $(document).ready(main);
 }

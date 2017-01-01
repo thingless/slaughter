@@ -3,7 +3,7 @@ import { Hex, Tenant, Board, TEAM_WATER, Game, Move } from './models'
 import {debugLogHex} from './hexops';
 import {Simulator} from './simulator';
 import {SlaughterRuntime} from './index';
-import {Dictionary} from './util'
+import {Dictionary, getGlobal} from './util'
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
     size -= 2; //boarder
@@ -284,9 +284,8 @@ export function setupDraggable(){
   });
 }
 
-declare var global:any;
-var win = self || window || global;
-if (win.document) {
+var global:any = getGlobal();
+if (global.document) {
     // Parse all scripts with type 'text/template'.
     // Each can be accessed as template[<id>]
     var templates:Dictionary<(...data: any[]) => string> = {};
