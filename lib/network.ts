@@ -38,7 +38,7 @@ export abstract class NetworkProvider extends Backbone.Model {
             this.pendingMessages[message.id](message)
         } else {
             //the message is a new message to me! :)
-            console.log('message received', message);
+            //console.log('message received', message);
             this.trigger('message', message);
         }
     }
@@ -52,7 +52,7 @@ export abstract class NetworkProvider extends Backbone.Model {
         if(!message.to) throw "Message needs to be sent to someone";
         return new Promise<NetMessage>((resolve, reject)=>{
             this.pendingMessages[message.id] = (retMessage)=>{ //register for callback
-                console.log('message response', retMessage);
+                //console.log('message response', retMessage);
                 if(retMessage.error) reject(retMessage);
                 else resolve(retMessage);
                 delete this.pendingMessages[message.id] //cleanup

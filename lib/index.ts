@@ -13,7 +13,7 @@ import {SlaughterRuntime} from './runtime'
 var ENV = detectEnv();
 var global:any = getGlobal();
 
-export function main() {
+export function main():Promise<SlaughterRuntime> {
     var serverAddress = getConfigVariable('serverAddress') || null;
     var numberOfTeams = int(getConfigVariable('numberOfTeams'), 2);
     var mapSeed = int(getConfigVariable('seed'), 666);
@@ -26,7 +26,7 @@ export function main() {
     });
     var network = new WebsocketNetworkProvider(null);
     network.serverAddress = serverAddress;
-    network.networkUp.then(()=>{
+    return network.networkUp.then(()=>{
         console.log("Network is up");
         Backbone.sync = network.syncReplacement.bind(network); //override default backbone network
         var runtime = new SlaughterRuntime(network, game);
@@ -61,12 +61,14 @@ export function main() {
         global['runtime'] = runtime;
         global['hexops'] = hexops;
         global['Move'] = Move;
+        return runtime;
     })
 }
 global['main'] = main;
 
-if(detectEnv() == "browser"){
+declare var module:any;
+if(detectEnv() == "browser") {
    $(document).ready(main);
-} else {
+} else if (detectEnv() == "node" && !module.parent) { //if we are node and we ran this script
     main();
 }

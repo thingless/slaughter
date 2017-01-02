@@ -99,7 +99,6 @@ export class MonteRunner {
             this.runOnce()
             if(i%100===0) console.log('Finished MonteRunner iteration #'+i)
         }
-        console.log(this.root);
         /*request({
             method:"POST",
             uri:'http://localhost:8080/filesave',
