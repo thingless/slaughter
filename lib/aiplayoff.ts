@@ -22,11 +22,13 @@ export interface AiConfig extends Config {
     serverAddress:string
 }
 
+/*
 export interface ServerConfig  extends Config {
     size:number
     seed?:number
     numberOfTeams?:number
 }
+*/
 
 export function startAi(config:AiConfig) {
     function log(data:string) {
