@@ -43,6 +43,7 @@ export function startAi(config:AiConfig) {
     child.on('exit', function (code) {
         log('ai process exited with code ' + code);
     });
+    return child;
 }
 
 declare var process:any;
