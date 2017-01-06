@@ -3,6 +3,11 @@ import {DIRS} from './hexops';
 import {Board, Hex, Move, Tenant, TEAM_WATER, Game, FastHex} from './models';
 import {Dictionary} from './util'
 
+export interface TeamRatio{
+    ratio:number
+    team:number
+}
+
 export class Simulator {
     public game:Game = null;
     public territories:Array<Array<Hex>> = [];
@@ -134,6 +139,14 @@ export class Simulator {
 
         let finalValue = newTenantValue + oldTenantValue;
         return this.combatValueToMobileTenant(finalValue);
+    }
+
+    public teamsByRatioOfBoard():Array<TeamRatio>{
+        var totalHexes = this.board.models.filter((h)=>h.team != TEAM_WATER).length;
+        var res:Array<TeamRatio> = _.values(_.groupBy(this.board.models, (hex)=>hex.team))
+            .map((g)=>({team:g[0].team, ratio:g.length/totalHexes}) as TeamRatio)
+            .filter((g)=>g.team !== TEAM_WATER)
+        return _.sortBy(res, (g)=>-g.ratio)
     }
 
     public static getHomeHex(board:Board, territory:number){
@@ -410,7 +423,7 @@ export class Simulator {
 
                     // Find new money
                     newMoney = homeHex.money + income - upkeep;
-                    console.log("Territory", homeHex.territory, "for team", team, "has money = ", homeHex.money, " + ", income, " - ", upkeep, " = ", newMoney);
+                    //console.log("Territory", homeHex.territory, "for team", team, "has money = ", homeHex.money, " + ", income, " - ", upkeep, " = ", newMoney);
 
                     // Set new money (or 0 if it was negative)
                     homeHex.money = Math.max(newMoney, 0);

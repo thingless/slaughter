@@ -50,10 +50,26 @@ export function aiplayoffMain() {
     main().then((runtime:SlaughterRuntime)=>{
         var ai1, ai2;
         //reg for currentTurn change event
-        runtime.game.on("change:currentTurn", ()=>{
-            if(runtime.game.currentTurn != 1 || runtime.game.currentTurn / (runtime.game.numberOfTeams+1) < 100) return;
-            ai1.kill();
-            ai2.kill();
+        runtime.simulator.game.on("change:currentTurn", ()=>{
+            console.log("change:currentTurn")
+            if(runtime.game.currentTeam != 1) return; //only check end conditions on first players turn
+            var winningTeam = runtime.simulator.teamsByRatioOfBoard()[0];
+            var gameRound = (runtime.game.currentTurn-1) / (runtime.game.numberOfTeams+1);
+            if(winningTeam.ratio > .8){
+                ai1.kill()
+                ai2.kill()
+                console.log(`winner ${winningTeam.team} ${winningTeam.ratio}`)
+                process.exit()
+            }
+            else if(gameRound >= 100){
+                ai1.kill()
+                ai2.kill()
+                console.log(`winning ${winningTeam.team} ${winningTeam.ratio}`)
+                process.exit()
+            }
+            else {
+                console.log(`no winner on game round #${gameRound} best candidate is team ${winningTeam.team} with ratio ${(winningTeam.ratio).toFixed(2)}`)
+            }
         })
         //start the ais!
         ai1 = startAi({team:1, host:process.env.host, serverAddress:runtime.network.address});
