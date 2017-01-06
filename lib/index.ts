@@ -44,7 +44,7 @@ export function main():Promise<SlaughterRuntime> {
                     document.write("Server Online! <a href='" + location.href + "&serverAddress=" + network.address + "'>Tell your friends!</a>");
                 }
             }
-            console.log("Server has generated a map and is online at", network.address);
+            console.log(`Server has generated a map with seed ${mapSeed} and size ${mapSize}. Map is online at ${network.address}`);
         } else {
             // Figure out which team we are
             network.send({'from': network.address, 'to': network.serverAddress, 'method': 'assignTeam', 'data': {'team': team}}).then((resp)=>{
