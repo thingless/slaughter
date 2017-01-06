@@ -39,6 +39,12 @@ export function int(str:string, defaultNumber?:number):number {
     return isNaN(num) ? defaultNumber : num
 }
 
+export function float(str:string, defaultNumber?:number):number {
+    defaultNumber = _.isUndefined(defaultNumber) ? null : defaultNumber;
+    let num = parseFloat(str)
+    return isNaN(num) ? defaultNumber : num
+}
+
 declare var global:any;
 export function detectEnv():string {
     try {

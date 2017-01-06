@@ -132,6 +132,7 @@ export abstract class MonteNode {
     public minScore:number;
     public maxScore:number;
     public bestChildrenIndexes:Array<number>;
+    public expandConstant:number;
     constructor(moveIndex:number, moveGenerator:MoveGenerator){
         this.children = [];
         this.unvisitedChildren = _.shuffle(_.range(moveGenerator.availableMoves)) as Array<number>;
@@ -141,6 +142,7 @@ export abstract class MonteNode {
         this.moveIndex = moveIndex;
         this.minScore = 1;
         this.maxScore = 0;
+        this.expandConstant = util.float(util.getConfigVariable('expandConstant'), 0.4);
     }
     public generateDot():string{
         var lines = ['digraph graphname {']
@@ -245,10 +247,9 @@ export abstract class MonteNode {
         this.children.push(child)
         return [child, this.children.length-1];
     }
-    protected _ucb1(estimatedValue:number, plays:number, totalSims:number, c?:number){
+    protected _ucb1(estimatedValue:number, plays:number, totalSims:number){
         //look at https://andysalerno.com/2016/03/Monte-Carlo-Reversi for more info
-        c = +(c || 0.4)
-        return estimatedValue+c*Math.sqrt(Math.log(totalSims)/plays);
+        return estimatedValue+this.expandConstant*Math.sqrt(Math.log(totalSims)/plays);
     }
 }
 
