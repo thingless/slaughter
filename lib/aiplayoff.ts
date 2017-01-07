@@ -47,7 +47,7 @@ export function startAi(config:AiConfig) {
 }
 
 declare var process:any;
-export function aiplayoffMain() {
+export function aiplayoffMain(ai1Options, ai2Options) {
     main().then((runtime:SlaughterRuntime)=>{
         var ai1, ai2;
         //reg for currentTurn change event
@@ -73,12 +73,23 @@ export function aiplayoffMain() {
             }
         })
         //start the ais!
-        ai1 = startAi({team:1, host:process.env.host, serverAddress:runtime.network.address});
-        ai2 = startAi({team:2, host:process.env.host, serverAddress:runtime.network.address})
+        ai1 = startAi(_.extend({team:1, host:process.env.host, serverAddress:runtime.network.address}, ai1Options));
+        ai2 = startAi(_.extend({team:2, host:process.env.host, serverAddress:runtime.network.address}, ai2Options));
     })
 }
 
 declare var module:any;
 if (!module.parent) {
-    aiplayoffMain();
+    process.stdin.setEncoding('utf8');
+    var data = "";
+    process.stdin.on('readable', () => {
+        var chunk = process.stdin.read();
+        if (chunk !== null) {
+            data += chunk;
+        }
+    });
+    process.stdin.on('end', () => {
+        data = JSON.parse(data);
+        aiplayoffMain(data['ai1'], data['ai2']);
+    });
 }
