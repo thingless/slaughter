@@ -48,6 +48,7 @@ export function startAi(config:AiConfig) {
 
 declare var process:any;
 export function aiplayoffMain(aiOptions:AiPlayoff):Promise<AiPlayoff> {
+    process.env.numberOfTeams = aiOptions.ais.length;
     return main().then((runtime:SlaughterRuntime)=>{
         var options:Array<AiConfig> = aiOptions.ais.map((aiConfig, index)=>
             _.extend({}, aiConfig, {team:index+1, host:process.env.host, serverAddress:runtime.network.address})
