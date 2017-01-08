@@ -19,7 +19,6 @@ export class Simulator {
     get board():Board { return this.game.board }
 
     public recomputeCachedState():void {
-        hexops.annotateTerritories(this.board);
         this.fixHouses();
     }
 
