@@ -446,12 +446,16 @@ export class Simulator {
         return tenant === Tenant.TreePalm || tenant === Tenant.TreePine;
     }
 
-    private fixHouses():void {
+    private fixHouses(skipAnnotate?:boolean):void {
         // Re-annotate territories
+        if(!!skipAnnotate){
+            this.territories = _.values(_.groupBy(this.board.map((i)=>i), (hex)=>hex.territory)) as any;
+        } else {
+            this.territories = hexops.annotateTerritories(this.board);
+        }
         // For each territory, if they have 0 houses, insert one at "the middle"
         // If they have >1 house, keep the house that has the most money or the first one otherwise
-        let newTerritories = hexops.annotateTerritories(this.board);
-        newTerritories.map((territory)=>{
+        this.territories.map((territory)=>{
             if (territory.length === 1) {
                 if (territory[0].tenant === Tenant.House) {
                     territory[0].tenant = Simulator.pickTreeForHex(this.board, territory[0]);
@@ -519,7 +523,6 @@ export class Simulator {
                 }
             }
         })
-        this.territories = newTerritories;
     }
 
     public makeMove(move:Move, isAIMove?:boolean):boolean {
@@ -586,7 +589,8 @@ export class Simulator {
 
         // Reposition houses and reapportion territories
         if (this.needToFixHouses(move.toHex, oldTeam, move.toHex.team, oldTenant))
-            this.fixHouses();
+            hexops.teamFloodFill(this.board, move.fromHex, move.fromHex.territory, true);
+            this.fixHouses(true);
         return true;
     }
 }
