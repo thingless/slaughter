@@ -60,42 +60,29 @@ export function computeBorders(board:Board, territory:Array<Hex>):Array<Hex>{
     return Array.from(set);
 }
 
-export function teamFloodFill(board:Board, hex:Hex, territory:number):Array<Hex> {
-    var output:Array<Hex> = []
-
-    // Set the "territory" property of this hex and all connected hexes.
-    if (hex.territory) {
-        return;  // The hex already has a territory
-    }
-
+export function teamFloodFill(board:Board, hex:Hex, territory:number, overwriteTerritory?:boolean):Array<Hex>{
+    //quick exit if hex already has territory and not overwrite
+    if(!overwriteTerritory && hex.territory) return [];
+    //init vars
+    hex.territory = territory;
+    overwriteTerritory = !!overwriteTerritory;
     var startTeam = hex.team;
-
-    var queue:Array<Hex> = [];
-    queue.push(hex);
-
-    while(queue.length > 0) {
-        var hex = queue.shift();
-        if (hex.team === startTeam) {
-            if (hex.territory) {
-                continue;
-            }
-
-            //console.log("Annotating", hexops.cubicToOffsetCoords(hex.loc), "for team", hex.team, "as territory", territory)
-
-            // Mark this node as part of the territory
-            hex.territory = territory;
-            output.push(hex);
-
-            // Add the node's neighbors to the queue (if they are the right team)
-            allNeighbors(board, hex).map((neigh)=>{
-                if (neigh && neigh.team === startTeam && !neigh.territory) {  // Handle walking off the edge of the board
-                    queue.push(neigh);
-                }
-            })
-        }
+    var territorySet = new Set();
+    //declare recurseteamFloodFill
+    function  recurse(hex:Hex) {
+        territorySet.add(hex) //add this hex to set so we dont revisit
+        allNeighbors(board, hex).forEach((neigh)=>{
+            //if the neighbor is not our team... skip
+            if(!neigh || neigh.team != startTeam) return;
+            if(!overwriteTerritory && neigh.territory) return; //if hex already has territory and not overwrite... skip
+            if(territorySet.has(neigh)) return; //it if we have already looked at it... skip
+            recurse(neigh)
+        })
     }
-
-    return output;
+    recurse(hex); //start recurse
+    var ret:Array<Hex> = Array.from(territorySet);
+    ret.forEach((hex:Hex)=>{hex.territory = territory})
+    return ret;
 }
 
 export function locToId(loc:THREE.Vector3):string {
@@ -107,7 +94,7 @@ export function annotateTerritories(board:Board):Array<Array<Hex>> {
     // Additionally, return a list of territories (which are each just a list of Hexes)
 
     // Clear territories first
-    board.map((hex)=>hex.territory = null);
+    board.forEach((hex)=>hex.territory = null);
 
     var territories:Array<Array<Hex>> = [];
     var currentTerritory:number = 1;
