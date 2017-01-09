@@ -172,6 +172,7 @@ export class Move extends BaseModel {
 
 export class Board extends BaseColletion<Hex> {
     model=Hex
+    public currentTerritory:number;
 }
 
 export class Moves extends BaseColletion<Move> {

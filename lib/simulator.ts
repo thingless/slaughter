@@ -589,7 +589,12 @@ export class Simulator {
 
         // Reposition houses and reapportion territories
         if (this.needToFixHouses(move.toHex, oldTeam, move.toHex.team, oldTenant))
+            //update territories
             hexops.teamFloodFill(this.board, move.fromHex, move.fromHex.territory, true);
+            hexops.allNeighbors(this.board, move.toHex)
+                .filter((hex)=>hex.team===oldTeam)
+                .forEach((hex)=>hexops.teamFloodFill(this.board, hex, hexops.nextAvailableTerritory(this.board), true));
+            //fix houses
             this.fixHouses(true);
         return true;
     }

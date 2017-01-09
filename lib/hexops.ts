@@ -89,21 +89,24 @@ export function locToId(loc:THREE.Vector3):string {
     return loc.x + ',' + loc.y + ',' + loc.z;
 }
 
+export function nextAvailableTerritory(board:Board):number{
+    if(!board.currentTerritory) board.currentTerritory = 1;
+    return board.currentTerritory++;
+}
+
 export function annotateTerritories(board:Board):Array<Array<Hex>> {
     // Assign the "territory" prop on each hex to the same thing for each connected component
     // Additionally, return a list of territories (which are each just a list of Hexes)
 
     // Clear territories first
     board.forEach((hex)=>hex.territory = null);
-
+    board.currentTerritory = null;
     var territories:Array<Array<Hex>> = [];
-    var currentTerritory:number = 1;
 
     board.map((hex)=>{
-        var ter = teamFloodFill(board, hex, currentTerritory);
+        var ter = teamFloodFill(board, hex, nextAvailableTerritory(board));
         if (ter && ter.length) {
             territories.push(ter);
-            currentTerritory += 1;
         }
     });
 
