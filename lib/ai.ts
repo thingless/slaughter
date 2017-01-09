@@ -122,6 +122,9 @@ export class MonteRunner {
     }
 }
 
+
+var expandConstant:number;
+
 export abstract class MonteNode {
     public children:Array<MonteNode>;
     private unvisitedChildren:Array<number>;
@@ -142,7 +145,10 @@ export abstract class MonteNode {
         this.moveIndex = moveIndex;
         this.minScore = 1;
         this.maxScore = 0;
-        this.expandConstant = util.float(util.getConfigVariable('expandConstant'), 0.4);
+        if(!expandConstant){
+            expandConstant = util.float(util.getConfigVariable('expandConstant'), 0.4);
+        }
+        this.expandConstant = expandConstant;
     }
     public generateDot():string{
         var lines = ['digraph graphname {']
