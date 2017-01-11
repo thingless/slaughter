@@ -321,7 +321,7 @@ export class LCMonteNode extends MonteNode{
             if(upkeepCost > profitableTerritory.length)
                 numberOfHexesICanAfford -= territory.length;
         })
-        var ret = (numberOfHexes/totalNumberOfHexes)*0.3 +
+        var ret = (numberOfHexes/totalNumberOfHexes)*0.7 +
             (numberOfHexesICanAfford/numberOfHexes)*3.0 +
             (numberOfDefendedHexes/numberOfHexes)*0.3 +
             (numberOfHexesThatAreProfitable/numberOfHexes)*1.0
