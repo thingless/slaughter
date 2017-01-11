@@ -527,6 +527,9 @@ export class Simulator {
 
     public makeMove(move:Move, isAIMove?:boolean):boolean {
         isAIMove = !!isAIMove;
+        //if the team is > 500 and this is an aimove then its simply a pass/mock move
+        if(isAIMove && move.team > 500)
+            return true;
         // Update the board based on a move
         // Make sure the move is legal
         if (!this.isMoveLegal(move))
@@ -588,14 +591,15 @@ export class Simulator {
         move.toHex.money = 0;
 
         // Reposition houses and reapportion territories
-        if (this.needToFixHouses(move.toHex, oldTeam, move.toHex.team, oldTenant))
+        if (this.needToFixHouses(move.toHex, oldTeam, move.toHex.team, oldTenant)){
             //update territories
-            hexops.teamFloodFill(this.board, move.fromHex, move.fromHex.territory, true);
+            hexops.teamFloodFill(this.board, move.toHex, move.toHex.territory, true);
             hexops.allNeighbors(this.board, move.toHex)
-                .filter((hex)=>hex.team===oldTeam)
+                .filter((hex)=>hex.team === oldTeam)
                 .forEach((hex)=>hexops.teamFloodFill(this.board, hex, hexops.nextAvailableTerritory(this.board), true));
             //fix houses
             this.fixHouses(true);
+        }
         return true;
     }
 }

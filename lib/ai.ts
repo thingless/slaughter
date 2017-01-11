@@ -10,25 +10,43 @@ export interface MoveGenerator{
     generate:(moveIndex:number, board:Board)=>Move
 }
 
-export function buildMoveGenerator(board:Board, territories:Array<Array<Hex>>):MoveGenerator {
-    var moveGenerators:Array<MoveGenerator> = territories
-        .map((territory)=>buildMoveGeneratorForTerritory(board, territory))
-        .filter((i)=>!!i);
-    var availableMoves = util.sum(moveGenerators.map((gen)=>gen.availableMoves));
-    return {
-        availableMoves:availableMoves,
-        generate:(moveIndex:number, board)=>{
-            let sum = 0;
-            for (var i = 0; i < moveGenerators.length; i++) {
-                let gen = moveGenerators[i];
-                if(sum+gen.availableMoves > moveIndex)
-                    return gen.generate(moveIndex-sum , board);
-                sum += gen.availableMoves
+export function buildMoveGenerator(board:Board, territories:Array<Array<Hex>>, prevMove:Move):MoveGenerator {
+    var currentHome = prevMove && prevMove['currentHome'];
+    var homes = prevMove && prevMove['homes'];
+    if(!homes){
+        homes = territories
+            .map((territory)=>territory.filter((hex)=>hex.tenant === Tenant.House)[0])
+            .filter((hex)=>!!hex) //remove undefined
+    }
+    if(!currentHome){ //start a new territory
+        if(homes.lenth === 0) return null; //we are done
+        return {
+            availableMoves: homes.length,
+            generate:(moveIndex:number, board)=>{
+                var ret = new FastMove(END_TERRITORY, null, null, null) as Move
+                ret['currentHome'] = homes[moveIndex];
+                ret['homes'] = homes.slice(0,moveIndex).concat(homes.slice(moveIndex+1)) //create new array removeing selected moveIndex
+                return ret;
             }
+        }
+    }
+    var territory = territories.filter((territory)=>territory[0].territory === currentHome.territory)[0];
+    if(!territory) //if we dont have a territory fallback to searching all territories for home hex which is slower
+        territory = territories.filter((territory)=>!!territory.filter((hex)=>hex.id==currentHome.id).length)[0];
+    var gen = buildMoveGeneratorForTerritory(board,territory);
+    return {
+        availableMoves:gen.availableMoves,
+        generate:(moveIndex:number, board:Board)=>{
+            var ret = gen.generate(moveIndex, board);
+            if(ret.team !== END_TERRITORY)
+                ret['currentHome'] = currentHome;
+            ret['homes'] = homes;
+            return ret;
         }
     }
 }
 
+var END_TERRITORY = 666;
 export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>):MoveGenerator {
     // There are two types of moves:
     //   Moves that create a tenant
@@ -45,6 +63,7 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
     var money = Simulator.getHomeHex(board, territory[0].territory).money;
     if(money >= 10) tenantHexes.push(Tenant.Peasant as any);
     if(money >= 15) tenantHexes.push(Tenant.Tower as any);
+    tenantHexes.push(END_TERRITORY as any);
 
 
     var inner:Array<string> = territory.map((hex)=>hex.id);
@@ -71,11 +90,12 @@ export function buildMoveGeneratorForTerritory(board:Board, territory:Array<Hex>
             let srcHex:Hex = board.get(tenantHexes[moveSrcIdx]) || (tenantHexes[moveSrcIdx] as any);
             var dstHex:Hex = board.get(inner[moveDstIdx] || outer[moveDstIdx-inner.length]);
             // If the "source" is Tenant.Peasant, construct a peasant; Tenant.Tower => tower
-            if ((srcHex as any) === Tenant.Peasant){
+            if ((srcHex as any) === Tenant.Peasant)
                 return new FastMove(srcTeam, dstHex, null, Tenant.Peasant) as Move;
-            }
             if ((srcHex as any) === Tenant.Tower)
                 return new FastMove(srcTeam, dstHex, null, Tenant.Tower) as Move;
+            if((srcHex as any) === END_TERRITORY)
+                return new FastMove(END_TERRITORY, null, null, null) as Move
 
             return new FastMove(srcTeam, dstHex, srcHex, null) as Move;
         }
@@ -240,8 +260,9 @@ export abstract class MonteNode {
     }
     protected _select_unexpanded_child(simulator:Simulator):[MonteNode,number] {
         var moveIndex;
+        var move;
         while (typeof(moveIndex = this.unvisitedChildren.pop()) !== "undefined") {
-            let move = this.moveGenerator.generate(moveIndex, simulator.board);
+            move = this.moveGenerator.generate(moveIndex, simulator.board);
             if(simulator.makeMove(move, true)){
                 break; //we have found a truely valid move!
             }
@@ -249,7 +270,7 @@ export abstract class MonteNode {
         if(!_.isNumber(moveIndex)) return null; //we ran out of potential moves :(
         var currentTeam = simulator.game.currentTeam;
         var territories = simulator.territories.filter((territory)=>territory.length>1 && territory[0].team == currentTeam)
-        var child = new (this.constructor as any)(moveIndex, buildMoveGenerator(simulator.board, territories));
+        var child = new (this.constructor as any)(moveIndex, buildMoveGenerator(simulator.board, territories, move));
         this.children.push(child)
         return [child, this.children.length-1];
     }
