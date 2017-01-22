@@ -301,6 +301,7 @@ export class LCMonteNode extends MonteNode{
         var myTeam = simulator.game.currentTeam;
         var myTerritories = simulator.territories.filter((territory)=>territory[0].team == myTeam)
         var myHexes:Array<Hex> = _.flatten(myTerritories);
+        var hexesThatBorderEnemy = this.calcHexesThatBorderEnemy(simulator, myHexes)
 
         //total number of hexes includeing my hexes;
         var totalNumberOfHexes = simulator.board.filter((hex)=>hex.team != TEAM_WATER).length;
@@ -311,7 +312,13 @@ export class LCMonteNode extends MonteNode{
         //number of hexes that are profitable... aka no trees
         var numberOfHexesThatAreProfitable = 0;
         //The number of hexes we own that are currently defended
-        var numberOfDefendedHexes = this.calcDefendedHexes(simulator, myHexes)
+        var numberOfDefendedHexes = this.calcDefendedHexes(simulator, myHexes);
+        //The number of hexes that border the enemy
+        var numberOfHexesThatBorderEnemy = hexesThatBorderEnemy.length;
+        //The number of hexes that DONT border the enemy
+        var numberOfHexesThatDontBorderEnemy = myHexes.length - hexesThatBorderEnemy.length;
+        //The number of hexes that border the enemy & are defended
+        var numberOfDefendedHexesThatBorderEnemy = this.calcDefendedHexes(simulator, hexesThatBorderEnemy);
 
         //do computations related to territories... aka upkeep based stuff
         myTerritories.forEach((territory)=>{
@@ -323,10 +330,21 @@ export class LCMonteNode extends MonteNode{
         })
         var ret = (numberOfHexes/totalNumberOfHexes)*0.7 +
             (numberOfHexesICanAfford/numberOfHexes)*3.0 +
-            (numberOfDefendedHexes/numberOfHexes)*0.3 +
-            (numberOfHexesThatAreProfitable/numberOfHexes)*1.0
+            (numberOfDefendedHexes/numberOfHexes)*0.2 +
+            (numberOfHexesThatAreProfitable/numberOfHexes)*1.0 +
+            (numberOfHexesThatDontBorderEnemy/numberOfHexes)*0.1 +
+            (numberOfDefendedHexesThatBorderEnemy/numberOfHexesThatBorderEnemy)*0.4
         ;
-        return Math.max(0, ret); //clamp to 0-1 range
+
+        return Math.max(0, ret); //clamp to 0-Inf
+    }
+
+    private calcHexesThatBorderEnemy(simulator:Simulator, myHexes:Array<Hex>):Array<Hex>{
+        var board = simulator.board;
+        var myTeam = myHexes[0].team;
+        return myHexes.filter((hex)=>
+            hexops.allNeighbors(board, hex).filter((hex)=>hex.team !== myTeam && hex.team !== TEAM_WATER).length !== 0
+        )
     }
 
     private calcDefendedHexes(simulator:Simulator, myHexes:Array<Hex>):number{
