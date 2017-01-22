@@ -127,7 +127,7 @@ export class MonteRunner {
     }
     public runOnce(){
         this.simulator.deepFastClear(this.originalSimulator)
-        this.simulator.recomputeCachedState();
+        this.simulator.fixHouses();
         let oldLog = console.log
         console.log = function(){}
         let score = this.root.run(this.simulator)

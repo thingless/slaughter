@@ -14,13 +14,9 @@ export class Simulator {
     constructor(game:Game) {
         this.game = game;
         this.territories = hexops.annotateTerritories(this.board);
-        game.on('change:board', this.recomputeCachedState.bind(this));
+        game.on('change:board', this.fixHouses.bind(this, false));
     }
     get board():Board { return this.game.board }
-
-    public recomputeCachedState():void {
-        this.fixHouses();
-    }
 
     public needToFixHouses(hex:Hex, oldTeam:number, newTeam:number, oldTenant:Tenant):boolean {
         if(oldTeam === newTeam)
@@ -317,7 +313,7 @@ export class Simulator {
         return Simulator.upkeepForTenant(tenant);
     }
 
-    nextTurn(){
+    public nextTurn(){
         let prevTeam = this.game.currentTeam;
         this.board.models.filter((hex)=>hex.team === prevTeam).map((hex)=>hex.canMove = true);
         this.game.currentTurn += 1; //next turn
@@ -410,6 +406,7 @@ export class Simulator {
         // Compute their upkeep (# coins per mob)
         // Kill all mobs (and replace with gravestones) if currency is negative
 
+        this.fixHouses(false); //just to make sure territories are in order.
         this.territories.map((hexes)=>{
             // This territory belongs to our team!
             if(hexes[0].team === team) {
@@ -446,7 +443,7 @@ export class Simulator {
         return tenant === Tenant.TreePalm || tenant === Tenant.TreePine;
     }
 
-    private fixHouses(skipAnnotate?:boolean):void {
+    public fixHouses(skipAnnotate?:boolean):void {
         // Re-annotate territories
         if(!!skipAnnotate){
             this.territories = _.values(_.groupBy(this.board.map((i)=>i), (hex)=>hex.territory)) as any;
