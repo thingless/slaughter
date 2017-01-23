@@ -23,14 +23,21 @@ export function getQueryVariable(variable:string):string {
 }
 
 declare var process:any;
+var getConfigVariableCache:Dictionary<string> = {};
 export function getConfigVariable(variable:string):string {
+    if(!_.isUndefined(getConfigVariableCache[variable]))
+        return getConfigVariableCache[variable];
+    var ret:string;
     if(detectEnv() === "browser"){
-        return getQueryVariable(variable);
+        ret = getQueryVariable(variable);
     } else if(detectEnv() === "node"){
-        return process.env[variable];
+        ret = process.env[variable];
     } else if(detectEnv() == "webworker"){
-        return self['env'][variable]
+        ret = self['env'][variable]
     }
+    ret = ret || null;
+    getConfigVariableCache[variable] = ret;
+    return ret;
 }
 
 export function int(str:string, defaultNumber?:number):number {

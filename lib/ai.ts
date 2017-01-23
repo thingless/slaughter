@@ -143,8 +143,6 @@ export class MonteRunner {
 }
 
 
-var expandConstant:number;
-
 export abstract class MonteNode {
     public children:Array<MonteNode>;
     private unvisitedChildren:Array<number>;
@@ -165,10 +163,7 @@ export abstract class MonteNode {
         this.moveIndex = moveIndex;
         this.minScore = 1;
         this.maxScore = 0;
-        if(!expandConstant){
-            expandConstant = util.float(util.getConfigVariable('expandConstant'), 0.4);
-        }
-        this.expandConstant = expandConstant;
+        this.expandConstant = util.float(util.getConfigVariable('expandConstant'), 0.4);
     }
     public generateDot():string{
         var lines = ['digraph graphname {']
@@ -328,12 +323,12 @@ export class LCMonteNode extends MonteNode{
             if(upkeepCost > profitableTerritory.length)
                 numberOfHexesICanAfford -= territory.length;
         })
-        var ret = (numberOfHexes/totalNumberOfHexes)*0.7 +
-            (numberOfHexesICanAfford/numberOfHexes)*3.0 +
-            (numberOfDefendedHexes/numberOfHexes)*0.2 +
-            (numberOfHexesThatAreProfitable/numberOfHexes)*1.0 +
-            (numberOfHexesThatDontBorderEnemy/numberOfHexes)*0.1 +
-            (numberOfDefendedHexesThatBorderEnemy/numberOfHexesThatBorderEnemy)*0.4
+        var ret = (numberOfHexes/totalNumberOfHexes) * util.float(util.getConfigVariable('aiRatioOfBoard'), 0.7) +
+            (numberOfHexesICanAfford/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfHexesAffordable'), 3.0) +
+            (numberOfDefendedHexes/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfDefendedHexes'), 0.2) +
+            (numberOfHexesThatAreProfitable/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfProfitableHexes'), 1.0) +
+            (numberOfHexesThatDontBorderEnemy/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfBorderHexes'), 0.1) +
+            (numberOfDefendedHexesThatBorderEnemy/numberOfHexesThatBorderEnemy) * util.float(util.getConfigVariable('aiRatioOfDefendedBorderHexes'), 0.4)
         ;
 
         return Math.max(0, ret); //clamp to 0-Inf
