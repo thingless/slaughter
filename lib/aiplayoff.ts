@@ -40,6 +40,7 @@ export function startAi(config:AiConfig) {
     child.stderr.on('data', log);
     child.on('exit', function (code) {
         log('ai process exited with code ' + code);
+        if(code !== 0) process.exit(code);
     });
     return child;
 }

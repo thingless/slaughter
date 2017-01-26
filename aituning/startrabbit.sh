@@ -4,4 +4,4 @@ if [[ $# -eq 0 ]] ; then
     exit 1
 fi
 docker pull rabbitmq:3.6.6-management
-docker run -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=$1 -p 15672:15672 rabbitmq:3.6.6-management
+docker run -e RABBITMQ_DEFAULT_VHOST=vhost -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=$1 -p 15672:15672 -p 5672:5672 rabbitmq:3.6.6-management
