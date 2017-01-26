@@ -27,7 +27,7 @@ function consumeMsg(msg) {
 }
 
 var url = `amqp://admin:${process.env.RABBITMQ_PASS||'admin'}@${process.env.RABBITMQ_HOST||'localhost'}:5672/vhost`;
-var numberOfConsumers = parseInt(process.env.CONSUMERS||2);
+var numberOfConsumers = parseInt(process.env.CONSUMERS||1);
 console.log('connecting to ' + url);
 amqp.connect(url, function(err, conn) {
   console.log('connected')
