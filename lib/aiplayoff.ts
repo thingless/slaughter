@@ -94,4 +94,9 @@ if (!module.parent) {
             process.stdout.write(JSON.stringify(res) + '\n');
             process.exit()
         })
+    //backup safeguard
+    setTimeout(function() {
+        console.error("It took waay to long to run... bailing")
+        process.exit(1)
+    }, 60*30*1000);
 }
