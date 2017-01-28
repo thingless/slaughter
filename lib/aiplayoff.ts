@@ -6,7 +6,7 @@ var colors:any = require('colors/safe');
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 import {SlaughterRuntime} from './runtime'
 import {Game} from './models'
-import {main} from './index'
+import {main} from './main'
 
 colors.setTheme({
     team1:'green',
