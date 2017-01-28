@@ -9,32 +9,35 @@ import {Game} from './models'
 import {main} from './main'
 
 colors.setTheme({
-    team1:'green',
-    team2:'blue',
-    team3:'yellow',
-    team4:'purple',
-    team5:'orange',
+    '1':'green',
+    '2':'blue',
+    '3':'yellow',
+    '4':'purple',
+    '5':'orange',
+    'server':'grey'
 })
 
 export interface AiConfig {
     team:number
     serverAddress:string
-    host:string
     //after playoff this is populated with result of playoff
     boardRatio?:number
 }
 
 export interface AiPlayoff {
     ais:Array<AiConfig>
+    host:string
+}
+
+function _log(team:number|string, data:string){
+    if(team){
+        data = colors[team](team+": ") + data;
+    }
+    console.warn(data.trim()); //write to std error
 }
 
 export function startAi(config:AiConfig) {
-    function log(data:string) {
-        if(config.team){
-            data = colors['team'+config.team]("player #"+config.team+": ") + data;
-        }
-        console.warn(data.trim()); //write to std error
-    }
+    var log = _log.bind(null, config.team);
     var child = spawn(process.execPath, ['./src/aiworker.js'], {env:config});
     child.stdout.on('data', log);
     child.stderr.on('data', log);
@@ -50,9 +53,10 @@ export function startAi(config:AiConfig) {
 declare var process:any;
 export function aiplayoffMain(aiOptions:AiPlayoff):Promise<AiPlayoff> {
     process.env.numberOfTeams = aiOptions.ais.length;
+    process.env.host = aiOptions.host;
     return main().then((runtime:SlaughterRuntime)=>{
         var options:Array<AiConfig> = aiOptions.ais.map((aiConfig, index)=>
-            _.extend({}, aiConfig, {team:index+1, host:process.env.host, serverAddress:runtime.network.address})
+            _.extend({}, aiConfig, {team:index+1, host:aiOptions.host, serverAddress:runtime.network.address})
         )
         var ais:Array<any>; //array of ai processes
         return new Promise((resolve, reject)=>{
@@ -82,14 +86,54 @@ export function aiplayoffMain(aiOptions:AiPlayoff):Promise<AiPlayoff> {
     }) as any;
 }
 
+function getPort(startPort?:number):Promise<number> {
+    startPort = startPort || 8000;
+    return new Promise((resolve,reject)=>{
+        var server = require('net').createServer();
+        var port = parseInt(Math.random()*1000 as any) + startPort;
+        server.listen(port, function (err) {
+            server.once('close', resolve.bind(null, port));
+            server.close()
+        })
+        server.on('error', function (err) {
+            getPort(startPort).then(resolve)
+        })
+    });
+}
+
+function startServer(port:number) {
+    return new Promise((resolve, reject)=>{
+        var log = _log.bind(null, 'server');
+        console.log(port)
+        var child = spawn(process.execPath, ['./lib/server.js'], {env:{PORT:port}});
+        child.stdout.once('data',resolve);
+        child.stdout.on('data',log);
+        child.stderr.on('data', log);
+        child.on('exit', function (code) {
+            log('server process exited with code ' + code);
+            if(code !== 0) process.exit(code);
+        });
+    })
+}
+
 declare var module:any;
 if (!module.parent) {
     console.log = console.warn //this script uses stdout for communication... so redirect garbage write to stdin
     if(process.argv.length <= 2){
-        console.error(`usage: size=16 host=localhost:8080 node ./src/aiplayoff.js '{"ais":[{},{}]}'`)
+        console.error(`usage: size=16 node ./src/aiplayoff.js '{"ais":[{},{}]}'`)
         process.exit(1);
     }
-    aiplayoffMain(JSON.parse(process.argv[2]))
+    var port;
+    getPort()
+        .then((p)=>{
+            port = p;
+            return startServer(port);
+        })
+        .then(()=>{
+            var options = JSON.parse(process.argv[2]);
+            options.host = "localhost:"+port;
+            return aiplayoffMain(options)
+        })
         .then((res)=>{
             process.stdout.write(JSON.stringify(res) + '\n');
             process.exit()
