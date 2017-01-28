@@ -54,6 +54,7 @@ declare var process:any;
 export function aiplayoffMain(aiOptions:AiPlayoff):Promise<AiPlayoff> {
     process.env.numberOfTeams = aiOptions.ais.length;
     process.env.host = aiOptions.host;
+    process.env.size = 16; //XXX: does this need to be configurable?
     return main().then((runtime:SlaughterRuntime)=>{
         var options:Array<AiConfig> = aiOptions.ais.map((aiConfig, index)=>
             _.extend({}, aiConfig, {team:index+1, host:aiOptions.host, serverAddress:runtime.network.address})
