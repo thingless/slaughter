@@ -4,11 +4,11 @@ var amqp = require('amqplib/callback_api');
 //var _ = require('underscore');
 
 if(process.argv.length <= 2){
-    console.error(`usage: size=16 host=localhost:8080 node ./src/enqueue.js '{"ais":[{},{}]}'`)
+    console.error(`usage: RABBITMQ_PASS=password RABBITMQ_HOST=localhost:5672 node ./src/enqueue.js '{"ais":[{},{}]}'`)
     process.exit(1);
 }
 
-var url = `amqp://admin:${process.env.RABBITMQ_PASS||'admin'}@${process.env.RABBITMQ_HOST||'localhost'}:5672/vhost`;
+var url = `amqp://admin:${process.env.RABBITMQ_PASS||'admin'}@${process.env.RABBITMQ_HOST||'localhost:5672'}/vhost`;
 var numberOfConsumers = parseInt(process.env.CONSUMERS||2);
 console.log('connecting to ' + url);
 amqp.connect(url, function(err, conn) {

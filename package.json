@@ -7,8 +7,8 @@
     "build": "./build.sh",
     "watch": "./node_modules/.bin/nodemon --watch ./lib --ext ts,html --exec bash ./build.sh",
     "install": "./node_modules/.bin/typings install",
-    "server": "node lib/server.js",
-    "worker": "node aituning/worker.js"
+    "server": "node ./lib/server.js",
+    "worker": "node ./aituning/worker.js"
   },
   "author": "",
   "license": "MIT",
