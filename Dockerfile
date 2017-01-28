@@ -10,4 +10,7 @@ RUN npm install
 COPY . /usr/src/app
 COPY . /usr/src/app
 
+#assume localhost rabbitmq
+ENV RABBITMQ_HOST="172.17.0.1:5672"
+
 CMD [ "npm", "run", "worker"]
