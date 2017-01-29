@@ -39,20 +39,19 @@ amqp.connect(url, function(err, conn) {
     console.log('created channel');
     ch.assertQueue('aituning', {durable: false});
     ch.assertQueue('aituningRes', {durable: false});
+    ch.prefetch(numberOfConsumers);
     console.log('asserted queues aituning & aituningRes');
     console.log(`Spinning up ${numberOfConsumers} consumers...`);
-    for (var i = 0; i < numberOfConsumers; i++) {
-        ch.consume('aituning', (msg)=>{
-            consumeMsg(JSON.parse(msg.content.toString()))
-                .then((res)=>{
-                    ch.sendToQueue('aituningRes', Buffer.from(JSON.stringify(res)));
-                    ch.ack(msg) //ack the message as success
-                })
-                .catch((err)=>
-                    ch.nack(msg, false, false) //failed to process message... nack & dead letter
-                )
-        });
-    }
+    ch.consume('aituning', (msg)=>{
+        consumeMsg(JSON.parse(msg.content.toString()))
+            .then((res)=>{
+                ch.sendToQueue('aituningRes', Buffer.from(JSON.stringify(res)));
+                ch.ack(msg) //ack the message as success
+            })
+            .catch((err)=>
+                ch.nack(msg, false, false) //failed to process message... nack & dead letter
+            )
+    });
     console.log(`${numberOfConsumers} consumers started`)
   });
 });
