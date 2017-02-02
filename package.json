@@ -22,14 +22,17 @@
     "colors": "^1.1.2"
   },
   "dependencies": {
+    "amqp-stats": "0.0.14",
     "amqplib": "^0.5.1",
     "backbone": "^1.3.3",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "genetic-js": "git+https://github.com/richardklafter/genetic-js.git",
     "interact.js": "^1.2.6",
     "jquery": "^3.1.1",
     "lodash": "^4.17.2",
     "request": "^2.79.0",
+    "sleep": "^5.1.0",
     "snapsvg": "^0.4.0",
     "three": "^0.82.1",
     "underscore": "^1.8.3",
