@@ -67,7 +67,7 @@ export function aiplayoffMain(aiOptions:AiPlayoff):Promise<AiPlayoff> {
                 if(runtime.game.currentTeam != 1) return; //only check end conditions on first players turn
                 var winningTeam = runtime.simulator.teamsByRatioOfBoard()[0];
                 var gameRound = (runtime.game.currentTurn-1) / (runtime.game.numberOfTeams+1);
-                if(winningTeam.ratio > .8 || gameRound >= 100){
+                if(winningTeam.ratio > .8 || gameRound >= 500){
                     ais.forEach((ai)=>ai.kill()) //stop all the ais
                     console.warn(`winner is team ${winningTeam.team} on game round #${gameRound} with ratio ${(winningTeam.ratio).toFixed(2)}`)
                     //update boardRatios
