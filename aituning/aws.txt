@@ -1,0 +1,3 @@
+#!/bin/bash
+#command to put in aws to start worker on boot
+docker run -d -e RABBITMQ_HOST=icyego.com:5672  -e RABBITMQ_CONSUMERS=5 -e RABBITMQ_PASS=boobsmake1hard2 freethenation/slaughter:latest
