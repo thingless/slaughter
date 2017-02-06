@@ -57,7 +57,7 @@ function sleepPromise(milliseconds) {
 function doNextGeneration(entities, generationId){
     return enqueuNextGeneration(entities, generationId)
         .then(()=>sleepPromise(5000)) //sleep so the queue will not immediately be empty
-        .then(()=>waitUntillQueueEmpty(process.env.RABBITMQ_STATS_HOST, process.env.RABBITMQ_PASS))
+        .then(()=>waitUntillQueueEmpty(process.env.RABBITMQ_STATS_HOST, process.env.RABBITMQ_PASS, 5))
 }
 
 var genetic = Genetic.create();

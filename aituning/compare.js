@@ -4,9 +4,10 @@ var amqp = require('amqplib/callback_api');
 var AMQPStats = require('amqp-stats');
 var sleep = require('sleep').sleep; //in seconds
 
-function waitUntillQueueEmpty(statsHost, password, queue, vhost) {
+function waitUntillQueueEmpty(statsHost, password, slopCount, queue, vhost) {
     vhost = vhost || 'vhost';
-    queue = queue || 'aituning'
+    queue = queue || 'aituning';
+    slopCount = slopCount || 0; //does the queue rly need to be empty or just close to empty?
     var stats = new AMQPStats({
         username: "admin",
         password: password,//process.env.RABBITMQ_PASS,
@@ -16,10 +17,10 @@ function waitUntillQueueEmpty(statsHost, password, queue, vhost) {
         function check(){
             var done = stats.getQueue(vhost, queue, (err, res, data)=>{
                 if(err){ reject(err); return; }
-                if(data.messages === 0){
+                if(data.messages <= slopCount){
                     resolve()
                 } else {
-                    setTimeout(check, 30*1000);
+                    setTimeout(check, 15*1000);
                 }
             })
         }
