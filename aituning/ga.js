@@ -6,9 +6,17 @@ var sleep = require('sleep').sleep; //in seconds
 var waitUntillQueueEmpty = require('./compare').waitUntillQueueEmpty;
 var guid = require('./compare').guid;
 var connectToRabbit = require('./compare').connectToRabbit;
+var moniker = require('moniker');
 
 function lerp(a, b, p) {
     return a + (b-a)*p;
+}
+
+function nameAi(vector){
+    return _.extend({},vector,{
+        id:guid(),
+        name:moniker.choose()
+    })
 }
 
 function normalizeParamsVector(vector){
@@ -17,9 +25,9 @@ function normalizeParamsVector(vector){
         if (_.isNumber(val)) total += val;
     });
     vector = _.mapValues(vector, (val, key)=>{
+        if(!_.isNumber(val)) return val;
         return val/total;
     })
-    vector.id = guid(); //XXX: not rly part of normalization but... meh
     return vector;
 }
 
@@ -67,20 +75,20 @@ genetic.optimize = Genetic.Optimize.Maximize;
 genetic.select1 = Genetic.Select1.Tournament2;
 genetic.select2 = Genetic.Select2.FittestRandom;
 genetic.seed = function(){
-    return normalizeParamsVector({
+    return nameAi(normalizeParamsVector({
         aiRatioOfBoard:Math.random(),
         aiRatioOfHexesAffordable:Math.random(),
         aiRatioOfDefendedHexes:Math.random(),
         aiRatioOfProfitableHexes:Math.random(),
         aiRatioOfBorderHexes:Math.random(),
         aiRatioOfDefendedBorderHexes:Math.random(),
-    })
+    }));
 }
 genetic.mutate = function(entity) {
     entity = _.extend({}, entity);
     key = selectRandomKey(entity);
     entity[key] += Math.random()-0.5;
-    return normalizeParamsVector(entity);
+    return nameAi(normalizeParamsVector(entity));
 }
 genetic.crossover = function(mother, father) {
     var son = _.extend({}, father);
@@ -89,7 +97,10 @@ genetic.crossover = function(mother, father) {
     var daughter = _.extend({}, mother);
     key = selectRandomKey(mother);
     mother[key] = father[key];
-    return [son, daughter];
+    return [
+        nameAi(normalizeParamsVector(son)),
+        nameAi(normalizeParamsVector(daughter))
+    ];
 }
 genetic.fitness = function(entity){
     genetic.doNextGeneration = genetic.doNextGeneration || doNextGeneration(this.entities, this.generationNumber)
@@ -107,7 +118,11 @@ genetic.generation = function(pop, generation, stats){
 }
 genetic.notification = function(pop, generation, stats, isFinished){
     console.log("Finished generation #", generation)
-    console.log("Stats = "+JSON.stringify(stats))
+    console.log("Stats: "+JSON.stringify(stats))
+    console.log("High Scores:")
+    pop.slice(0, 5).forEach((entity)=>{
+        console.log(entity.fitness, entity);
+    })
     console.log("Population:");
     console.log(JSON.stringify(pop))
 }
