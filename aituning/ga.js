@@ -30,28 +30,33 @@ function selectRandomKey(entity) {
 
 function enqueuNextGeneration(entities, generationId) {
     //first create random games
-    var entities = _(_.range(40))
+    var tmp = _(_.range(40))
         .map(()=>entities)
         .flatten()
         .shuffle()
         .value();
     var games = [];
-    while(entities.length > 1){
-        games.push(entities.splice(0,2));
+    while(tmp.length > 1){
+        games.push(tmp.splice(0,2));
     }
     games = games.map((g)=>JSON.stringify({generationId:generationId, ais:g}))
     //next enqueue the games
     return rabbitConnectPromise.then((r)=>{
         var [conn, ch] = r;
+        console.log("enqueueing "+games.length+" games for "+entities.length+" entities");
         games.forEach((game)=>{
-            console.log("enqueuing:", game);
             ch.sendToQueue('aituning', Buffer.from(game));
         })
     })
 }
 
+function sleepPromise(milliseconds) {
+    return new Promise((resolve,reject)=>setTimeout(resolve, milliseconds||0))
+}
+
 function doNextGeneration(entities, generationId){
     return enqueuNextGeneration(entities, generationId)
+        .then(()=>sleepPromise(5000)) //sleep so the queue will not immediately be empty
         .then(()=>waitUntillQueueEmpty(process.env.RABBITMQ_STATS_HOST, process.env.RABBITMQ_PASS))
 }
 
@@ -87,8 +92,8 @@ genetic.crossover = function(mother, father) {
     return [son, daughter];
 }
 genetic.fitness = function(entity){
-    genetic.queueEmptyPromise = genetic.queueEmptyPromise || doNextGeneration(this.entities, this.generationNumber)
-    return genetic.queueEmptyPromise.then(()=>{
+    genetic.doNextGeneration = genetic.doNextGeneration || doNextGeneration(this.entities, this.generationNumber)
+    return genetic.doNextGeneration.then(()=>{
         var fitness = genetic.fitnessData[entity.id]
         if(!fitness) return 0; //no data is a 0
         return _.reduce(fitness, (memo, num)=>memo+num, 0) / fitness.length;
@@ -96,7 +101,7 @@ genetic.fitness = function(entity){
 }
 genetic.generation = function(pop, generation, stats){
     genetic.fitnessData = {};
-    genetic.queueEmptyPromise = null;
+    genetic.doNextGeneration = null;
     genetic.generationNumber = generation;
     return true;
 }
