@@ -49,9 +49,9 @@ export function startAi(config:AiConfig) {
 }
 
 
-
 declare var process:any;
 export function aiplayoffMain(aiOptions:AiPlayoff):Promise<AiPlayoff> {
+    var startTime = Date.now()/1000;
     process.env.numberOfTeams = aiOptions.ais.length;
     process.env.host = aiOptions.host;
     process.env.size = 16; //XXX: does this need to be configurable?
@@ -67,7 +67,7 @@ export function aiplayoffMain(aiOptions:AiPlayoff):Promise<AiPlayoff> {
                 if(runtime.game.currentTeam != 1) return; //only check end conditions on first players turn
                 var winningTeam = runtime.simulator.teamsByRatioOfBoard()[0];
                 var gameRound = (runtime.game.currentTurn-1) / (runtime.game.numberOfTeams+1);
-                if(winningTeam.ratio > .8 || gameRound >= 500){
+                if(winningTeam.ratio > .8 || gameRound >= 500 || (Date.now()/1000)-startTime > 15*60){
                     ais.forEach((ai)=>ai.kill()) //stop all the ais
                     console.warn(`winner is team ${winningTeam.team} on game round #${gameRound} with ratio ${(winningTeam.ratio).toFixed(2)}`)
                     //update boardRatios
@@ -139,9 +139,4 @@ if (!module.parent) {
             process.stdout.write(JSON.stringify(res) + '\n');
             process.exit()
         })
-    //backup safeguard
-    setTimeout(function() {
-        console.error("It took waay to long to run... bailing")
-        process.exit(1)
-    }, 60*30*1000);
 }
