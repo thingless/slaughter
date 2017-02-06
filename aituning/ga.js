@@ -85,12 +85,11 @@ genetic.seed = function(){
     }));
 }
 genetic.mutate = function(entity) {
-    entity = _.extend({}, entity);
-    key = selectRandomKey(entity);
-    entity[key] += Math.random()-0.5;
-    var ret = nameAi(normalizeParamsVector(entity));
+    var ret = _.extend({}, entity);
+    ret[selectRandomKey(ret)] += Math.random()-0.5;
+    ret = nameAi(ret);
     console.log("mutate before", entity, "after", ret);
-    return ret;
+    return normalizeParamsVector(ret);
 }
 genetic.crossover = function(mother, father) {
     var son = _.extend({}, father);
