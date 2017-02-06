@@ -149,5 +149,5 @@ function dequeueResponses() {
 
 if (require.main === module) {
     dequeueResponses();
-    genetic.evolve({size:5, iterations:100, fittestAlwaysSurvives:true});
+    genetic.evolve({size:40, iterations:100, fittestAlwaysSurvives:true});
 }
