@@ -72,8 +72,8 @@ var genetic = Genetic.create();
 genetic.fitnessData = {}
 genetic.generationNumber = 0;
 genetic.optimize = Genetic.Optimize.Maximize;
-genetic.select1 = Genetic.Select1.Tournament2;
-genetic.select2 = Genetic.Select2.FittestRandom;
+genetic.select1 = Genetic.Select1.Tournament3;
+genetic.select2 = Genetic.Select2.Tournament3;
 genetic.seed = function(){
     return nameAi(normalizeParamsVector({
         aiRatioOfBoard:Math.random(),
@@ -88,19 +88,23 @@ genetic.mutate = function(entity) {
     entity = _.extend({}, entity);
     key = selectRandomKey(entity);
     entity[key] += Math.random()-0.5;
-    return nameAi(normalizeParamsVector(entity));
+    console.log("mutate before", entity, "after", ret);
+    var ret = nameAi(normalizeParamsVector(entity));
+    return ret;
 }
 genetic.crossover = function(mother, father) {
     var son = _.extend({}, father);
     var key = selectRandomKey(mother);
     son[key] = mother[key]
     var daughter = _.extend({}, mother);
-    key = selectRandomKey(mother);
-    mother[key] = father[key];
-    return [
-        nameAi(normalizeParamsVector(son)),
-        nameAi(normalizeParamsVector(daughter))
+    key = selectRandomKey(father);
+    daughter[key] = father[key];
+    var ret = [
+        nameAi(son),
+        nameAi(daughter)
     ];
+    console.log("mother",mother,"father",father,"son",ret[0],"daughter",ret[1]);
+    return _.map(ret, normalizeParamsVector);
 }
 genetic.fitness = function(entity){
     genetic.doNextGeneration = genetic.doNextGeneration || doNextGeneration(this.entities, this.generationNumber)
@@ -149,5 +153,5 @@ function dequeueResponses() {
 
 if (require.main === module) {
     dequeueResponses();
-    genetic.evolve({size:40, iterations:100, fittestAlwaysSurvives:true});
+    genetic.evolve({size:15, iterations:100, fittestAlwaysSurvives:true});
 }
