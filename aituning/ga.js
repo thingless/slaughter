@@ -88,8 +88,8 @@ genetic.mutate = function(entity) {
     entity = _.extend({}, entity);
     key = selectRandomKey(entity);
     entity[key] += Math.random()-0.5;
-    console.log("mutate before", entity, "after", ret);
     var ret = nameAi(normalizeParamsVector(entity));
+    console.log("mutate before", entity, "after", ret);
     return ret;
 }
 genetic.crossover = function(mother, father) {
