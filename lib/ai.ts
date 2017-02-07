@@ -323,12 +323,21 @@ export class LCMonteNode extends MonteNode{
             if(upkeepCost > profitableTerritory.length)
                 numberOfHexesICanAfford -= territory.length;
         })
-        var ret = (numberOfHexes/totalNumberOfHexes) * util.float(util.getConfigVariable('aiRatioOfBoard'), 0.7) +
-            (numberOfHexesICanAfford/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfHexesAffordable'), 3.0) +
-            (numberOfDefendedHexes/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfDefendedHexes'), 0.2) +
-            (numberOfHexesThatAreProfitable/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfProfitableHexes'), 1.0) +
-            (numberOfHexesThatDontBorderEnemy/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfBorderHexes'), 0.1) +
-            (numberOfDefendedHexesThatBorderEnemy/numberOfHexesThatBorderEnemy) * util.float(util.getConfigVariable('aiRatioOfDefendedBorderHexes'), 0.4)
+         /*{  aiRatioOfBoard: 0.42831446049547894,
+            aiRatioOfHexesAffordable: 0.09367924492233125,
+            aiRatioOfDefendedHexes: 0.009961628889200163,
+            aiRatioOfProfitableHexes: 0.274043149555206,
+            aiRatioOfBorderHexes: 0.18986100278224152,
+            aiRatioOfDefendedBorderHexes: 0.004140513355542087,
+            id: '0bbef2c2-c968-4436-9896-87fd3d932f1b',
+            name: 'parallel-chain'
+         }*/
+        var ret = (numberOfHexes/totalNumberOfHexes) * util.float(util.getConfigVariable('aiRatioOfBoard'), 0.42831446049547894) +
+            (numberOfHexesICanAfford/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfHexesAffordable'), 0.09367924492233125) +
+            (numberOfDefendedHexes/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfDefendedHexes'), 0.009961628889200163) +
+            (numberOfHexesThatAreProfitable/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfProfitableHexes'), 0.274043149555206) +
+            (numberOfHexesThatDontBorderEnemy/numberOfHexes) * util.float(util.getConfigVariable('aiRatioOfBorderHexes'), 0.18986100278224152) +
+            (numberOfDefendedHexesThatBorderEnemy/numberOfHexesThatBorderEnemy) * util.float(util.getConfigVariable('aiRatioOfDefendedBorderHexes'), 0.004140513355542087)
         ;
 
         return Math.max(0, ret); //clamp to 0-Inf
