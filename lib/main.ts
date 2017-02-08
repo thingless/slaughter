@@ -11,7 +11,7 @@ var global:any = getGlobal();
 export function main():Promise<SlaughterRuntime> {
     var serverAddress = getConfigVariable('serverAddress') || null;
     var numberOfTeams = int(getConfigVariable('numberOfTeams'), 2);
-    var mapSeed = int(getConfigVariable('seed'), 666);
+    var mapSeed = int(getConfigVariable('seed'), parseInt((Math.random()*1000).toString()));
     var mapSize = int(getConfigVariable('size'), 32);
     var render = !!(getConfigVariable('render') || serverAddress);
     var team = int(getConfigVariable('team')) || null;
