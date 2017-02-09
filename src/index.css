@@ -53,6 +53,7 @@ body, html {
     stroke-width: 0;
     fill: black;
     font-size: 8px;
+    user-select: none;
 }
 
 .hex.drop-target{
