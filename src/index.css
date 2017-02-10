@@ -45,10 +45,16 @@ body svg{ display: none; }
     height: 40px;
 }
 
-#svg-slaughter{
+#zoom-container{
+    display: flex;
     flex: 1 1 100%;
-    margin: 10px;
+    overflow: auto;
+}
+
+#svg-slaughter{
     display: block;
+    flex: 1 1 100%;
+    transform-origin: top left;
 }
 
 .team-swatch {
