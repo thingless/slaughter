@@ -16,20 +16,23 @@
     <input type="button" class="nextTurn" value="Next Turn">
   </script>
   -->
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/slate/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/index.css">
 </head>
 
-<body>
-<svg id="svg-slaughter">
-  <filter id="dropshadow" height="130%">
-    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
-    <feOffset dx="2" dy="2" result="offsetblur"/> <!-- how much to offset -->
-    <feMerge>
-      <feMergeNode/> <!-- this contains the offset blurred image -->
-      <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
-    </feMerge>
-  </filter>
+<body><div id="root">
+  <div id="sidebar">
+  </div>
+  <svg id="svg-slaughter">
+    <filter id="dropshadow" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
+      <feOffset dx="2" dy="2" result="offsetblur"/> <!-- how much to offset -->
+      <feMerge>
+        <feMergeNode/> <!-- this contains the offset blurred image -->
+        <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
+      </feMerge>
+    </filter>
 
-</svg>
-</body>
+  </svg>
+</div></body>
 </html>

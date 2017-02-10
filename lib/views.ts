@@ -199,11 +199,14 @@ export class GameView extends Backbone.View<Game> {
         this._hexViews.forEach((v)=>v.remove())
         this._hexViews = this.model.board
             .map((hex)=>new HexView({model: hex}))
-        //set width & height
-        let bbox = Snap($('.hex').last()[0] as any).getBBox()
-        this.$el.width(bbox.x+bbox.width)
-        this.$el.height(bbox.y+bbox.height)
-        this.$el.attr('viewBox', `0 0 ${bbox.x+bbox.width} ${bbox.y+bbox.height}`)
+        //set viewBox
+        var bboxes = $('.hex:not(.team--1)').toArray()
+            .map((e)=>Snap(e as any).getBBox());
+        var left = _.min(bboxes.map((b)=>b.x));
+        var top = _.min(bboxes.map((b)=>b.y));
+        var right =  _.max(bboxes.map((b)=>b.x+b.width));
+        var bottom = _.max(bboxes.map((b)=>b.y+b.height));
+        this.$el.attr('viewBox', `${left} ${top} ${right-left} ${bottom-top}`)
         this._updateCurrentTeam();
         return this;
     }
