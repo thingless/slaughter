@@ -46,10 +46,11 @@ body svg{ display: none; }
 }
 
 .hex .money {
-    font-size: 10px;
+    font-size: 18px;
     fill: gold;
-    font-weight: bold;
-    stroke-width: 0;
+    font-weight: bolder;
+    stroke-width: 1;
+    transform: translate(-15px,8px);
 }
 
 .hex .territory {
