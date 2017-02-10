@@ -155,6 +155,7 @@ export class HexView extends Backbone.View<Hex> {
     }
 }
 
+/*
 export class MenuView extends Backbone.View<Game> {
     initialize(options:Backbone.ViewOptions<Game>){
         this.setElement($('#menu'))
@@ -180,13 +181,14 @@ export class MenuView extends Backbone.View<Game> {
         return this;
     }
 }
+*/
 
 export class GameView extends Backbone.View<Game> {
     _hexViews:Array<HexView>
     initialize(options:Backbone.ViewOptions<Game>){
         this._hexViews = [];
         this.setElement($('#svg-slaughter'))
-        new MenuView({model:this.model});
+        //new MenuView({model:this.model});
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);

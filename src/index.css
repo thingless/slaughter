@@ -14,16 +14,6 @@ body, html {
     margin-right: auto;
 }
 
-#menu {
-    background: white;
-    height: 20px;
-    top: 0;
-    left: 0;
-    right: 0;
-    position: fixed;
-    background: lightblue;
-}
-
 .team-swatch {
     height: 15px;
     width: 15px;
