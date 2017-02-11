@@ -108,6 +108,7 @@ export class HexView extends Backbone.View<Hex> {
                     group.addClass('sprite')
                     if(Simulator.isMobileUnit(this.model.tenant) && this.model.canMove){
                         group.addClass('draggable')
+                        Snap(this.el).addClass('draggable-proxy')
                     }
                     //if its a house and we can buy anything
                     if(this.model.tenant == Tenant.House && this.model.money >= 10){
@@ -218,6 +219,15 @@ export class GameView extends Backbone.View<Game> {
 
 //we use interact.js to do drag and drop. This function reg/configs interact.js
 export function setupDraggable(){
+  interact('.current-team.draggable-proxy').on('down', function (event) {
+    var interaction = event.interaction,
+        handle = event.currentTarget;
+    var draggable = $(handle).find('.draggable')[0];
+    if(draggable){
+       interaction.start({name:'drag'}, interact('.current-team .draggable'), draggable);
+    }
+  });
+
   interact('.current-team .draggable').draggable({
     inertia: false, //enable inertial throwing
     // keep the element within the area of it's parent
