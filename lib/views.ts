@@ -219,6 +219,7 @@ export class GameView extends Backbone.View<Game> {
 
 //we use interact.js to do drag and drop. This function reg/configs interact.js
 export function setupDraggable(){
+  //hexes should act as handles / proxies for draggable tenants
   interact('.current-team.draggable-proxy').on('down', function (event) {
     var interaction = event.interaction,
         handle = event.currentTarget;
