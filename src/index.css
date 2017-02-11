@@ -55,6 +55,12 @@ body svg{ display: none; }
     display: block;
     flex: 1 1 100%;
     transform-origin: top left;
+    align-self: center;
+    max-height: 100%;
+}
+
+#svg-slaughter text{
+    user-select: none;
 }
 
 .team-swatch {
@@ -88,7 +94,6 @@ body svg{ display: none; }
     stroke-width: 0;
     fill: black;
     font-size: 8px;
-    user-select: none;
 }
 
 .hex.drop-target{
