@@ -219,15 +219,17 @@ export class GameView extends Backbone.View<Game> {
 
 //we use interact.js to do drag and drop. This function reg/configs interact.js
 export function setupDraggable(){
+  /*
   //hexes should act as handles / proxies for draggable tenants
   interact('.current-team.draggable-proxy').on('down', function (event) {
     var interaction = event.interaction,
         handle = event.currentTarget;
     var draggable = $(handle).find('.draggable')[0];
-    if(draggable){
+    if(!interaction.interacting() && draggable){
        interaction.start({name:'drag'}, interact('.current-team .draggable'), draggable);
     }
   });
+  */
 
   interact('.current-team .draggable').draggable({
     inertia: false, //enable inertial throwing
@@ -268,7 +270,7 @@ export function setupDraggable(){
     },
     // call this function on every dragend event
     onend: function (event:Interact.InteractEvent) {
-        event.target.classList.add('drag-active')
+        event.target.classList.remove('drag-active')
         event.target.dispatchEvent(new CustomEvent('dragend',{ bubbles:true }))
     }
   });
