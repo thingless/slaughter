@@ -235,10 +235,20 @@ export function setupDraggable(){
     },
     // call this function on every dragmove event
     onmove: function (event:Interact.InteractEvent) {
-        var target = event.target,
+        //get scaling factor
+        var dims:Array<number> = $('#svg-slaughter')
+            .attr('viewBox')
+            .split(/\s+/gi)
+            .slice(2)
+            .map(parseFloat);
+        var scaleFactor = _.min([
+            $('#svg-slaughter').width()/dims[0],
+            $('#svg-slaughter').height()/dims[1],
+        ]);
         // keep the dragged position in the data-x/data-y attributes
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        var target = event.target;
+        var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx/scaleFactor;
+        var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy/scaleFactor;
         // translate the element
         target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         // update the posiion attributes
