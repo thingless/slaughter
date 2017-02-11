@@ -55,7 +55,6 @@ body svg{ display: none; }
 #svg-slaughter{
     display: block;
     flex: 1 1 100%;
-    transform-origin: top left;
     align-self: center;
     max-height: 100%;
 }
