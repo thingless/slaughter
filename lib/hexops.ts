@@ -160,6 +160,12 @@ export function mapGen(size:number, numberOfTeams:number, seed?:number):Board {
         hex.team = TEAM_WATER
     )
     board = trimWaterEdges(board)
+    //check if board is tooo small
+    var hexLocations = board.map((hex)=>cubicToOffsetCoords(hex.loc))
+    if(_.max(hexLocations.map((l)=>l.x)) < size*.70 || _.max(hexLocations.map((l)=>l.y)) < size*.70){
+        console.log('Generated board was poor. Incrementing seed and regenerating.')
+        return mapGen(size, numberOfTeams, seed+1);
+    }
     board = roundRobinRandomAssignTeams(numberOfTeams, board, seed)
     board = populateTrees(board, 0.1, seed)
     return board
