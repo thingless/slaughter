@@ -36,14 +36,13 @@ body svg{ display: none; }
 #sidebar-essential button {
     margin: 2px;
     padding: 0px;
-    font-size: 40px;
     font-weight: normal;
     padding-top: 10px;
     padding-bottom: 10px;
 }
 
 #sidebar-essential .spacer{
-    height: 40px;
+    height: 20px;
 }
 
 #zoom-container{
