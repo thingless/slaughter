@@ -190,10 +190,24 @@ export class SidebarView extends Backbone.View<Game> {
     }
     events(){ return {
         "click .next-turn":this._onNextTurnClick,
+        "click .zoom-in":this._zoomIn,
+        "click .zoom-out":this._zoomOut,
     } as Backbone.EventsHash }
     private _onNextTurnClick(e){
         SlaughterRuntime.instance.simulator.nextTurn();
         SlaughterRuntime.instance.sendMovesToServer();
+    }
+    private _zoom():number{
+        var res =(/\(([^,]+)/).exec($('#svg-slaughter').css('transform'));
+        return (res && parseFloat(res[1])) || 1;
+    }
+    private _zoomIn(){
+        var zoom = this._zoom()+.1;
+        $('#svg-slaughter').css('transform', `scale(${zoom.toFixed(1)})`)
+    }
+    private _zoomOut(){
+        var zoom = this._zoom()-.1;
+        $('#svg-slaughter').css('transform', `scale(${zoom.toFixed(1)})`)
     }
 }
 
