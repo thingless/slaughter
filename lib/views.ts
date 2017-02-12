@@ -184,12 +184,25 @@ export class MenuView extends Backbone.View<Game> {
 }
 */
 
+export class SidebarView extends Backbone.View<Game> {
+    initialize(options:Backbone.ViewOptions<Game>){
+        this.setElement($('#sidebar'))
+    }
+    events(){ return {
+        "click .next-turn":this._onNextTurnClick,
+    } as Backbone.EventsHash }
+    private _onNextTurnClick(e){
+        SlaughterRuntime.instance.simulator.nextTurn();
+        SlaughterRuntime.instance.sendMovesToServer();
+    }
+}
+
 export class GameView extends Backbone.View<Game> {
     _hexViews:Array<HexView>
     initialize(options:Backbone.ViewOptions<Game>){
         this._hexViews = [];
         this.setElement($('#svg-slaughter'))
-        //new MenuView({model:this.model});
+        new SidebarView({model:this.model});
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);
