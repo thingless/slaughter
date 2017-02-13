@@ -14,26 +14,14 @@ body svg{ display: none; }
     height:100%;
 }
 
-#sidebar{
-    flex: 0 0 400px;
-    flex-basis: 100px;
-    background-color: #272b30;
-    align-self: stretch;
-    display: flex;
-}
-
-#sidebar-details {
-    flex: 1 1 100%;
-}
-
-#sidebar-essential {
+#sidebar {
     flex: 0 0 100px;
     display: flex;
     flex-direction: column;
     margin: 0;/*undo navbar style*/
 }
 
-#sidebar-essential button {
+#sidebar button {
     margin: 2px;
     padding: 0px;
     font-weight: normal;
@@ -41,7 +29,7 @@ body svg{ display: none; }
     padding-bottom: 10px;
 }
 
-#sidebar-essential .spacer{
+#sidebar .spacer{
     height: 20px;
 }
 
