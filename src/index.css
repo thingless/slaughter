@@ -19,6 +19,7 @@ body svg{ display: none; }
     display: flex;
     flex-direction: column;
     margin: 0;/*undo navbar style*/
+    align-items: center;
 }
 
 #sidebar button {
@@ -27,6 +28,7 @@ body svg{ display: none; }
     font-weight: normal;
     padding-top: 10px;
     padding-bottom: 10px;
+    align-self: stretch;
 }
 
 #sidebar .spacer{
@@ -45,6 +47,7 @@ body svg{ display: none; }
     align-self: center;
     max-height: 100%;
     transform-origin: top left;
+    transition: all 0.25s ease-in-out;
 }
 
 #svg-slaughter text{
@@ -77,6 +80,10 @@ body svg{ display: none; }
 }
 #team-chart .current-team{
     animation: flash 4s infinite;
+}
+
+#build-menu img{
+    height: 50px;
 }
 
 .hex {
