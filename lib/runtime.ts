@@ -8,14 +8,12 @@ export class SlaughterRuntime {
     public network:NetworkProvider;
     public router:Router;
     public game:Game;
-    public ourTeam:number;
     public pendingMoves:Moves;
     constructor(network:NetworkProvider, game:Game) {
         this.game = game
         this.network = network;
         this.simulator = new Simulator(game)
         this.router = new Router(network)
-        this.ourTeam = null;
         this.pendingMoves = new Moves();
         SlaughterRuntime.instance = this;
     }
@@ -24,6 +22,7 @@ export class SlaughterRuntime {
         new GameView({model:this.game});
     }
     public get board():Board { return this.game.board; }
+    public get ourTeam():number { return this.game.ourTeam; }
     public static instance:SlaughterRuntime; //singleton
     public sendMovesToServer():void {
         let msg:NetMessage = {

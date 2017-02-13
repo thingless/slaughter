@@ -84,6 +84,7 @@ body svg{ display: none; }
 
 #build-menu img{
     height: 50px;
+    background-color: transparent;
 }
 
 .hex {

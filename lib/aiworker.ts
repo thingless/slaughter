@@ -59,7 +59,7 @@ export function aimain() {
     }).then((assignedTeam)=>{
         team = assignedTeam;
         console.log("Server says that we are team", team);
-        runtime.ourTeam = team;
+        runtime.game.ourTeam = team;
         var player;
         game.fetch().then(()=>{
             player = new AiPlayer(runtime, LCMonteNode)

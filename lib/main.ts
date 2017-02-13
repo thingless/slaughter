@@ -45,7 +45,7 @@ export function main():Promise<SlaughterRuntime> {
             network.send({'from': network.address, 'to': network.serverAddress, 'method': 'assignTeam', 'data': {'team': team}}).then((resp)=>{
                 team = resp['data']['team'];
                 console.log("Server says that we are team", team);
-                runtime.ourTeam = team;
+                runtime.game.ourTeam = team;
 
                 // Load the game from the server & render
                 game.fetch();

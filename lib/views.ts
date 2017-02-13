@@ -235,6 +235,23 @@ export class TeamChart extends Backbone.View<Game> {
     }
 }
 
+export class BuildMenu extends Backbone.View<Game> {
+    initialize(options:Backbone.ViewOptions<Game>){
+        this.setElement($('#build-menu'))
+        this.listenTo(this.model.board, 'update', this.render)
+        this.listenTo(this.model, 'change:board', this.render)
+        this.listenTo(this.model, 'change:ourTeam', this.render);
+        this.render();
+    }
+    render():BuildMenu{
+        this.$el.find('.draggable')
+            .removeClass()
+            .addClass('draggable')
+            .addClass('team-'+this.model.ourTeam)
+        return this;
+    }
+}
+
 export class GameView extends Backbone.View<Game> {
     _hexViews:Array<HexView>
     initialize(options:Backbone.ViewOptions<Game>){
@@ -242,6 +259,7 @@ export class GameView extends Backbone.View<Game> {
         this.setElement($('#svg-slaughter'))
         new SidebarView({model:this.model});
         new TeamChart({model:this.model});
+        new BuildMenu({model:this.model});
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);
