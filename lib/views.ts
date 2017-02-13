@@ -186,7 +186,7 @@ export class MenuView extends Backbone.View<Game> {
 
 export class SidebarView extends Backbone.View<Game> {
     initialize(options:Backbone.ViewOptions<Game>){
-        this.setElement($('#sidebar'))
+        this.setElement($('#sidebar'));
     }
     events(){ return {
         "click .next-turn":this._onNextTurnClick,
@@ -211,12 +211,37 @@ export class SidebarView extends Backbone.View<Game> {
     }
 }
 
+export class TeamChart extends Backbone.View<Game> {
+    initialize(options:Backbone.ViewOptions<Game>){
+        this.setElement($('#team-chart'))
+        this.listenTo(this.model.board, 'update', this.render)
+        this.listenTo(this.model, 'change:board', this.render)
+        this.listenTo(this.model, 'change:currentTurn', this.render);
+        this.render();
+    }
+    template():string{
+        var totalHexes = this.model.board.filter((hex)=>hex.team!=TEAM_WATER).length
+        return templates['teamChartTemplate']({
+            teams: _.range(1, this.model.numberOfTeams+1),
+            currentTeam: this.model.currentTeam,
+            teamsPercent: _.range(1, this.model.numberOfTeams+1)
+                .map((team)=>this.model.board.filter((hex)=>hex.team==team))
+                .map((hexes)=>hexes.length/totalHexes*100.0)
+        });
+    }
+    render():TeamChart{
+        this.$el.html(this.template());
+        return this;
+    }
+}
+
 export class GameView extends Backbone.View<Game> {
     _hexViews:Array<HexView>
     initialize(options:Backbone.ViewOptions<Game>){
         this._hexViews = [];
         this.setElement($('#svg-slaughter'))
         new SidebarView({model:this.model});
+        new TeamChart({model:this.model});
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);

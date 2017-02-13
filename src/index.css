@@ -63,13 +63,32 @@ body svg{ display: none; }
     user-select: none;
 }
 
-.team-swatch {
-    height: 15px;
-    width: 15px;
-    display: inline-block;
-    border: 1px solid black;
-    box-shadow: 2px 2px 0 #444;
+#team-chart{
+    margin-right: 5px;
+    margin-left: 5px;
+}
+#team-chart h4{
+    margin-bottom: 0px;
     text-align: center;
+}
+#team-chart .section{
+    display: flex;
+    align-items: center;
+}
+#team-chart .bar{
+    margin: 3px;
+    display: inline-block;
+    height: 25px;
+}
+#team-chart .bar-label{
+    flex: 0 0 auto;
+    background-color: transparent;
+}
+#team-chart .bar-wrap{
+    width: 100%;
+}
+#team-chart .current-team{
+    animation: flash 4s infinite;
 }
 
 .hex {
@@ -125,40 +144,28 @@ body svg{ display: none; }
     display: none;
     fill: #7777cc;
 }
-.hex.team-1 {
+.team-1 {
     fill: #b4cdc5;
-}
-.hex.team-2 {
-    fill: #3f6796;
-}
-.hex.team-3 {
-    fill: #f7917f;
-}
-.hex.team-4 {
-    fill: #ebebeb;
-}
-.hex.team-5 {
-    fill: #ffefbb;
-}
-.hex.team-6 {
-    fill: lightgreen;
-}
-.team-swatch.team-1 {
     background-color: #b4cdc5;
 }
-.team-swatch.team-2 {
+.team-2 {
+    fill: #3f6796;
     background-color: #3f6796;
 }
-.team-swatch.team-3 {
+.team-3 {
+    fill: #f7917f;
     background-color: #f7917f;
 }
-.team-swatch.team-4 {
+.team-4 {
+    fill: #ebebeb;
     background-color: #ebebeb;
 }
-.team-swatch.team-5 {
+.team-5 {
+    fill: #ffefbb;
     background-color: #ffefbb;
 }
-.team-swatch.team-6 {
+.team-6 {
+    fill: lightgreen;
     background-color: lightgreen;
 }
 

@@ -16,6 +16,20 @@
     <input type="button" class="nextTurn" value="Next Turn">
   </script>
   -->
+  <script id="teamChartTemplate" type="text/template">
+    <h4>Player #<%= currentTeam %>'s turn!</h4>
+    <% teams.forEach((team, i)=>{ %>
+      <div class="section">
+        <span class="bar-label team-<%= team %>">
+          <!--<span class="glyphicon glyphicon-user" aria-hidden="true"></span>-->
+          <span class="glyphicon glyphicon-blackboard" aria-hidden="true"></span>
+        </span>
+        <span class="bar-wrap">
+          <div style="width: <%= teamsPercent[i].toFixed(1) %>%" class="bar team-<%= team %>"></div>
+        </span>
+      </div>
+    <% }); %>
+  </script>
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/slate/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/index.css">
 </head>
@@ -25,7 +39,7 @@
     <div id="sidebar-details">
 
     </div>
-    <div id="sidebar-essential" class="navbar navbar-inverse">
+    <div id="sidebar-essential" class="navbar">
       <button type="button" class="btn btn-default" aria-label="Left Align">
         <span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>
         Menu
@@ -39,6 +53,8 @@
         <span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>
         Zoom Out
       </button>
+      <div class="spacer"></div>
+      <div id="team-chart"></div>
       <div class="spacer"></div>
       <button type="button" class="btn btn-warning next-turn" aria-label="Left Align">
         End Turn
