@@ -149,9 +149,13 @@ export class HexView extends Backbone.View<Hex> {
         }
     }
     private _onDrop(event){
-        let fromHexId:string = event.detail.from.id.split("hex-")[1].replace(/_/g, ",")
-        let fromHex:Hex = SlaughterRuntime.instance.board.get(fromHexId)
-        this._makeMove(new Move(fromHex.team, this.model, fromHex, null))
+        if(!event.detail.from){
+            this._makeMove(new Move(this.model.team, this.model, null, event.detail.newTenant))
+        } else {
+            let fromHexId:string = event.detail.from.id.split("hex-")[1].replace(/_/g, ",")
+            let fromHex:Hex = SlaughterRuntime.instance.board.get(fromHexId)
+            this._makeMove(new Move(fromHex.team, this.model, fromHex, null))
+        }
         this.render() //need to update ourselfs
     }
 }
@@ -242,6 +246,7 @@ export class BuildMenu extends Backbone.View<Game> {
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:ourTeam', this.render);
         this.render();
+        this._setupDraggable();
     }
     render():BuildMenu{
         this.$el.find('.draggable')
@@ -249,6 +254,38 @@ export class BuildMenu extends Backbone.View<Game> {
             .addClass('draggable')
             .addClass('team-'+this.model.ourTeam)
         return this;
+    }
+    private _setupDraggable(){
+        interact('.draggable', this.el).draggable({
+            inertia: false,
+            restrict: {
+                restriction: $('body')[0],
+                elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+            },
+            autoScroll: true, // enable autoScroll
+            onstart: function name(event:Interact.InteractEvent) {
+                event.target.classList.add('drag-active')
+            },
+            // call this function on every dragmove event
+            onmove: function (event:Interact.InteractEvent) {
+                // keep the dragged position in the data-x/data-y attributes
+                var target = event.target;
+                var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                // translate the element
+                target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+                // update the posiion attributes
+                target.setAttribute('data-x', x);
+                target.setAttribute('data-y', y);
+            },
+            onend: function (event:Interact.InteractEvent) {
+                //clear all drag drop UI
+                event.target.classList.remove('drag-active');
+                event.target.setAttribute('data-x', 0);
+                event.target.setAttribute('data-y', 0);
+                event.target.style.transform = '';
+            }
+        })
     }
 }
 
@@ -305,8 +342,7 @@ export function setupDraggable(){
     inertia: false, //enable inertial throwing
     // keep the element within the area of it's parent
     restrict: {
-      restriction: "parent",
-      endOnly: true,
+      restriction: $('#svg-slaughter')[0],
       elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
     },
     autoScroll: true, // enable autoScroll
@@ -341,7 +377,6 @@ export function setupDraggable(){
     // call this function on every dragend event
     onend: function (event:Interact.InteractEvent) {
         event.target.classList.remove('drag-active')
-        event.target.dispatchEvent(new CustomEvent('dragend',{ bubbles:true }))
     }
   });
 
@@ -371,6 +406,7 @@ export function setupDraggable(){
             detail:{
                 to:$(event.target).closest('.hex')[0],
                 from:$(event.relatedTarget).closest('.hex')[0],
+                newTenant:Tenant[$(event.relatedTarget).attr('data-tenant')],
             }
         }))
     },
