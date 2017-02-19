@@ -260,9 +260,8 @@ export class BuildMenu extends Backbone.View<Game> {
     render():BuildMenu{
         this.$el.find('.draggable')
             .removeClass()
-            .addClass('draggable')
             .addClass('team-'+this.model.ourTeam)
-        //disable units in build menu that we can not afford
+        //enable units in build menu that we can not afford
         if(this.model.selectedTerritory){
             var homeHex = Simulator.getHomeHex(this.model.board, this.model.selectedTerritory);
             var money = homeHex && homeHex.money || 0;
@@ -270,8 +269,10 @@ export class BuildMenu extends Backbone.View<Game> {
                 .toArray()
                 .filter((el)=>{
                     var tenant:Tenant = Tenant[$(el).attr('data-tenant')];
-                    return Simulator.tenantCost(tenant) > money;
-                }).forEach((el)=>$(el).removeClass('draggable'))
+                    return Simulator.tenantCost(tenant) <= money;
+                }).forEach((el)=>{
+                    $(el).addClass('draggable')
+                })
         }
         return this;
     }

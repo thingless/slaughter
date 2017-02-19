@@ -85,6 +85,13 @@ body svg{ display: none; }
 #build-menu img{
     height: 60px;
     background-color: transparent;
+    user-select: none;
+    filter: grayscale(100%);
+    opacity: .5;
+}
+#build-menu img.draggable{
+    filter: none;
+    opacity: 1;
 }
 
 .hex {

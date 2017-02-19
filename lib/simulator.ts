@@ -108,6 +108,7 @@ export class Simulator {
         if(tenant == Tenant.Spearman) return 20;
         if(tenant == Tenant.Knight) return 30;
         if(tenant == Tenant.Paladan) return 40;
+        return 0;
     }
 
     private computeMoveCost(move:Move):number {
