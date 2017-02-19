@@ -102,18 +102,21 @@ export class Simulator {
         return null;
     }
 
+    public static tenantCost(tenant:Tenant):number{
+        if(tenant == Tenant.Tower) return 15;
+        if(tenant == Tenant.Peasant) return 10;
+        if(tenant == Tenant.Spearman) return 20;
+        if(tenant == Tenant.Knight) return 30;
+        if(tenant == Tenant.Paladan) return 40;
+    }
+
     private computeMoveCost(move:Move):number {
         // This is an existing entity, so it is free
         if (move.fromHex)
             return 0;
-
-        if (move.newTenant === Tenant.Tower)
-            return 15;
-
-        if (move.newTenant === Tenant.Peasant)
-            return 10;
-
-        return null;
+        if (!move.newTenant)
+            throw "Invalid move for computeMoveCost";
+        return Simulator.tenantCost(move.newTenant)
     }
 
     private getUpgradedTenant(move:Move):Tenant {

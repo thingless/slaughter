@@ -253,6 +253,7 @@ export class BuildMenu extends Backbone.View<Game> {
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:ourTeam', this.render);
+        this.listenTo(this.model, 'change:selectedTerritory', this.render)
         this.render();
         this._setupDraggable();
     }
@@ -261,9 +262,21 @@ export class BuildMenu extends Backbone.View<Game> {
             .removeClass()
             .addClass('draggable')
             .addClass('team-'+this.model.ourTeam)
+        //disable units in build menu that we can not afford
+        if(this.model.selectedTerritory){
+            var homeHex = Simulator.getHomeHex(this.model.board, this.model.selectedTerritory);
+            var money = homeHex && homeHex.money || 0;
+            this.$el.find('[data-tenant]')
+                .toArray()
+                .filter((el)=>{
+                    var tenant:Tenant = Tenant[$(el).attr('data-tenant')];
+                    return Simulator.tenantCost(tenant) > money;
+                }).forEach((el)=>$(el).removeClass('draggable'))
+        }
         return this;
     }
     private _setupDraggable(){
+        var self = this;
         interact('.draggable', this.el).draggable({
             inertia: false,
             restrict: {
