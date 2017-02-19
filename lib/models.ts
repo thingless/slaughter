@@ -208,4 +208,6 @@ export class Game extends BaseModel {
     get turnsPerTeam():number {return Math.floor(this.currentTurn / (this.numberOfTeams+1)); }
     set clientTeamMap(val:Dictionary<number>) { this.set('clientTeamMap', val); }
     get clientTeamMap() { return this.get('clientTeamMap'); }
+    get selectedTerritory():number { return this.get('selectedTerritory') }
+    set selectedTerritory(val:number) { this.set('selectedTerritory', val) }
 }

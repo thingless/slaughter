@@ -2,8 +2,8 @@
 import { Hex, Tenant, Board, TEAM_WATER, Game, Move } from './models'
 import {debugLogHex} from './hexops';
 import {Simulator} from './simulator';
-import {SlaughterRuntime} from './runtime'
-import {Dictionary, getGlobal} from './util'
+import {SlaughterRuntime} from './runtime';
+import {Dictionary, getGlobal} from './util';
 
 function hexCorner(center:THREE.Vector2, size:number, i:number):THREE.Vector2 {
     size -= 2; //boarder
@@ -70,6 +70,7 @@ export class HexView extends Backbone.View<Hex> {
         //update classes
         _.range(1, 50).forEach((i)=>this.$el.removeClass('team-'+i))
         Snap(this.el)
+            .removeClass('selected-territory')
             .addClass('hex')
             .addClass('team-'+this.model.team)
             .attr({id:'hex-'+this.model.id.replace(/,/g,'_')})
@@ -128,6 +129,10 @@ export class HexView extends Backbone.View<Hex> {
         } else if (moneyEl){
             moneyEl.attr({text: this.model.money.toString()})
         }
+        //update selectedTerritory
+        if(this.model.territory == SlaughterRuntime.instance.game.selectedTerritory){
+            Snap(this.el).addClass('selected-territory')
+        }
         return this;
     }
     private _makeMove(move) {
@@ -147,6 +152,9 @@ export class HexView extends Backbone.View<Hex> {
             else
                 this._makeMove(new Move(this.model.team, this.model, null, Tenant.Peasant));
         }
+        var homeHex = Simulator.getHomeHex(SlaughterRuntime.instance.board, this.model.territory);
+        if(homeHex && homeHex.team == SlaughterRuntime.instance.ourTeam)
+            SlaughterRuntime.instance.game.selectedTerritory = homeHex.territory;
     }
     private _onDrop(event){
         if(!event.detail.from){
@@ -300,7 +308,11 @@ export class GameView extends Backbone.View<Game> {
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);
+        this.listenTo(this.model, 'change:selectedTerritory', this._updateSelectedTerritory)
         this.render();
+    }
+    private _updateSelectedTerritory(){
+        this._hexViews.forEach((hexView)=>hexView.render());
     }
     render():GameView{
         //redraw hexes

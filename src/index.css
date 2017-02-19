@@ -136,6 +136,10 @@ body svg{ display: none; }
   filter:url(#dropshadow);
 }
 
+.hex.selected-territory {
+    stroke-width: 2;
+}
+
 .hex.team--1 {
     display: none;
     fill: #7777cc;
