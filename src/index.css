@@ -79,7 +79,7 @@ body svg{ display: none; }
     width: 100%;
 }
 #team-chart .current-team{
-    animation: flash 4s infinite;
+    animation: flash 2s infinite;
 }
 
 #build-menu img{
@@ -121,7 +121,7 @@ body svg{ display: none; }
 }
 
 .current-team .canbuy{
-    animation: flash 4s infinite;
+    animation: flash 2s infinite;
 }
 
 .draggable.drag-active{
@@ -192,6 +192,6 @@ body svg{ display: none; }
   }
 
   25%, 75% {
-    opacity: .5;
+    opacity: .25;
   }
 }
