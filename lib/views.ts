@@ -250,10 +250,11 @@ export class TeamChart extends Backbone.View<Game> {
 export class BuildMenu extends Backbone.View<Game> {
     initialize(options:Backbone.ViewOptions<Game>){
         this.setElement($('#build-menu'))
-        this.listenTo(this.model.board, 'update', this.render)
-        this.listenTo(this.model, 'change:board', this.render)
+        this.listenTo(this.model.board, 'update', this.render);
+        this.listenTo(this.model, 'change:board', this.render);
         this.listenTo(this.model, 'change:ourTeam', this.render);
-        this.listenTo(this.model, 'change:selectedTerritory', this.render)
+        this.listenTo(this.model, 'change:selectedTerritory', this.render);
+        this.listenTo(SlaughterRuntime.instance.pendingMoves, 'all', this.render);
         this.render();
         this._setupDraggable();
     }
