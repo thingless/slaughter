@@ -219,6 +219,41 @@ export class TeamChart extends Backbone.View<Game> {
     }
 }
 
+export class EconView extends Backbone.View<Game> {
+    initialize(options:Backbone.ViewOptions<Game>){
+        this.setElement($('#econ-view'))
+        this.listenTo(this.model.board, 'update', this.render);
+        this.listenTo(this.model, 'change:board', this.render);
+        this.listenTo(this.model, 'change:ourTeam', this.render);
+        this.listenTo(this.model, 'change:selectedTerritory', this.render);
+        this.listenTo(SlaughterRuntime.instance.pendingMoves, 'all', this.render);
+        this.render();
+    }
+    render():EconView{
+        this.$el.removeClass('no-selection');
+        if(!this.model.selectedTerritory){
+            this.$el.addClass('no-selection');
+            return;
+        }
+        var homeHex = Simulator.getHomeHex(this.model.board, this.model.selectedTerritory);
+        var savings = homeHex.money;
+        var income = this.model.board
+            .filter((hex)=>hex.territory==homeHex.territory)
+            .filter((hex)=>hex.tenant != Tenant.TreePalm && hex.tenant != Tenant.TreePine)
+            .length
+        var wages = this.model.board
+                .filter((hex)=>hex.territory==homeHex.territory && !!hex.tenant)
+                .map((hex)=> Simulator.upkeepForTenant(hex.tenant))
+                .reduce((x,y)=>x+y, 0);
+        var balance = savings + income - wages;
+        this.$el.find('.savings-value').text(savings);
+        this.$el.find('.income-value').text(income);
+        this.$el.find('.wages-value').text(wages);
+        this.$el.find('.balance-value').text(balance);
+        return this;
+    }
+}
+
 export class BuildMenu extends Backbone.View<Game> {
     initialize(options:Backbone.ViewOptions<Game>){
         this.setElement($('#build-menu'))
@@ -292,6 +327,7 @@ export class GameView extends Backbone.View<Game> {
         new SidebarView({model:this.model});
         new TeamChart({model:this.model});
         new BuildMenu({model:this.model});
+        new EconView({model:this.model});
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);

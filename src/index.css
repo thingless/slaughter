@@ -94,6 +94,20 @@ body svg{ display: none; }
     opacity: 1;
 }
 
+#econ-view.no-selection{
+    opacity: 0;
+}
+
+#econ-view td{
+    padding: 2px;
+}
+
+#econ-view .balance-row{
+    border-top-width: 1px;
+    border-top-color: white;
+    border-top: 2px solid white;
+}
+
 .hex {
   cursor: pointer;
   stroke: #000;
