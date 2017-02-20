@@ -329,6 +329,9 @@ export class GameView extends Backbone.View<Game> {
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);
         this.listenTo(this.model, 'change:selectedTerritory', this._updateSelectedTerritory)
+        this.listenTo(this.model, 'change:currentTurn', ()=>{
+            this.model.selectedTerritory = null; //remove selection when turn changes
+        })
         this.render();
     }
     private _updateSelectedTerritory(){
