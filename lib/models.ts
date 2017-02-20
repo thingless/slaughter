@@ -182,7 +182,6 @@ export class Moves extends BaseColletion<Move> {
 export class Game extends BaseModel {
     public relations = {
         'board':Board,
-        'moves':Moves,
     }
     defaults(){ return {
         currentTeam:1,
@@ -195,8 +194,6 @@ export class Game extends BaseModel {
     }
     get board():Board { return this.get('board') }
     set board(val:Board) { this.set('board', val) }
-    get moves():Board { return this.get('moves') }
-    set moves(val:Board) { this.set('moves', val) }
     get url():string{ return '/game/' + this.get('id') }
     get numberOfTeams():number { return this.get('numberOfTeams') }
     set numberOfTeams(val:number) { this.set('numberOfTeams', val) }
