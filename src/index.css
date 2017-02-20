@@ -99,6 +99,11 @@ body svg{ display: none; }
     opacity: 1;
 }
 
+#econ-view{
+    transition: opacity;
+    transition-duration: 0.25s;
+}
+
 #econ-view.no-selection{
     opacity: 0;
 }
