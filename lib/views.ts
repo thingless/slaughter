@@ -60,10 +60,7 @@ export class HexView extends Backbone.View<Hex> {
         var ele = s.group(poly, money, territory)
 
         this.setElement(ele.node);
-        this.listenTo(this.model, 'change:team', this.render)
-        this.listenTo(this.model, 'change:tenant', this.render)
-        this.listenTo(this.model, 'change:money', this.render)
-        this.listenTo(this.model, 'change:canMove', this.render)
+        this.listenTo(this.model, 'all', this.render);
         this.render();
     }
     render():HexView{

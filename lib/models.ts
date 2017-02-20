@@ -130,8 +130,8 @@ export class Hex extends BaseModel {
     set money(val:number) { this.set('money', val) }
     get canMove() { return this.get('canMove') }
     set canMove(val:boolean) { this.set('canMove', val) }
-
-    public territory:number = null;
+    get territory() { return this.get('territory') }
+    set territory(val:number) { this.set('territory', val) }
 
     initialize(){
         this.set('id', this.loc.x+','+this.loc.y+','+this.loc.z)
