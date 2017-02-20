@@ -8,6 +8,16 @@ body, html {
 /*Snap adds SVGs to body to load em... this is a hack to make sure they do not effect rendering*/
 body svg{ display: none; }
 
+/*Nothing is selectable or draggable*/
+*{
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
 #root {
     display:flex;
     width:100%;
@@ -50,10 +60,6 @@ body svg{ display: none; }
     transition: all 0.25s ease-in-out;
 }
 
-#svg-slaughter text{
-    user-select: none;
-}
-
 #team-chart{
     margin-right: 5px;
     margin-left: 5px;
@@ -85,7 +91,6 @@ body svg{ display: none; }
 #build-menu img{
     height: 60px;
     background-color: transparent;
-    user-select: none;
     filter: grayscale(100%);
     opacity: .5;
 }
