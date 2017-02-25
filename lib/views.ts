@@ -251,6 +251,54 @@ export class EconView extends Backbone.View<Game> {
     }
 }
 
+export class UndoView extends Backbone.View<Game>{
+    private undoHistory:Array<string>;
+    //kinda awkward but we only get to an event AFTER changes have happened so we have to store the current state
+    private currentHistory:string;
+    //if we are in an undo we want to ignore events
+    private undoInProgress:boolean;
+    events(){ return {
+        "click":this.undo,
+    } as Backbone.EventsHash }
+    initialize(options:Backbone.ViewOptions<Game>){
+        this.setElement($('#undo-button'))
+        this.undoHistory = [];
+        //register for events that we wish to be able to undo or redo
+        this.listenTo(SlaughterRuntime.instance.pendingMoves, "add", this._record);
+        this.listenTo(this.model, 'change:board', this._newTurn);
+        this.listenTo(this.model, "change:currentTurn", this._newTurn);
+        this.render();
+    }
+    private _newTurn(){
+        //ignore event if it was triggered by an undo
+        if(this.undoInProgress) return;
+        this.undoHistory = [];
+        this._record(false);
+    }
+    private _record(undoable:boolean){
+        undoable = _.isUndefined(undoable) ? true : !!undoable;
+        if (this.currentHistory && undoable){
+            this.undoHistory.push(this.currentHistory);
+        }
+        this.currentHistory = JSON.stringify(this.model.toJSON()); //record current
+        this.render();
+    }
+    public render():UndoView{
+        this.$el
+            .removeClass('disabled')
+            .addClass(this.undoHistory.length?"":"disabled")
+        return this;
+    }
+    public undo(){
+        var json = this.undoHistory.pop();
+        if(!json) return; //bail if there is nothing to undo
+        this.undoInProgress = true;
+        this.model.set(this.model.parse(JSON.parse(json)));
+        this.undoInProgress = false;
+        this._record(false);
+    }
+}
+
 export class BuildMenu extends Backbone.View<Game> {
     initialize(options:Backbone.ViewOptions<Game>){
         this.setElement($('#build-menu'))
@@ -325,6 +373,7 @@ export class GameView extends Backbone.View<Game> {
         new TeamChart({model:this.model});
         new BuildMenu({model:this.model});
         new EconView({model:this.model});
+        new UndoView({model:this.model});
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);
