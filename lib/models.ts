@@ -22,7 +22,7 @@ export class BaseModel extends Backbone.Model {
                 cls = cls.subclasses.find((cls)=>cls.name==val['type'])
             }
             if(!cls) return;
-            var obj:BaseModel = this[key] || new cls();
+            var obj:BaseModel = this.get(key) || new cls();
             obj.set(obj.parse(val, options))
             response[key] = obj;
         })
