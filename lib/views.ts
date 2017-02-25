@@ -264,18 +264,18 @@ export class UndoView extends Backbone.View<Game>{
         this.setElement($('#undo-button'))
         this.undoHistory = [];
         //register for events that we wish to be able to undo or redo
-        this.listenTo(this.model.pendingMoves, "add", this._record);
-        this.listenTo(this.model, 'change:board', this._newTurn);
-        this.listenTo(this.model, "change:currentTurn", this._newTurn);
+        this.listenTo(this.model.pendingMoves, "add", this._recordState);
+        this.listenTo(this.model, 'change:board', this._clearHistory);
+        this.listenTo(this.model, "change:currentTurn", this._clearHistory);
         this.render();
     }
-    private _newTurn(){
+    private _clearHistory(){
         //ignore event if it was triggered by an undo
         if(this.undoInProgress) return;
         this.undoHistory = [];
-        this._record(false);
+        this._recordState(false);
     }
-    private _record(undoable:boolean){
+    private _recordState(undoable:boolean){
         undoable = _.isUndefined(undoable) ? true : !!undoable;
         if (this.currentHistory && undoable){
             this.undoHistory.push(this.currentHistory);
@@ -295,7 +295,7 @@ export class UndoView extends Backbone.View<Game>{
         this.undoInProgress = true;
         this.model.set(this.model.parse(JSON.parse(json)));
         this.undoInProgress = false;
-        this._record(false);
+        this._recordState(false);
     }
 }
 
