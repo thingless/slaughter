@@ -45,7 +45,7 @@ export class BaseColletion<T extends Backbone.Model> extends Backbone.Collection
                 cls = cls['subclasses'].find((cls)=>cls.name==val['type'])
             }
             if(!cls) return val;
-            let obj:Backbone.Model = new cls();
+            let obj:Backbone.Model = (val.id && this.get(val.id)) || new cls();
             obj.set(obj.parse(val, options));
             return obj;
         })
