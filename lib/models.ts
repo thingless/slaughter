@@ -22,18 +22,9 @@ export class BaseModel extends Backbone.Model {
                 cls = cls.subclasses.find((cls)=>cls.name==val['type'])
             }
             if(!cls) return;
-            if (cls.prototype instanceof BaseModel){
-                let obj:BaseModel = new cls();
-                obj.set(obj.parse(val, options))
-                response[key] = obj;
-            } else if (cls.prototype instanceof BaseColletion){
-                let obj:BaseColletion<any> = new cls();
-                obj.add(obj.parse(val, options))
-                response[key] = obj;
-            }
-            else {
-                throw 'unable to parse relationship!';
-            }
+            var obj:BaseModel = this[key] || new cls();
+            obj.set(obj.parse(val, options))
+            response[key] = obj;
         })
         return response;
     }
@@ -182,6 +173,7 @@ export class Moves extends BaseColletion<Move> {
 export class Game extends BaseModel {
     public relations = {
         'board':Board,
+        'pendingMoves':Moves,
     }
     defaults(){ return {
         currentTeam:1,
@@ -190,7 +182,7 @@ export class Game extends BaseModel {
     }}
     initialize(attributes, options){
         this.set('board', new Board(null, {parent:this}))
-        this.set('moves', new Moves(null, {parent:this}))
+        this.set('pendingMoves', new Moves(null, {parent:this}))
     }
     get board():Board { return this.get('board') }
     set board(val:Board) { this.set('board', val) }
@@ -207,4 +199,6 @@ export class Game extends BaseModel {
     get clientTeamMap() { return this.get('clientTeamMap'); }
     get selectedTerritory():number { return this.get('selectedTerritory') }
     set selectedTerritory(val:number) { this.set('selectedTerritory', val) }
+    get pendingMoves():Moves { return this.get('pendingMoves') }
+    set pendingMoves(val:Moves) { this.set('pendingMoves', val) }
 }

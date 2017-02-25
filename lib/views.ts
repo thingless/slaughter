@@ -137,7 +137,7 @@ export class HexView extends Backbone.View<Hex> {
         SlaughterRuntime.instance.simulator.makeMove(move);
 
         // And add it to the pending move set
-        SlaughterRuntime.instance.pendingMoves.add(move);
+        SlaughterRuntime.instance.game.pendingMoves.add(move);
     }
     private _onHexClick(e){
         debugLogHex(this.model);
@@ -223,7 +223,7 @@ export class EconView extends Backbone.View<Game> {
         this.listenTo(this.model, 'change:board', this.render);
         this.listenTo(this.model, 'change:ourTeam', this.render);
         this.listenTo(this.model, 'change:selectedTerritory', this.render);
-        this.listenTo(SlaughterRuntime.instance.pendingMoves, 'all', this.render);
+        this.listenTo(this.model.pendingMoves, 'all', this.render);
         this.render();
     }
     render():EconView{
@@ -264,7 +264,7 @@ export class UndoView extends Backbone.View<Game>{
         this.setElement($('#undo-button'))
         this.undoHistory = [];
         //register for events that we wish to be able to undo or redo
-        this.listenTo(SlaughterRuntime.instance.pendingMoves, "add", this._record);
+        this.listenTo(this.model.pendingMoves, "add", this._record);
         this.listenTo(this.model, 'change:board', this._newTurn);
         this.listenTo(this.model, "change:currentTurn", this._newTurn);
         this.render();
@@ -306,7 +306,7 @@ export class BuildMenu extends Backbone.View<Game> {
         this.listenTo(this.model, 'change:board', this.render);
         this.listenTo(this.model, 'change:ourTeam', this.render);
         this.listenTo(this.model, 'change:selectedTerritory', this.render);
-        this.listenTo(SlaughterRuntime.instance.pendingMoves, 'all', this.render);
+        this.listenTo(this.model.pendingMoves, 'all', this.render);
         this.render();
         this._setupDraggable();
     }

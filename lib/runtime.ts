@@ -8,13 +8,11 @@ export class SlaughterRuntime {
     public network:NetworkProvider;
     public router:Router;
     public game:Game;
-    public pendingMoves:Moves;
     constructor(network:NetworkProvider, game:Game) {
         this.game = game
         this.network = network;
         this.simulator = new Simulator(game)
         this.router = new Router(network)
-        this.pendingMoves = new Moves();
         SlaughterRuntime.instance = this;
     }
     public initBrowser():void{
@@ -29,11 +27,11 @@ export class SlaughterRuntime {
             'from': this.network.address,
             'to': this.network.serverAddress,
             'method': 'submitMoves',
-            'data': {'moves': this.pendingMoves.toJSON()},
+            'data': {'moves': this.game.pendingMoves.toJSON()},
         };
         this.network.send(msg).then((res)=>{
             console.log("Moves submitted");
-            this.pendingMoves.reset();
+            this.game.pendingMoves.reset();
         });
     }
     public assignTeam(team:number):Promise<number>{
