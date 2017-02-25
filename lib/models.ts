@@ -201,4 +201,6 @@ export class Game extends BaseModel {
     set selectedTerritory(val:number) { this.set('selectedTerritory', val) }
     get pendingMoves():Moves { return this.get('pendingMoves') }
     set pendingMoves(val:Moves) { this.set('pendingMoves', val) }
+    get selectedTenant():Tenant { return this.get('selectedTenant') }
+    set selectedTenant(val:Tenant) { this.set('selectedTenant', val) }
 }

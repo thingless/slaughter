@@ -88,6 +88,20 @@ body svg{ display: none; }
     animation: flash 2s infinite;
 }
 
+#selected-tenant{
+    border: 5px solid white;
+    border-radius: 10px;
+    padding: 2px;
+}
+
+#selected-tenant.no-selection img{
+    visibility: hidden;
+}
+
+#selected-tenant img{
+    height: 60px;
+}
+
 #build-menu img{
     height: 60px;
     background-color: transparent;

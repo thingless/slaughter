@@ -1,5 +1,5 @@
 /// <reference path="../typings/index.d.ts" />
-import { Hex, Tenant, Board, TEAM_WATER, Game, Move } from './models'
+import { Hex, Tenant, Board, TEAM_WATER, Game, Move, tenantToString } from './models'
 import {debugLogHex} from './hexops';
 import {Simulator} from './simulator';
 import {SlaughterRuntime} from './runtime';
@@ -80,18 +80,7 @@ export class HexView extends Backbone.View<Hex> {
         //cleanup old tenant if it exsits
         $(this.el).find('.sprite').remove();
         if(this.model.tenant){
-            //get graphics for new tenant
-            let svgTable:Dictionary<string> = {}
-            svgTable[Tenant.Grave.toString()] = '/img/grave.svg'
-            svgTable[Tenant.House.toString()] = '/img/house.svg'
-            svgTable[Tenant.Knight.toString()] = '/img/knight.svg'
-            svgTable[Tenant.Paladan.toString()] = '/img/paladan.svg'
-            svgTable[Tenant.Peasant.toString()] = '/img/peasant.svg'
-            svgTable[Tenant.Spearman.toString()] = '/img/spearman.svg'
-            svgTable[Tenant.Tower.toString()] = '/img/tower.svg'
-            svgTable[Tenant.TreePine.toString()] = '/img/treepine.svg'
-            svgTable[Tenant.TreePalm.toString()] = '/img/treepalm.svg'
-            var tenantSvg:string = svgTable[this.model.tenant] || null
+            var tenantSvg:string = this.model.tenant && `/img/${tenantToString(this.model.tenant)}.svg` || null;
             //render new tenant
             if(tenantSvg){
                 getSvg(tenantSvg).then((frag:DocumentFragment)=>{
@@ -192,6 +181,24 @@ export class SidebarView extends Backbone.View<Game> {
     }
 }
 
+export class SelectedTenantView extends Backbone.View<Game>{
+    initialize(options:Backbone.ViewOptions<Game>){
+        this.setElement($('#selected-tenant'))
+        this.listenTo(this.model, 'selectedTenant:change', this.render);
+        this.render();
+    }
+    render():SelectedTenantView{
+        let selectedTenant = this.model.selectedTenant;
+        if(selectedTenant){
+            this.$el.removeClass('no-selection')
+            this.$el.find('img').attr('src',`/img/${tenantToString(selectedTenant)}.svg`)
+        } else {
+            this.$el.addClass('no-selection')
+        }
+        return this;
+    }
+}
+
 export class TeamChart extends Backbone.View<Game> {
     initialize(options:Backbone.ViewOptions<Game>){
         this.setElement($('#team-chart'))
@@ -251,7 +258,7 @@ export class EconView extends Backbone.View<Game> {
     }
 }
 
-export class UndoView extends Backbone.View<Game>{
+export class UndoService extends Backbone.View<Game>{
     private undoHistory:Array<string>;
     //kinda awkward but we only get to an event AFTER changes have happened so we have to store the current state
     private currentHistory:string;
@@ -283,7 +290,7 @@ export class UndoView extends Backbone.View<Game>{
         this.currentHistory = JSON.stringify(this.model.toJSON()); //record current
         this.render();
     }
-    public render():UndoView{
+    public render():UndoService{
         this.$el
             .removeClass('disabled')
             .addClass(this.undoHistory.length?"":"disabled")
@@ -373,7 +380,8 @@ export class GameView extends Backbone.View<Game> {
         new TeamChart({model:this.model});
         new BuildMenu({model:this.model});
         new EconView({model:this.model});
-        new UndoView({model:this.model});
+        new UndoService({model:this.model});
+        new SelectedTenantView({model:this.model});
         this.listenTo(this.model.board, 'update', this.render)
         this.listenTo(this.model, 'change:board', this.render)
         this.listenTo(this.model, 'change:currentTurn', this._updateCurrentTeam);
