@@ -179,6 +179,8 @@ export class Game extends BaseModel {
         currentTeam:1,
         currentTurn:1,
         clientTeamMap:{},
+        selectedTerritory:null,
+        currentMove:null,
     }}
     initialize(attributes, options){
         this.set('board', new Board(null, {parent:this}))

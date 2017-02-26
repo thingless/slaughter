@@ -131,21 +131,28 @@ export class HexView extends Backbone.View<Hex> {
         debugLogHex(this.model);
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
-        //finish current move?
+        //handle selectedTerritory
+        var selectedTerritory:number;
+        var homeHex = Simulator.getHomeHex(SlaughterRuntime.instance.board, this.model.territory);
+        if(homeHex && homeHex.team == SlaughterRuntime.instance.ourTeam)
+            selectedTerritory = homeHex.territory;
+        //if selectedTerritory has changed revert currentMove
+        if(selectedTerritory && selectedTerritory != SlaughterRuntime.instance.game.selectedTerritory){
+            SlaughterRuntime.instance.gameView.undoService.undoCurrentMove();
+            SlaughterRuntime.instance.game.selectedTerritory = selectedTerritory;
+        }
+        //handle finish current move?
         let move:Move = SlaughterRuntime.instance.game.currentMove;
         if(move){
             move.toHex = this.model;
-            this._makeMove(move)
-            SlaughterRuntime.instance.game.currentMove = null;
+            SlaughterRuntime.instance.gameView.undoService.undoCurrentMove();
+            this._makeMove(move);
         }
-        //else start new move?
-        else if(this.model.tenant){
+        //else handle start new move?
+        else if(Simulator.canMove(this.model)){
             SlaughterRuntime.instance.game.currentMove = new Move(this.model.team, null, this.model, null);
+            this.model.tenant = null;
         }
-        //Set selectedTerritory
-        var homeHex = Simulator.getHomeHex(SlaughterRuntime.instance.board, this.model.territory);
-        if(homeHex && homeHex.team == SlaughterRuntime.instance.ourTeam)
-            SlaughterRuntime.instance.game.selectedTerritory = homeHex.territory;
     }
 }
 
@@ -238,6 +245,10 @@ export class EconView extends Backbone.View<Game> {
             return;
         }
         var homeHex = Simulator.getHomeHex(this.model.board, this.model.selectedTerritory);
+        if(!homeHex){
+            this.$el.addClass('no-selection');
+            return;
+        }
         var savings = homeHex.money;
         var income = this.model.board
             .filter((hex)=>hex.territory==homeHex.territory)
@@ -270,8 +281,9 @@ export class UndoService extends Backbone.View<Game>{
         this.undoHistory = [];
         //register for events that we wish to be able to undo or redo
         this.listenTo(this.model.pendingMoves, "add", this._recordState);
-        this.listenTo(this.model, 'change:board', this._clearHistory);
         this.listenTo(this.model, "change:currentTurn", this._clearHistory);
+        this.listenTo(this.model, "change:currentMove", this._recordState);
+        this.listenTo(this.model, "sync", this._clearHistory);
         this.render();
     }
     private _clearHistory(){
@@ -281,6 +293,8 @@ export class UndoService extends Backbone.View<Game>{
         this._recordState(false);
     }
     private _recordState(undoable:boolean){
+        //ignore event if it was triggered by an undo
+        if(this.undoInProgress) return;
         undoable = _.isUndefined(undoable) ? true : !!undoable;
         if (this.currentHistory && undoable){
             this.undoHistory.push(this.currentHistory);
@@ -294,13 +308,18 @@ export class UndoService extends Backbone.View<Game>{
             .addClass(this.undoHistory.length?"":"disabled")
         return this;
     }
-    public undo(){
+    public undo():boolean{
         var json = this.undoHistory.pop();
-        if(!json) return; //bail if there is nothing to undo
+        if(!json) return false; //bail if there is nothing to undo
         this.undoInProgress = true;
         this.model.set(this.model.parse(JSON.parse(json)));
         this.undoInProgress = false;
         this._recordState(false);
+        return true;
+    }
+    public undoCurrentMove():boolean{
+        while (this.model.currentMove && this.undo()){}
+        return true;
     }
 }
 
@@ -323,16 +342,32 @@ export class BuildMenu extends Backbone.View<Game> {
         if(!this.model.selectedTerritory) return this; // If territory is not selected... bail
         var homeHex = Simulator.getHomeHex(this.model.board, this.model.selectedTerritory);
         var money = homeHex && homeHex.money || 0;
-        if(money >= 10){
+        if(money >= Simulator.tenantCost(Tenant.Peasant)){
             this.$el.find('.build-peasant').addClass('can-afford')
         }
-        if(money >= 15){
+        if(money >= Simulator.tenantCost(Tenant.Tower)){
             this.$el.find('.build-tower').addClass('can-afford')
         }
         return this;
     }
     private _startBuildMove(tenant:Tenant){
-        this.model.currentMove = new Move(this.model.currentTeam, null, null, tenant);
+        if(!this.model.selectedTerritory) return this; // If territory is not selected... bail
+        var homeHex = Simulator.getHomeHex(this.model.board, this.model.selectedTerritory);
+        var money = homeHex && homeHex.money || 0;
+        var cost = Simulator.tenantCost(tenant);
+        if(money < cost) return; //bail if we cant afford
+        if(this.model.currentMove){
+            let upgradedTenant = Simulator.getUpgradedTenant(this.model.currentMove)
+            if(!upgradedTenant) return; //bail if the tenant is not upgradeable
+            if(this.model.currentMove.newTenant){
+                this.model.currentMove.newTenant = upgradedTenant;
+            } else {
+                this.model.currentMove.fromHex.tenant = upgradedTenant;
+            }
+        } else {
+            this.model.currentMove = new Move(this.model.currentTeam, null, null, tenant);
+        }
+        homeHex.money -= cost;
     }
 }
 

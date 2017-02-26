@@ -73,7 +73,7 @@ export class Simulator {
         this.game.currentTurn = originalSimulator.game.currentTurn;
     }
 
-    public tenantToCombatValue(tenant:Tenant):number {
+    public static tenantToCombatValue(tenant:Tenant):number {
         if (tenant === Tenant.Peasant)
             return 1;
         if (tenant === Tenant.Spearman)
@@ -90,7 +90,7 @@ export class Simulator {
         return 0;
     }
 
-    private combatValueToMobileTenant(cv:number):Tenant {
+    private static combatValueToMobileTenant(cv:number):Tenant {
         if (cv === 1)
             return Tenant.Peasant;
         if (cv === 2)
@@ -120,7 +120,7 @@ export class Simulator {
         return Simulator.tenantCost(move.newTenant)
     }
 
-    private getUpgradedTenant(move:Move):Tenant {
+    public static getUpgradedTenant(move:Move):Tenant {
         let newTenant = move.fromHex && move.fromHex.tenant || move.newTenant;
         if (!newTenant)
             return null;
@@ -130,14 +130,14 @@ export class Simulator {
         if (!this.isMobileUnit(newTenant) || !this.isMobileUnit(oldTenant))
             return null;
 
-        let newTenantValue = this.tenantToCombatValue(newTenant);
-        let oldTenantValue = this.tenantToCombatValue(oldTenant);
+        let newTenantValue = Simulator.tenantToCombatValue(newTenant);
+        let oldTenantValue = Simulator.tenantToCombatValue(oldTenant);
 
         if (newTenantValue === 0 || oldTenantValue === 0)
             return null;
 
         let finalValue = newTenantValue + oldTenantValue;
-        return this.combatValueToMobileTenant(finalValue);
+        return Simulator.combatValueToMobileTenant(finalValue);
     }
 
     public teamsByRatioOfBoard():Array<TeamRatio>{
@@ -181,13 +181,13 @@ export class Simulator {
         // units in the same territories. So we find all neighbors of the same territory and take the max CV.
         let combatValue:number = _.max(hexops.allNeighbors(this.board, hex)
             .filter((neighbor)=>neighbor.team == hex.team)
-            .map((hex)=>this.tenantToCombatValue(hex.tenant)));
+            .map((hex)=>Simulator.tenantToCombatValue(hex.tenant)));
         // The hex's tenant counts too!
-        return Math.max(combatValue, this.tenantToCombatValue(hex.tenant) || 0);
+        return Math.max(combatValue, Simulator.tenantToCombatValue(hex.tenant) || 0);
     }
 
     private canDefeat(tenant:Tenant, hex:Hex):boolean {
-        let ourCV = this.tenantToCombatValue(tenant) || 0;
+        let ourCV = Simulator.tenantToCombatValue(tenant) || 0;
         let theirCV = this.findCombatValue(hex);
         return ourCV > theirCV;
     }
@@ -283,7 +283,7 @@ export class Simulator {
                 // 2. It is occupied by a friendly unit and we might be able to combine
                 if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
                     this.isMobileUnit(move.toHex.tenant)) {
-                    let newTenant = this.getUpgradedTenant(move);
+                    let newTenant = Simulator.getUpgradedTenant(move);
                     if (newTenant === null) {
                         console.log("The target hex is occupied by a friendly unit but we cannot combine");
                         return false;
@@ -549,7 +549,7 @@ export class Simulator {
 
         // If there's a friendly mob there, combine them
         if (move.toHex.team === move.team && move.toHex.tenant) {
-            let upgradedTenant = this.getUpgradedTenant(move);
+            let upgradedTenant = Simulator.getUpgradedTenant(move);
             if (upgradedTenant) {
                 ourTenant = upgradedTenant;
             }

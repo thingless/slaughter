@@ -354,7 +354,7 @@ export class LCMonteNode extends MonteNode{
         //do computations that are hex based
         var undefendedHexes = new Set(myHexes);
         myHexes.forEach((hex)=>{
-            if(simulator.tenantToCombatValue(hex.tenant) > 0){
+            if(Simulator.tenantToCombatValue(hex.tenant) > 0){
                 undefendedHexes.delete(hex);
                 hexops.allNeighbors(simulator.board, hex)
                     .forEach(undefendedHexes.delete.bind(undefendedHexes));
