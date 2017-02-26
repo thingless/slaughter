@@ -359,7 +359,9 @@ export class BuildMenu extends Backbone.View<Game> {
         var cost = Simulator.tenantCost(tenant);
         if(money < cost) return; //bail if we cant afford
         if(this.model.currentMove){
-            let upgradedTenant = Simulator.getUpgradedTenant(this.model.currentMove)
+            let currentTenant:Tenant = this.model.currentMove.newTenant || this.model.currentMove.fromHex.tenant;
+            let upgradedTenant:Tenant = Simulator.combineTenants(currentTenant, tenant);
+            debugger;
             if(!upgradedTenant) return; //bail if the tenant is not upgradeable
             if(this.model.currentMove.newTenant){
                 this.model.currentMove.newTenant = upgradedTenant;

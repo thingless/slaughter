@@ -120,24 +120,21 @@ export class Simulator {
         return Simulator.tenantCost(move.newTenant)
     }
 
-    public static getUpgradedTenant(move:Move):Tenant {
+    public static combineTenants(tenant1:Tenant, tenant2:Tenant){
+        if(!tenant1 || !tenant2 ||
+           Simulator.tenantToCombatValue(tenant1) === 0 ||
+           Simulator.tenantToCombatValue(tenant2) === 0 ||
+           !Simulator.isMobileUnit(tenant1) ||
+           !Simulator.isMobileUnit(tenant2)
+        ) return null;
+        let combatValue:number = Simulator.tenantToCombatValue(tenant1) + Simulator.tenantToCombatValue(tenant2);
+        return Simulator.combatValueToMobileTenant(combatValue);
+    }
+
+    private static getUpgradedTenant(move:Move):Tenant {
         let newTenant = move.fromHex && move.fromHex.tenant || move.newTenant;
-        if (!newTenant)
-            return null;
-
-        let oldTenant = move.toHex.tenant;
-
-        if (!this.isMobileUnit(newTenant) || !this.isMobileUnit(oldTenant))
-            return null;
-
-        let newTenantValue = Simulator.tenantToCombatValue(newTenant);
-        let oldTenantValue = Simulator.tenantToCombatValue(oldTenant);
-
-        if (newTenantValue === 0 || oldTenantValue === 0)
-            return null;
-
-        let finalValue = newTenantValue + oldTenantValue;
-        return Simulator.combatValueToMobileTenant(finalValue);
+        let oldTenant = move.toHex && move.toHex.tenant;
+        return Simulator.combineTenants(newTenant, oldTenant);
     }
 
     public teamsByRatioOfBoard():Array<TeamRatio>{
