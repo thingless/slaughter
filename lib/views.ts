@@ -188,7 +188,10 @@ export class SelectedTenantView extends Backbone.View<Game>{
         this.render();
     }
     render():SelectedTenantView{
-        let selectedTenant = this.model.selectedTenant;
+        let selectedTenant:Tenant = this.model.currentMove.newTenant;
+        if(!selectedTenant){
+            selectedTenant = this.model.currentMove.fromHex && this.model.currentMove.fromHex.tenant
+        }
         if(selectedTenant){
             this.$el.removeClass('no-selection')
             this.$el.find('img').attr('src',`/img/${tenantToString(selectedTenant)}.svg`)
