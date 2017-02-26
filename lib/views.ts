@@ -82,6 +82,7 @@ export class HexView extends Backbone.View<Hex> {
             //render new tenant
             if(tenantSvg){
                 getSvg(tenantSvg).then((frag:DocumentFragment)=>{
+                    if(!this.model.tenant) return; //bail if tenant has been removed during async promise
                     var tenant = Snap(frag as any);
                     let sprite = tenant.select('g');
                     sprite.attr({
@@ -393,7 +394,11 @@ export class GameView extends Backbone.View<Game> {
         this.render();
     }
     private _updateSelectedTerritory(){
-        this._hexViews.forEach((hexView)=>hexView.render());
+        let t1:number = this.model['_previousAttributes']['selectedTerritory']
+        let t2:number = this.model.selectedTerritory
+        this._hexViews
+            .filter((hexView)=>hexView.model.territory == t1 || hexView.model.territory == t2)
+            .forEach((hexView)=>hexView.render());
     }
     render():GameView{
         //redraw hexes
