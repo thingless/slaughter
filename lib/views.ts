@@ -132,16 +132,15 @@ export class HexView extends Backbone.View<Hex> {
         debugLogHex(this.model);
         window['lastHex'] = window['hex'];
         window['hex'] = this.model;
-        //handle selectedTerritory
-        var selectedTerritory:number;
-        var homeHex = Simulator.getHomeHex(SlaughterRuntime.instance.board, this.model.territory);
-        if(homeHex && homeHex.team == SlaughterRuntime.instance.ourTeam)
-            selectedTerritory = homeHex.territory;
-        //if selectedTerritory has changed revert currentMove
-        if(selectedTerritory && selectedTerritory != SlaughterRuntime.instance.game.selectedTerritory){
+        //if we are selecting a new territory... revert currentMove
+        if(this.model.team == SlaughterRuntime.instance.ourTeam &&
+           this.model.territory &&
+           this.model.territory != SlaughterRuntime.instance.game.selectedTerritory
+        ){
             SlaughterRuntime.instance.gameView.undoService.undoCurrentMove();
-            SlaughterRuntime.instance.game.selectedTerritory = selectedTerritory;
+            SlaughterRuntime.instance.game.selectedTerritory = this.model.territory;
         }
+        var selectedTerritory:number = SlaughterRuntime.instance.game.selectedTerritory;
         //handle finish current move?
         let move:Move = SlaughterRuntime.instance.game.currentMove;
         if(move){
@@ -154,6 +153,8 @@ export class HexView extends Backbone.View<Hex> {
             SlaughterRuntime.instance.game.currentMove = new Move(this.model.team, null, this.model, null);
             this.model.tenant = null;
         }
+        //undoCurrentMove might undo selectedTerritory... just make sure a territory is selected in the end
+        SlaughterRuntime.instance.game.selectedTerritory = selectedTerritory;
     }
 }
 
