@@ -1,13 +1,14 @@
 import {Simulator} from './simulator';
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';
 import {Game, Move, Tenant, Board, Hex, Moves} from './models'
-import {GameView, setupDraggable} from './views'
+import {GameView} from './views'
 
 export class SlaughterRuntime {
     public simulator:Simulator;
     public network:NetworkProvider;
     public router:Router;
     public game:Game;
+    public gameView:GameView;
     constructor(network:NetworkProvider, game:Game) {
         this.game = game
         this.network = network;
@@ -16,8 +17,7 @@ export class SlaughterRuntime {
         SlaughterRuntime.instance = this;
     }
     public initBrowser():void{
-        setupDraggable();
-        new GameView({model:this.game});
+        this.gameView = new GameView({model:this.game});
     }
     public get board():Board { return this.game.board; }
     public get ourTeam():number { return this.game.ourTeam; }

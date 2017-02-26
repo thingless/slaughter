@@ -1,5 +1,4 @@
 import {Game, Move, Tenant, Board, Hex, Moves} from './models'
-import {GameView, setupDraggable} from './views'
 import * as hexops from './hexops'
 import {getConfigVariable, guid, int, getGlobal} from './util'
 import {NetworkProvider, WebsocketNetworkProvider, Router, NetMessage} from './network';

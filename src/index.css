@@ -108,7 +108,7 @@ body svg{ display: none; }
     filter: grayscale(100%);
     opacity: .5;
 }
-#build-menu img.draggable{
+#build-menu img.can-afford{
     filter: none;
     opacity: 1;
 }
