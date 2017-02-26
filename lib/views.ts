@@ -188,8 +188,14 @@ export class SidebarView extends Backbone.View<Game> {
 export class SelectedTenantView extends Backbone.View<Game>{
     initialize(options:Backbone.ViewOptions<Game>){
         this.setElement($('#selected-tenant'))
-        this.listenTo(this.model, 'change:currentMove', this.render);
+        this._registerListeners();
         this.render();
+    }
+    private _registerListeners(){
+        this.stopListening();
+        this.listenTo(this.model, 'change:currentMove', this._registerListeners);
+        this.listenTo(this.model, 'change:currentMove', this.render);
+        this.listenTo(this.model.currentMove, 'all', this.render)
     }
     render():SelectedTenantView{
         if(this.model.currentMove){
@@ -361,7 +367,6 @@ export class BuildMenu extends Backbone.View<Game> {
         if(this.model.currentMove){
             let currentTenant:Tenant = this.model.currentMove.newTenant || this.model.currentMove.fromHex.tenant;
             let upgradedTenant:Tenant = Simulator.combineTenants(currentTenant, tenant);
-            debugger;
             if(!upgradedTenant) return; //bail if the tenant is not upgradeable
             if(this.model.currentMove.newTenant){
                 this.model.currentMove.newTenant = upgradedTenant;
