@@ -111,6 +111,7 @@ body svg{ display: none; }
 #build-menu img.can-afford{
     filter: none;
     opacity: 1;
+    cursor: pointer;
 }
 
 #econ-view{
