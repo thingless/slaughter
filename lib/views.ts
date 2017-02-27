@@ -58,7 +58,7 @@ export class HexView extends Backbone.View<Hex> {
         var ele = s.group(poly, money, territory)
 
         this.setElement(ele.node);
-        this.listenTo(this.model, 'all', this.render);
+        this.listenTo(this.model, 'all', _.debounce(this.render, 10)); //debounce renders triggered by events
         this.render();
     }
     render():HexView{
@@ -76,13 +76,14 @@ export class HexView extends Backbone.View<Hex> {
         let territoryEl = Snap(this.el).select('.territory')
         territoryEl.attr({text: this.model.territory || ''})
         //cleanup old tenant if it exsits
-        $(this.el).find('.sprite').remove();
-        if(this.model.tenant){
-            var tenantSvg:string = this.model.tenant && `/img/${tenantToString(this.model.tenant)}.svg` || null;
+        this.$el.find('.sprite').remove();
+        var currentTenant:Tenant = this.model.tenant;
+        if(currentTenant){
+            var tenantSvg:string = currentTenant && `/img/${tenantToString(currentTenant)}.svg` || null;
             //render new tenant
             if(tenantSvg){
                 getSvg(tenantSvg).then((frag:DocumentFragment)=>{
-                    if(!this.model.tenant) return; //bail if tenant has been removed during async promise
+                    if(currentTenant != this.model.tenant) return; //bail if tenant has changed
                     var tenant = Snap(frag as any);
                     let sprite = tenant.select('g');
                     sprite.attr({
