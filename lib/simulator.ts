@@ -120,10 +120,8 @@ export class Simulator {
         return Simulator.tenantCost(move.newTenant)
     }
 
-    public static combineTenants(tenant1:Tenant, tenant2:Tenant){
+    public static combineTenants(tenant1:Tenant, tenant2:Tenant):Tenant{
         if(!tenant1 || !tenant2 ||
-           Simulator.tenantToCombatValue(tenant1) === 0 ||
-           Simulator.tenantToCombatValue(tenant2) === 0 ||
            !Simulator.isMobileUnit(tenant1) ||
            !Simulator.isMobileUnit(tenant2)
         ) return null;
@@ -132,9 +130,18 @@ export class Simulator {
     }
 
     private static getUpgradedTenant(move:Move):Tenant {
-        let newTenant = move.fromHex && move.fromHex.tenant || move.newTenant;
-        let oldTenant = move.toHex && move.toHex.tenant;
-        return Simulator.combineTenants(newTenant, oldTenant);
+        //its possible to combine up to 3 tenants in a single move eg fromHex, newTenant, toHex
+        if(move.newTenant == Tenant.Tower) return Tenant.Tower;
+        //handle tenant in fromHex
+        if(Simulator.isMobileUnit(move.fromHex.tenant))
+            var tenant:Tenant = move.fromHex.tenant;
+        //handle new tenant
+        tenant = Simulator.combineTenants(tenant, move.newTenant) || move.newTenant
+        if(!tenant) return null; //if we don't have a tenant by now then move is not legal
+        //handle toHex tenant
+        if(Simulator.isMobileUnit(move.fromHex.tenant) && move.fromHex.territory == move.toHex.territory)
+            tenant = Simulator.combineTenants(tenant, move.fromHex.tenant);
+        return tenant;
     }
 
     public teamsByRatioOfBoard():Array<TeamRatio>{
@@ -190,111 +197,78 @@ export class Simulator {
     }
 
     public isMoveLegal(move:Move):boolean {
+        //basic validation
+        if(!move.toHex || !move.fromHex || move.fromHex.team != move.team){
+            console.log("Ill formed move");
+        }
         // If the to hex is water, we cannot move there
-        if(!move.toHex || move.toHex.team == TEAM_WATER) {
+        if(move.toHex.team == TEAM_WATER) {
             console.log("Cannot move to water");
             return false;
         }
-        //If the hex is from itself its a no-op
-        if(move.fromHex && move.toHex && move.toHex.id === move.fromHex.id){
-            console.log("Cannot move to self");
-            return false;
-        }
-
         //Is it our turn?
         if(move.team !== this.game.currentTeam){
-            console.log("Its not your turn");
+            console.log("It is not your turn!");
             return false;
         }
-
-        // Find the territory of the from hex (or of the to hex if this is a new entity)
-        let ourTerritory = move.fromHex && move.fromHex.territory;
-        if (!ourTerritory) {
-            if (!move.newTenant) {
-                // Ill-formed move
-                console.log("No fromHex & no newTenant - ill-formed move")
+        // We need to see if it can still move this turn
+        if (Simulator.isMobileUnit(move.fromHex.tenant) && !move.fromHex.canMove) {
+            console.log("This entity cannot move this turn");
+            return false;
+        }
+        //validate resulting tenant
+        var ourTerritory = move.fromHex.territory;
+        var ourTenant:Tenant = Simulator.getUpgradedTenant(move);
+        if(!ourTenant){
+            console.log("Move would result in an invalid tenant")
+            return false;
+        }
+        if(ourTenant == Tenant.Tower && ourTerritory != move.toHex.territory){
+            console.log("Can't place tower outside of our territory")
+            return false;
+        }
+        if(ourTenant == Tenant.Tower && move.toHex.tenant != Tenant.TreePalm && move.toHex.tenant != Tenant.TreePine){
+            console.log("Can't place tower on top of another unit")
+            return false;
+        }
+        //validate cost of adding/upgradeing tenant
+        var homeHex:Hex;
+        if(move.newTenant){
+            homeHex = homeHex || Simulator.getHomeHex(this.board, move.fromHex.territory);
+            //Do we have a home hex?
+            if(!homeHex){
+                console.log("Could not find homeHex for fromHex territory")
                 return false;
             }
-            if (move.toHex.team !== move.team) {
-                // New pieces can only go into our territory
-                console.log("New pieces must land in our territory first");
-                return false;
-            }
-            if (this.computeMoveCost(move) > ((this.getHomeHex(move)||{})['money']||0)) {
-                // We cannot afford this move
+            //can we afford the unit?
+            if(homeHex.money||0 < Simulator.tenantCost(move.newTenant)){
                 console.log("Move is too expensive");
                 return false;
             }
-            ourTerritory = move.toHex.territory;
-        } else {
-            if (move.fromHex.team !== move.team) {
-                // we cannot move others' pieces
-                console.log("We cannot move others' pieces")
-                return false;
-            }
         }
-
         // If this move is to a territory that isn't our own, we need to ensure the target hex
         // is adjacent to one of this territory.
         if (ourTerritory !== move.toHex.territory) {
-            let lst = hexops.allNeighbors(this.board, move.toHex)
-                .filter((maybeOurHex)=> maybeOurHex.territory===ourTerritory)
+            let adjacentHex = hexops.allNeighbors(this.board, move.toHex)
+                .filter((maybeOurHex)=> maybeOurHex.territory===ourTerritory)[0]
             // We don't own any adjacent territory
-            if(lst.length === 0) {
+            if(!adjacentHex) {
                 console.log("We cannot move to a new territory unless the hex is adjacent to our territory");
                 return false;
             }
         }
-
-        // If we don't have a new entity, we need to see if it can still move this turn
-        if (move.fromHex && !this.canMove(move.fromHex)) {
-            console.log("This entity cannot move this turn");
+        //validate we are not moving on top of friendly building
+        if(ourTerritory == move.toHex.territory &&
+          move.toHex.tenant &&
+          (move.toHex.tenant == Tenant.Tower || move.toHex.tenant == Tenant.House)){
+            console.log("The target hex is occupied by a friendly building");
             return false;
         }
-
-        // Find the tenant
-        let ourTenant:Tenant = move.fromHex && move.fromHex.tenant || move.newTenant;
-
-        // If it's not mobile, the hex must be empty & ours, full stop
-        if (!this.isMobileUnit(ourTenant)) {
-            if (move.toHex.territory !== ourTerritory) {
-                console.log("This entity is not mobile, so it cannot go outside of our territory");
-                return false;
-            }
-            if (move.toHex.tenant) {
-                console.log("This entity is not mobile, so it cannot go where another entity is");
-                return false;
-            }
-        }
-
-        // If the target hex is occupied and we are trying to move a unit, there are three scenarios:
-        if (move.toHex.tenant) {
-            // 0. It is occupied by a tree. Fuck trees.
-            if (move.toHex.tenant !== Tenant.TreePalm && move.toHex.tenant !== Tenant.TreePine) {
-                // 1. It is occupied by a friendly building and we cannot move there
-                if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
-                    !this.isMobileUnit(move.toHex.tenant)) {
-                    console.log("The target hex is occupied by a friendly building");
-                    return false;
-                }
-                // 2. It is occupied by a friendly unit and we might be able to combine
-                if (move.toHex.territory === ourTerritory && this.isMobileUnit(ourTenant) &&
-                    this.isMobileUnit(move.toHex.tenant)) {
-                    let newTenant = Simulator.getUpgradedTenant(move);
-                    if (newTenant === null) {
-                        console.log("The target hex is occupied by a friendly unit but we cannot combine");
-                        return false;
-                    }
-                }
-            }
-        }
-
         // Occupied by (or adjacent to) an enemy or neutral building or unit - we need to check combat values
-        if(move.toHex.team !== move.team && !this.canDefeat(ourTenant, move.toHex)) {
+        if(move.toHex.team !== move.fromHex.team && !this.canDefeat(ourTenant, move.toHex)) {
             console.log("The target hex is occupied by an enemy building and we cannot beat it");
             return false;
         }
-
         return true;
     }
 
