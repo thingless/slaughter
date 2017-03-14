@@ -111,15 +111,6 @@ export class Simulator {
         return 0;
     }
 
-    private computeMoveCost(move:Move):number {
-        // This is an existing entity, so it is free
-        if (move.fromHex)
-            return 0;
-        if (!move.newTenant)
-            throw "Invalid move for computeMoveCost";
-        return Simulator.tenantCost(move.newTenant)
-    }
-
     public static combineTenants(tenant1:Tenant, tenant2:Tenant):Tenant{
         if(!tenant1 || !tenant2 ||
            !Simulator.isMobileUnit(tenant1) ||
@@ -155,11 +146,6 @@ export class Simulator {
     public static getHomeHex(board:Board, territory:number){
         // TODO: don't just search the whole board lol
         return board.filter((hex)=>hex.territory === territory && hex.tenant === Tenant.House)[0] || null;
-    }
-    public getHomeHex(move:Move):Hex {
-        // Find the hex of the house of the **player's** relevant territory for this move.
-        let territory = move.fromHex && move.fromHex.territory || move.toHex.territory;
-        return Simulator.getHomeHex(this.board, territory)
     }
 
     public static isMobileUnit(tenant:Tenant):boolean {
@@ -241,7 +227,7 @@ export class Simulator {
                 return false;
             }
             //can we afford the unit?
-            if(homeHex.money||0 < Simulator.tenantCost(move.newTenant)){
+            if((homeHex.money||0) < Simulator.tenantCost(move.newTenant)){
                 console.log("Move is too expensive");
                 return false;
             }
@@ -502,61 +488,45 @@ export class Simulator {
         //if the team is > 500 and this is an aimove then its simply a pass/mock move
         if(isAIMove && move.team > 500)
             return true;
-        // Update the board based on a move
         // Make sure the move is legal
         if (!this.isMoveLegal(move))
             return false;
         // save hex's current tenant
         let oldTenant:Tenant = move.toHex && move.toHex.tenant;
-
-        // Find out who we're moving
-        let ourTenant:Tenant = move.fromHex && move.fromHex.tenant || move.newTenant;
-
         // Find out which territory we're talking about
-        let ourTerritory:number = move.fromHex && move.fromHex.territory || move.toHex.territory;
-
+        let ourTerritory:number = move.fromHex && move.fromHex.territory;
         // Find out how much the move cost
-        let moveCost:number = this.computeMoveCost(move);
-
+        let moveCost:number = Simulator.tenantCost(move.newTenant);
         // If there's a friendly mob there, combine them
-        if (move.toHex.team === move.team && move.toHex.tenant) {
-            let upgradedTenant = Simulator.getUpgradedTenant(move);
-            if (upgradedTenant) {
-                ourTenant = upgradedTenant;
-            }
-        }
-        // If this is an ai move and its not a new unit we can not move (significantly reduces game tree)
-        else if(isAIMove && !move.newTenant){
-            move.toHex.canMove = false
-        }
+        let ourTenant:Tenant = Simulator.getUpgradedTenant(move);
+        //store old team for later
+         let oldTeam = move.toHex.team;
 
-        // Remove the tenant from the old hex
-        if(move.fromHex) {
+        // Remove the tenant from the old hex if its mobile
+        if(Simulator.canMove(move.fromHex)) {
             move.fromHex.tenant = null;
         }
-
         // Compute if they can still move - if territories changed, they cannot move again this turn
         if (move.toHex.territory !== ourTerritory) {
+            move.toHex.canMove = false;
+        }
+        // If this is an ai move and its not to combine we can not move (significantly reduces game tree)
+        if(isAIMove && !move.toHex.tenant){
             move.toHex.canMove = false;
         }
         //if its to a tree we cant move
         if (this.isTree(move.toHex.tenant)) {
             move.toHex.canMove = false;
         }
-
-
         // Add them to the new hex
-        move.toHex.tenant = ourTenant;
-
-        let oldTeam = move.toHex.team;
-
         // The new hex now belongs to our team and is in our territory
+        move.toHex.tenant = ourTenant;
         move.toHex.team = move.team;
         move.toHex.territory = ourTerritory;
 
         // Subtract money from our house
         if (moveCost > 0) {
-            this.getHomeHex(move).money -= moveCost;
+            Simulator.getHomeHex(this.board, move.fromHex.territory).money -= moveCost;
         }
 
         // If there was a house on this territory, it's gone - remove its money
@@ -575,4 +545,5 @@ export class Simulator {
         return true;
     }
 }
+
 

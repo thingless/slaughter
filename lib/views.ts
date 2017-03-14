@@ -375,7 +375,7 @@ export class BuildMenu extends Backbone.View<Game> {
                 this.model.currentMove.fromHex.tenant = upgradedTenant;
             }
         } else {
-            this.model.currentMove = new Move(this.model.currentTeam, null, null, tenant);
+            this.model.currentMove = new Move(this.model.currentTeam, null, homeHex, tenant);
         }
         homeHex.money -= cost;
     }
